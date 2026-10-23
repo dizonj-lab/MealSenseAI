@@ -74,6 +74,14 @@ with sync_playwright() as p:
     page.get_by_role("button", name="Confirm & save meal").click()
     expect(page.get_by_text("Meal saved to your history")).to_be_visible()
     shot(page, "08_saved_meal")
+    # forecast & what-if: add a second scenario and check cautions render
+    expect(page.get_by_text("Forecast & what-if analysis")).to_be_visible(timeout=15000)
+    page.get_by_role("button", name="Run hard right after").click()
+    expect(page.get_by_text("Scenario 2:")).to_be_visible(timeout=15000)
+    expect(page.get_by_text("within 15 min of eating").first).to_be_visible()
+    page.get_by_text("Forecast & what-if analysis").scroll_into_view_if_needed()
+    page.wait_for_timeout(500)
+    shot(page, "08b_forecast")
 
     page.get_by_role("link", name="History").click()
     expect(page.get_by_text("Kaya toast with butter").first).to_be_visible()

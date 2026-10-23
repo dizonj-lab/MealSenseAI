@@ -44,6 +44,20 @@ cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000
 Training pipeline (`ml/training/`, see its README): validation → label harmonisation → pre-processing → augmentation →
 balancing → stratified 70/15/15 split → transfer learning → evaluation (accuracy, P/R/F1, confusion matrix, top-5) → ONNX export.
 
+## Post-meal forecast & what-if (educational)
+Each analysed meal includes:
+- A **meal advisory** checked against WHO sugar and sodium guidance, glycaemic load and HPB My Healthy Plate.
+- A **5-hour forecast** for an office day with no workout.
+- Up to **3 what-if scenarios**: activity (walking, cycling, rowing, running, swimming, badminton, stairs, resistance training), moderate or high intensity, start time after the meal, and duration.
+
+How it works (`backend/app/services/forecast.py`):
+- **Energy:** E = MET × kg × h (Ainsworth 2011 Compendium).
+- **Fuel use:** carbohydrate oxidation from the crossover concept.
+- **Glucose:** a one-compartment mass balance, dG/dt = Ra − k·G − U_ex, with saturating muscle uptake.
+- **Safety:** timing and diabetes cautions with peer-reviewed citations (ADA 2016, Riddell 2017, Reynolds 2016, de Oliveira 2011, Marliss 2002, and others).
+
+Glucose is shown as a **relative index**, never mmol/L: it is not a personal glucose prediction.
+
 ## Honest scope
 - Scores are raw model outputs, **not calibrated**; the UI labels them strong / moderate / weak.
 - The COCO detector only knows 10 foods. Hawker dishes therefore depend on the fine-tuned classifier and on its training classes.

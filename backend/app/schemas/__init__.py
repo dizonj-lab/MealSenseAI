@@ -143,3 +143,15 @@ class DaySummary(BaseModel):
 class HistoryOut(BaseModel):
     meals: list[MealSummary]
     days: list[DaySummary]
+
+
+class Scenario(BaseModel):
+    activity: Literal["light_walk", "brisk_walk", "stairs", "cycling", "rowing", "swimming", "running", "badminton", "resistance"]
+    intensity: Literal["moderate", "high"] = "moderate"
+    start_min: int = Field(default=15, ge=0, le=240, description="Minutes after the meal")
+    duration_min: int = Field(default=20, ge=5, le=180)
+
+
+class ForecastIn(BaseModel):
+    scenarios: list[Scenario] = Field(default_factory=list, max_length=4)
+    horizon_min: int = Field(default=300, ge=120, le=480)

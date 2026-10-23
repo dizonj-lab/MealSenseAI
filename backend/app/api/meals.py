@@ -12,8 +12,8 @@ from app.core.config import settings
 from app.core.db import get_db
 from app.core.security import current_user
 from app.models import Correction, Meal, MealFood, User
-from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, HistoryOut, MealOut
-from app.services import analysis, imaging, nutrition, portion
+from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut
+from app.services import analysis, forecast, imaging, nutrition, portion
 
 router = APIRouter(prefix="/meals", tags=["meals"])
 
@@ -118,6 +118,15 @@ def get_image(view: str, original: bool = False, meal: Meal = Depends(owned_meal
     if not path:
         raise HTTPException(404, "Image not found")
     return FileResponse(path)
+
+
+@router.post("/{meal_id}/forecast", summary="Educational post-meal forecast and what-if activity scenarios")
+def meal_forecast(body: ForecastIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user)):
+    foods = [analysis.food_dict(f) for f in meal.foods if not f.removed and f.nutrition_key]
+    if not foods:
+        raise HTTPException(422, "Add at least one food with a nutrition match first")
+    return forecast.forecast(foods, meal.totals, meal.insights, user.profile,
+                             [s.model_dump() for s in body.scenarios], body.horizon_min)
 
 
 @router.put("/{meal_id}/confirm", response_model=MealOut)

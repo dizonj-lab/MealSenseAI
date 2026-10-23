@@ -4,6 +4,7 @@ import { api, fmt } from '../lib/api'
 import { useAuthImage } from '../lib/hooks'
 import type { Food, Meal } from '../lib/types'
 import FoodPicker from './FoodPicker'
+import Forecast from './Forecast'
 import { Card, ErrorNote, LevelBadge, Progress, Spinner } from './ui'
 
 const ORIGIN: Record<string, string> = { model: 'AI recognised', description: 'From description', manual: 'Added by you', slm: 'SLM suggestion' }
@@ -182,6 +183,7 @@ export default function MealReview({ meal, onChange, onSaved, readOnly = false }
         </div>
       </div>
       <InsightCards meal={meal} />
+      {(meal.totals?.calories_kcal ?? 0) > 0 && <Forecast mealId={meal.id} version={meal.insights?.generated_at ?? ''} />}
       {!readOnly && <div className="card p-4 flex flex-col sm:flex-row gap-3 sm:items-center">
         <div className="flex gap-1.5 flex-wrap">{['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
           <button key={m} onClick={() => setMealType(m)} className={`chip px-3 py-1.5 capitalize border ${mealType === m ? 'bg-brand-600 text-white border-brand-600' : 'bg-white border-slate-200 text-slate-600'}`}>{m}</button>))}</div>

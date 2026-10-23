@@ -20,6 +20,7 @@ export type Insights = {
   recommendations: { tag: string; title: string; detail: string }[]
   allergy_warnings: string[]
   explanation: { text: string | null; source: string }
+  generated_at?: string
 }
 export type Meal = {
   id: number; status: string; meal_type: string | null; description: string | null; reference_object: string | null; serving_note: string | null
