@@ -10,12 +10,13 @@ export default function ModelInsights() {
   if (!d) return <div className="grid place-items-center py-20"><Spinner /></div>
   return (
     <div className="space-y-4">
-      <div className="grid lg:grid-cols-2 gap-4">
+      <div className="grid lg:grid-cols-3 gap-4">
         {d.vision.models.map((m: any) => (
           <Card key={m.name} title={m.name} icon={<Cpu className="size-5 text-brand-600" />} action={<span className={`chip ${d.vision.available ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>{d.vision.available ? 'Active' : 'Unavailable'}</span>}>
-            <Row k="Task" v={m.task} /><Row k="Version" v={m.version} /><Row k="Trained on" v={m.trained_on} /><Row k="Food classes mapped" v={m.food_classes} />
+            <Row k="Pipeline stage" v={m.stage} /><Row k="Task" v={m.task} /><Row k="Version" v={m.version} /><Row k="Trained on" v={m.trained_on} /><Row k="Food classes" v={m.food_classes} />
             <Row k="Inferences" v={m.latency.count} /><Row k="Latency avg / p95" v={m.latency.count ? `${m.latency.avg_ms} / ${m.latency.p95_ms} ms` : '—'} />
-            <Row k="Scores calibrated" v="No (raw scores shown qualitatively)" /><Row k="Accuracy" v={<span className="text-amber-700">Not measured</span>} />
+            <Row k="Scores calibrated" v="No (raw scores shown qualitatively)" />
+            <Row k="Accuracy" v={m.test_metrics ? <span className="text-emerald-700">{m.accuracy}</span> : <span className="text-amber-700">{m.accuracy}</span>} />
           </Card>))}
       </div>
       <div className="grid lg:grid-cols-2 gap-4">

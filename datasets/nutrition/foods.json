@@ -964,6 +964,37 @@
    "verification": "transcribed_unverified"
   },
   {
+   "key": "sushi",
+   "name": "Sushi (nigiri / maki, mixed)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 145,
+    "carbs_g": 28.0,
+    "protein_g": 5.8,
+    "fat_g": 0.9,
+    "sugar_g": 3.5,
+    "fiber_g": 0.8,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 200,
+   "serving_desc": "8 pieces",
+   "glycemic_index": 52,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "fish",
+    "soy"
+   ],
+   "aliases": [
+    "sushi",
+    "maki",
+    "nigiri"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
    "key": "beef_steak",
    "name": "Beef steak (sirloin), cooked",
    "category": "protein",

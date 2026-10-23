@@ -38,33 +38,38 @@ def user_entered(grams: float) -> dict:
             "notes": ["Portion entered by user; accuracy depends on how it was measured."]}
 
 
-def estimate(food: dict, *, bbox=None, containers=None, reference_object=None, n_views=1,
-             note: str | None = None, servings: float = 1.0) -> tuple[float, dict]:
+def estimate(food: dict, *, bbox=None, area_frac=None, containers=None, reference_object=None, n_views=1,
+             note: str | None = None, servings: float = 1.0, instances: int = 1, has_mask: bool = False) -> tuple[float, dict]:
     base = food["default_serving_g"]
     mult, hint = size_hint(note)
     mult *= servings
     notes = [f"Typical serving prior: {base} g ({food['serving_desc']})."]
     level, method = "high", "typical_serving"
+    if instances > 1:
+        mult *= instances
+        notes.append(f"{instances} separate instances detected; counted as {instances} servings.")
 
     ref = reference_object if reference_object in TYPICAL_FILL else None
     container = None
     if bbox and ref:
-        want = "bowl" if ref == "rice_bowl" else "dining table"
-        cands = [c for c in (containers or []) if c["label"] in (want, "bowl")]
-        container = max(cands, key=lambda c: c["bbox"]["w"] * c["bbox"]["h"], default=None)
+        want = {"bowl"} if ref == "rice_bowl" else {"dining table", "bowl"}
+        container = max((c for c in (containers or []) if c["label"] in want),
+                        key=lambda c: c.get("area_frac") or c["bbox"]["w"] * c["bbox"]["h"], default=None)
     if container:
-        ratio = (bbox["w"] * bbox["h"]) / max(container["bbox"]["w"] * container["bbox"]["h"], 1e-6)
+        food_area = area_frac if area_frac is not None else bbox["w"] * bbox["h"]
+        cont_area = container.get("area_frac") or container["bbox"]["w"] * container["bbox"]["h"]
+        ratio = food_area / max(cont_area, 1e-6)
         factor = max(0.5, min(2.0, ratio / TYPICAL_FILL[ref]))
         mult *= factor
-        level, method = "medium", "reference_area_ratio"
-        notes.append(f"Food covers ~{ratio:.0%} of the detected {container['label']} "
+        level, method = "medium", "mask_area_ratio" if has_mask else "box_area_ratio"
+        notes.append(f"Food {'mask' if has_mask else 'box'} covers ~{ratio:.0%} of the detected {container['label']} "
                      f"({REFERENCE_OBJECTS[ref]}); scaled serving by {factor:.2f}× (area only, thickness unknown).")
     elif ref:
         notes.append("Reference object selected but not located by the detector; area scaling skipped.")
     if hint:
         notes.append(f"Applied {hint} (×{mult:.2f} total).")
     if n_views > 1:
-        notes.append("Second view used for visual review only; no depth/volume reconstruction is performed.")
+        notes.append("Second view used for detection and review only; no depth/volume reconstruction is performed.")
     notes.append("Photos without a calibrated scale cannot measure volume — please correct grams if known.")
     grams = round(base * mult)
     return grams, {"method": method, **_band(grams, level), "notes": notes}

@@ -44,15 +44,19 @@ def test_real_model_inference_on_photo(client, auth):
                     files={"top": ("coffee.png", (FIX / "coffee.png").read_bytes(), "image/png")})
     assert r.status_code == 201, r.text
     meal = client.post(f"{API}/meals/analyze", json={"meal_id": r.json()["id"]}, headers=auth).json()
-    rec = next(s for s in meal["stages"] if s["key"] == "recognize")
+    keys = [s["key"] for s in meal["stages"]]
+    assert keys == ["capture", "preprocess", "detect", "classify", "portion", "nutrition", "aggregate",
+                    "contextualise", "recommend", "output"]
+    rec = next(s for s in meal["stages"] if s["key"] == "classify")
     top = rec["per_view"][0]["top_labels"]
-    assert top and rec["per_view"][0]["latency_ms"]["classifier"] > 0
+    assert top and rec["latency_ms"] > 0
     print("top labels:", top)
     labels = [f["original_prediction"]["model_label"] for f in meal["foods"] if f["origin"] == "model"]
     assert "espresso" in labels  # verified pretrained ImageNet class on the skimage 'coffee' photo
     f = next(f for f in meal["foods"] if f["original_prediction"]["model_label"] == "espresso")
     assert f["original_prediction"]["score_type"].startswith("raw")
     assert f["nutrition_source"]["source"]
+    assert client.get(f"{API}/meals/{meal['id']}/images/top_overlay", headers=auth).status_code == 200
 
 
 def test_unsupported_image_then_manual_and_corrections(client, auth):
@@ -67,7 +71,7 @@ def test_unsupported_image_then_manual_and_corrections(client, auth):
     keys = {f["nutrition_key"] for f in meal["foods"]}
     assert {"nasi_lemak", "teh_tarik"} <= keys
     assert not any(f["origin"] == "model" for f in meal["foods"])  # blank image -> no fabricated recognition
-    assert next(s for s in meal["stages"] if s["key"] == "recognize")["status"] == "unsupported"
+    assert next(s for s in meal["stages"] if s["key"] == "classify")["status"] == "unsupported"
     nl = next(f for f in meal["foods"] if f["nutrition_key"] == "nasi_lemak")
     assert nl["grams"] == 260 and nl["portion"]["uncertainty"] == "high"
     assert abs(nl["nutrients"]["calories_kcal"] - 494.0) < 0.5
@@ -129,6 +133,12 @@ def test_portion_reference_scaling():
     ref = nutrition.get("white_rice")
     g, p = portion.estimate(ref, bbox={"x": 0, "y": 0, "w": 0.5, "h": 0.5}, reference_object="rice_bowl",
                             containers=[{"label": "bowl", "score": 0.9, "bbox": {"x": 0, "y": 0, "w": 0.5, "h": 0.5}}])
-    assert p["method"] == "reference_area_ratio" and p["uncertainty"] == "medium" and g > ref["default_serving_g"]
+    assert p["method"] == "box_area_ratio" and p["uncertainty"] == "medium" and g > ref["default_serving_g"]
+    g, p = portion.estimate(ref, bbox={"x": 0, "y": 0, "w": 0.5, "h": 0.5}, area_frac=0.11, has_mask=True,
+                            reference_object="rice_bowl",
+                            containers=[{"label": "bowl", "score": 0.9, "area_frac": 0.2, "bbox": {"x": 0, "y": 0, "w": 0.5, "h": 0.5}}])
+    assert p["method"] == "mask_area_ratio" and g == ref["default_serving_g"]  # 0.11/0.2 = 0.55 = typical fill
+    g, _ = portion.estimate(nutrition.get("banana"), instances=2)
+    assert g == 2 * nutrition.get("banana")["default_serving_g"]
     g, p = portion.estimate(ref, note="2 bowls")
     assert g == 2 * ref["default_serving_g"] and p["uncertainty"] == "high"

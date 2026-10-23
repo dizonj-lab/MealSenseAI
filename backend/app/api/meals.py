@@ -55,11 +55,17 @@ async def capture(top: UploadFile | None = File(None), side: UploadFile | None =
         raise HTTPException(422, str(e))
     meal.images = images
     warn = [w for im in images for w in im["warnings"]]
-    meal.stages = [{"key": "preprocess", "name": "Image validation & preprocessing", "status": "done",
-                    "detail": (f"{len(images)} image(s) validated, orientation corrected, resized ≤1024 px; "
-                               "originals retained." if images else "No photo provided; description only.")
-                              + (" Warnings: " + "; ".join(warn) if warn else ""),
-                    "latency_ms": round((time.perf_counter() - t0) * 1000, 1)}]
+    capture_ms = round((time.perf_counter() - t0) * 1000, 1)
+    views = ", ".join(im["view"] for im in images) or "none"
+    meal.stages = [
+        {"key": "capture", "name": "Meal capture", "status": "done", "latency_ms": capture_ms,
+         "detail": f"Photos: {views}" + ("; description provided" if meal.description else "")
+                   + (f"; reference: {portion.REFERENCE_OBJECTS[reference_object]}" if reference_object else "")},
+        {"key": "preprocess", "name": "Image pre-processing", "status": "done" if images else "skipped",
+         "latency_ms": capture_ms,
+         "detail": (f"{len(images)} image(s) validated, orientation corrected, converted to RGB, resized ≤1024 px "
+                    "(models normalise internally); originals retained." if images else "No photo provided.")
+                   + (" Warnings: " + "; ".join(warn) if warn else "")}]
     db.commit()
     db.refresh(meal)
     return meal
@@ -106,10 +112,12 @@ def get_meal(meal: Meal = Depends(owned_meal)):
 
 @router.get("/{meal_id}/images/{view}", response_class=FileResponse)
 def get_image(view: str, original: bool = False, meal: Meal = Depends(owned_meal)):
-    im = next((i for i in meal.images if i["view"] == view), None)
-    if not im:
+    overlay = view.endswith("_overlay")
+    im = next((i for i in meal.images if i["view"] == view.removesuffix("_overlay")), None)
+    path = im and (im.get("overlay_path") if overlay else im["original_path"] if original else im["path"])
+    if not path:
         raise HTTPException(404, "Image not found")
-    return FileResponse(im["original_path"] if original else im["path"])
+    return FileResponse(path)
 
 
 @router.put("/{meal_id}/confirm", response_model=MealOut)

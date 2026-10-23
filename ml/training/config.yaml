@@ -1,0 +1,55 @@
+# MealSenseAI dataset pre-processing & training configuration (see README.md for the stage map)
+dataset:
+  name: mealsense-food
+  version: "0.1"
+  sources:            # 1. Data sources — folder-per-class layouts; class = image's parent folder name
+    - name: food101
+      path: datasets/raw/food-101/images
+      version: "1.0"
+      license: "Food-101 (research use)"
+    - name: foodsg233
+      path: datasets/raw/foodsg-233
+      version: "1.0"
+      license: "FoodSG-233 (request from authors)"
+    - name: own
+      path: datasets/raw/own_images
+      version: "0.1"
+      license: "project-owned"
+  class_map: ml/training/class_map.json   # 3. label harmonisation + nutrition keys
+  min_side_px: 64                          # 2. validation
+  allowed_formats: [JPEG, PNG, WEBP, MPO]
+  near_duplicate_hamming: 4                # dHash distance treated as duplicate (0 disables)
+  mvp:                                     # 3. MVP class selection
+    max_classes: 30
+    min_images_per_class: 30
+  preprocess:                              # 4. image pre-processing (stored once)
+    short_side_px: 256                     # resize keeping aspect ratio; 224 crop happens at train time
+    trim_borders: true
+    jpeg_quality: 95
+  split: {train: 0.70, val: 0.15, test: 0.15, seed: 42}   # 7. stratified split
+  output_dir: datasets/processed
+
+train:
+  backbone: efficientnet_b0                # 8. ImageNet-pretrained CNN (timm)
+  backbone_weights_url: https://github.com/huggingface/pytorch-image-models/releases/download/v0.1-weights/efficientnet_b0_ra-3dd342df.pth
+  image_size: 224
+  normalize: {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}   # ImageNet mean/std
+  augmentation:                            # 5. train set only
+    rotation_deg: 20
+    hflip: true
+    random_resized_crop_scale: [0.7, 1.0]
+    brightness: 0.2
+    contrast: 0.2
+    saturation: 0.2
+    hue: 0.02
+  balancing: weighted_sampler              # 6. weighted_sampler | class_weights | oversample | none
+  batch_size: 32
+  epochs_head: 3                           # frozen backbone, train classifier head
+  epochs_finetune: 5                       # unfreeze last blocks
+  lr_head: 0.001
+  lr_finetune: 0.0002
+  weight_decay: 0.0001
+  label_smoothing: 0.1
+  early_stopping_patience: 3
+  num_workers: 2
+  export_dir: ml/models/food_classifier    # ONNX + labels + model card picked up by the app

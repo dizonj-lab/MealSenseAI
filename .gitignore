@@ -1,5 +1,6 @@
-.venv/
-node_modules/
+.venv
+.venv-train
+node_modules
 frontend/dist/
 data/
 data_server.log
@@ -11,3 +12,8 @@ frontend/*.tsbuildinfo
 datasets/food-101/
 datasets/foodsg/
 ml/models/*.tflite
+datasets/raw/
+datasets/processed/
+ml/models/*.pt
+ml/models/*.onnx
+ml/runs/

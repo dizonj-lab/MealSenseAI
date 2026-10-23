@@ -7,8 +7,10 @@ import MealReview from '../components/MealReview'
 import { Card, ErrorNote } from '../components/ui'
 
 const STAGES = [
-  ['preprocess', 'Image validation & preprocessing'], ['recognize', 'Food detection & classification'], ['portion', 'Portion estimation'],
-  ['nutrition', 'Nutrition mapping'], ['aggregate', 'Meal aggregation'], ['insights', 'Review & insights'],
+  ['capture', 'Meal capture'], ['preprocess', 'Image pre-processing'], ['detect', 'Food instance detection'],
+  ['classify', 'Food classification'], ['portion', 'Portion estimation'], ['nutrition', 'Nutrition mapping'],
+  ['aggregate', 'Meal aggregation'], ['contextualise', 'AI contextualisation'], ['recommend', 'Recommendations'],
+  ['output', 'Application output'],
 ] as const
 const REFS: [string, string][] = [['none', 'None'], ['dinner_plate', 'Dinner plate'], ['rice_bowl', 'Rice bowl'], ['credit_card', 'Credit card'], ['hand', 'Hand']]
 
@@ -43,7 +45,7 @@ function StageList({ stages, running }: { stages: Stage[]; running: number }) {
     <ol className="space-y-2.5">
       {STAGES.map(([key, name], i) => {
         const s = stages.find(x => x.key === key)
-        const icon = s ? (s.status === 'done' ? <CheckCircle2 className="size-5 text-emerald-600" /> : s.status === 'unsupported' ? <XCircle className="size-5 text-amber-500" /> : <CircleDashed className="size-5 text-slate-400" />)
+        const icon = s ? (s.status === 'done' ? <CheckCircle2 className="size-5 text-emerald-600" /> : s.status === 'unsupported' || s.status === 'fallback' ? <XCircle className="size-5 text-amber-500" /> : <CircleDashed className="size-5 text-slate-400" />)
           : i === running ? <Loader2 className="size-5 text-brand-600 animate-spin" /> : <CircleDashed className="size-5 text-slate-300" />
         return (
           <li key={key} className="flex gap-3">
@@ -53,7 +55,9 @@ function StageList({ stages, running }: { stages: Stage[]; running: number }) {
                 {s && <span className="text-xs text-slate-400 shrink-0">{s.latency_ms} ms</span>}</div>
               {s && <p className="text-xs text-slate-500 mt-0.5">{s.detail}</p>}
               {s?.per_view?.map(v => v.top_labels?.length > 0 && (
-                <p key={v.view} className="text-[11px] text-slate-400 mt-0.5">{v.view} view top-5: {v.top_labels.map((t: any) => `${t.label} ${t.score.toFixed(2)}`).join(', ')}</p>))}
+                <p key={v.view} className="text-[11px] text-slate-400 mt-0.5">{v.view} view, whole-image top-5: {v.top_labels.map((t: any) => `${t.label} ${t.score.toFixed(2)}`).join(', ')}</p>))}
+              {s?.per_view?.map(v => v.instances?.length > 0 && (
+                <p key={v.view + 'i'} className="text-[11px] text-slate-400 mt-0.5">{v.view} view instances: {v.instances.map((i: any) => `${i.label} (${i.kind}, ${(i.area_frac * 100).toFixed(0)}% of image${i.food ? ` → ${i.food.label}` : ''})`).join('; ')}</p>))}
             </div>
           </li>)
       })}
@@ -85,9 +89,9 @@ export default function Capture() {
       if (ref !== 'none') fd.append('reference_object', ref)
       if (note.trim()) fd.append('serving_note', note.trim())
       const captured = await api<Meal>('/meals/capture', { method: 'POST', body: fd })
-      setStages(captured.stages); setRunning(1)
-      // stages 2–6 run server-side in one request; advance the indicator while waiting
-      timer = window.setInterval(() => setRunning(r => Math.min(r + 1, 5)), 700)
+      setStages(captured.stages); setRunning(2)
+      // stages 3–10 run server-side in one request; advance the indicator while waiting
+      timer = window.setInterval(() => setRunning(r => Math.min(r + 1, 9)), 500)
       const analyzed = await api<Meal>('/meals/analyze', { method: 'POST', json: { meal_id: captured.id } })
       setStages(analyzed.stages); setMeal(analyzed)
       setTimeout(() => reviewRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)

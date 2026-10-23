@@ -13,16 +13,14 @@ const MAPQ: Record<string, [string, string]> = {
 }
 const UNC: Record<string, string> = { low: 'text-emerald-700', medium: 'text-amber-700', high: 'text-rose-700', unknown: 'text-slate-500' }
 
-function MealImage({ mealId, view, foods }: { mealId: number; view: string; foods: Food[] }) {
-  const url = useAuthImage(`/api/v1/meals/${mealId}/images/${view}`)
-  const boxes = foods.filter(f => !f.removed && f.original_prediction?.bbox && f.original_prediction?.view === view)
+function MealImage({ mealId, view, hasOverlay }: { mealId: number; view: string; hasOverlay: boolean }) {
+  const [showMasks, setShowMasks] = useState(hasOverlay)
+  const url = useAuthImage(`/api/v1/meals/${mealId}/images/${view}${showMasks ? '_overlay' : ''}`)
   return (
-    <figure className="relative rounded-xl overflow-hidden bg-slate-100 aspect-[4/3]">
-      {url ? <img src={url} className="absolute inset-0 size-full object-cover" alt={`${view} view`} /> : <div className="absolute inset-0 grid place-items-center"><Spinner /></div>}
-      {boxes.map(f => { const b = f.original_prediction.bbox; return (
-        <div key={f.id} className="absolute border-2 border-teal-400 rounded-md" style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }}>
-          <span className="absolute -top-0.5 left-0 -translate-y-full bg-teal-500 text-white text-[10px] px-1.5 py-0.5 rounded">{f.label}</span></div>) })}
+    <figure className="relative rounded-xl overflow-hidden bg-slate-100">
+      {url ? <img src={url} className="w-full h-auto block" alt={`${view} view`} /> : <div className="aspect-[4/3] grid place-items-center"><Spinner /></div>}
       <figcaption className="absolute bottom-2 left-2 chip bg-black/50 text-white capitalize">{view === 'top' ? 'Top view' : 'Side view'}</figcaption>
+      {hasOverlay && <button onClick={() => setShowMasks(m => !m)} className="absolute bottom-2 right-2 chip bg-white/90 text-slate-700 shadow">{showMasks ? 'Hide' : 'Show'} detections</button>}
     </figure>
   )
 }
@@ -55,8 +53,10 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
         {busy && <Spinner className="size-4" />}
       </div>
 
-      {pred?.model_label && <div className="mt-3 text-xs rounded-lg bg-slate-50 px-3 py-2 text-slate-600">
-        <b>{pred.model_name}</b> predicted “{pred.model_label}” · {pred.score_band} signal (raw score {pred.score.toFixed(2)}, uncalibrated){pred.views?.length > 1 && ' · seen in both views'}
+      {pred?.model_label && <div className="mt-3 text-xs rounded-lg bg-slate-50 px-3 py-2 text-slate-600 space-y-0.5">
+        <div><b>{pred.model_name}</b> predicted “{pred.model_label}” · {pred.score_band} signal (raw score {pred.score.toFixed(2)}, uncalibrated){pred.views?.length > 1 && ' · seen in both views'}</div>
+        {pred.instance && <div className="text-slate-500">Instance: {pred.instance === 'scene' ? 'whole image' : `${pred.detector_label} (${pred.has_mask ? 'mask' : 'box'}, ${(pred.area_frac * 100).toFixed(0)}% of photo)`}{pred.instances > 1 && ` · ×${pred.instances}`}</div>}
+        {pred.classifier_top?.length > 0 && <div className="text-slate-500">Classifier top-3: {pred.classifier_top.map((t: any) => `${t.label} ${t.score.toFixed(2)}`).join(', ')}</div>}
       </div>}
       {pred?.description_text && <div className="mt-3 text-xs rounded-lg bg-slate-50 px-3 py-2 text-slate-600">From your description: “{pred.description_text}” ({pred.parser})</div>}
 
@@ -164,7 +164,7 @@ export default function MealReview({ meal, onChange, onSaved, readOnly = false }
       <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-4 items-start">
         <div className="space-y-3 lg:sticky lg:top-20">
           {meal.images.length > 0 ? <div className={`grid gap-3 ${meal.images.length > 1 ? 'grid-cols-2 lg:grid-cols-1' : ''}`}>
-            {meal.images.map(im => <MealImage key={im.view} mealId={meal.id} view={im.view} foods={meal.foods} />)}</div>
+            {meal.images.map(im => <MealImage key={im.view} mealId={meal.id} view={im.view} hasOverlay={!!im.overlay_path} />)}</div>
             : <div className="card p-4 text-sm text-slate-500">No photo — analysed from description.</div>}
           <div className="card p-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Meal total · {t.item_count} item(s) · ~{fmt(t.grams)} g</div>

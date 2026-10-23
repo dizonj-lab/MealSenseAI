@@ -36,9 +36,10 @@ def models(user: User = Depends(current_user), db: Session = Depends(get_db)):
                           .where(InferenceLog.model_version == "ollama")).one()
     return {
         "vision": {"available": v["available"], "error": v["error"],
-                   "models": [{**m, "latency": _latency(db, m["name"]),
-                               "score_calibrated": False,
-                               "accuracy": "not measured — see Experiments (requires labeled data)"}
+                   "models": [{**m, "latency": _latency(db, m["name"]), "score_calibrated": False,
+                               "accuracy": (f"test accuracy {m['test_metrics']['accuracy']:.3f}, macro-F1 "
+                                            f"{m['test_metrics']['macro_f1']:.3f} (held-out split)")
+                               if m.get("test_metrics") else "not measured on food data"}
                               for m in v["models"].values()]},
         "slm": {**s, "role": "text-only: label normalisation, provisional matches, explanations",
                 "calls": slm_rows[0], "avg_latency_ms": round(slm_rows[1] or 0, 1), "tokens": int(slm_rows[2] or 0),

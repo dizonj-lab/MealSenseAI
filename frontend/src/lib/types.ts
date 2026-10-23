@@ -23,7 +23,7 @@ export type Insights = {
 }
 export type Meal = {
   id: number; status: string; meal_type: string | null; description: string | null; reference_object: string | null; serving_note: string | null
-  images: { view: string; warnings: string[]; processed_size: number[] }[]
+  images: { view: string; warnings: string[]; processed_size: number[]; overlay_path?: string | null }[]
   totals: Nutrients & { grams: number; item_count: number; incomplete_nutrients: string[]; unmapped_items: string[] }
   insights: Insights; model_info: any; stages: Stage[]; eaten_at: string; created_at: string; foods: Food[]
 }

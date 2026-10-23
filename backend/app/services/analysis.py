@@ -1,11 +1,27 @@
-"""Orchestrates stages 2–6 and recomputation after user corrections."""
+"""Inference pipeline orchestrator, aligned with the solution-architecture diagram:
+
+ 1 Meal capture            (capture endpoint)
+ 2 Image pre-processing    (capture endpoint)
+ 3 Food instance detection (YOLO11n-seg masks / EfficientDet boxes)
+ 4 Food classification     (per-instance crops: fine-tuned classifier or ImageNet fallback)
+ 5 Portion estimation
+ 6 Nutrition mapping
+ 7 Meal aggregation
+ 8 AI contextualisation    (local SLM, grounded in computed numbers + user goals)
+ 9 Recommendations
+10 Application output      (persisted meal returned to the UI for review/correction)
+"""
 import re
 import time
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
 from app.models import InferenceLog, Meal, MealFood
 from app.services import insights, nutrition, portion, slm, vision
+
+UNKNOWN_PORTION = {"method": "unknown", "uncertainty": "unknown", "range_g": None,
+                   "notes": ["No nutrition match; choose a food from the table and enter the portion."]}
 
 
 def food_dict(f: MealFood) -> dict:
@@ -46,34 +62,62 @@ def _provisional(label: str) -> str | None:
     return res.key if res and nutrition.get(res.key) else None
 
 
-def run(db: Session, meal: Meal, profile) -> list[dict]:
-    stages = [s for s in meal.stages if s["key"] == "preprocess"]
-    t0 = time.perf_counter()
-    results = []
-    for im in meal.images:
-        r = vision.analyze(im["path"], im["view"])
-        results.append(r)
-        if r["ok"]:
-            for task, model in (("classifier", vision.MODELS["classifier"]), ("detector", vision.MODELS["detector"])):
-                db.add(InferenceLog(meal_id=meal.id, model_name=model["name"], model_version=model["version"],
-                                    task=model["task"], latency_ms=r["latency_ms"][task],
-                                    extra={"view": im["view"], "food_hits": sum(1 for i in r["items"] if i["model"] == task)}))
-    preds = vision.merge(results)
-    vstat = vision.status()
-    detail = (f"{len(preds)} food item(s) recognised" if preds else
-              "No food from the models' vocabulary was recognised. Add foods manually or via description.")
-    if not vstat["available"]:
-        detail = f"Vision models unavailable ({vstat['error']}). Manual entry enabled."
-    stages.append({"key": "recognize", "name": "Food detection & classification",
-                   "status": "done" if preds else "unsupported", "detail": detail,
-                   "latency_ms": round((time.perf_counter() - t0) * 1000, 1),
-                   "per_view": [{"view": r["view"], "top_labels": r.get("top_labels", []),
-                                 "latency_ms": r.get("latency_ms"), "containers": r.get("containers", [])}
-                                for r in results]})
+class _Stages:
+    def __init__(self, existing: list[dict]):
+        self.items = [s for s in existing if s["key"] in ("capture", "preprocess")]
+        self.t = time.perf_counter()
 
-    # Stage 3 + 4: create food items, estimate portions, map nutrition
-    t1 = time.perf_counter()
-    for f in list(meal.foods):  # re-analysis replaces prior auto items
+    def add(self, key, name, status, detail, **extra):
+        now = time.perf_counter()
+        self.items.append({"key": key, "name": name, "status": status, "detail": detail,
+                           "latency_ms": round((now - self.t) * 1000, 1), **extra})
+        self.t = now
+
+
+def run(db: Session, meal: Meal, profile) -> list[dict]:
+    st = _Stages(meal.stages)
+    vstat = vision.status()
+    mods = vstat["models"]
+
+    # 3 + 4: detection and classification (run together per image; latencies reported separately)
+    results = [vision.analyze(im["path"], im["view"]) for im in meal.images]
+    meal.images = [{**im, "overlay_path": r.get("overlay_path")} for im, r in zip(meal.images, results)]
+    for im, r in zip(meal.images, results):
+        if not r["ok"]:
+            continue
+        for role, task in (("detector", "detector"), ("classifier", "classifier")):
+            m = mods.get(role) or mods.get("classifier_imagenet")
+            db.add(InferenceLog(meal_id=meal.id, model_name=m["name"], model_version=m["version"], task=m["task"],
+                                latency_ms=r["latency_ms"][task], extra={"view": im["view"]}))
+    preds = vision.merge(results)
+    det_ms = sum(r.get("latency_ms", {}).get("detector", 0) for r in results)
+    cls_ms = sum(r.get("latency_ms", {}).get("classifier", 0) for r in results)
+    n_inst = sum(1 for r in results for i in r.get("instances", []) if i["kind"] in ("food", "container"))
+    det_name = mods.get("detector", {}).get("name", "unavailable")
+    cls_name = (mods.get("classifier") or mods.get("classifier_imagenet") or {}).get("name", "unavailable")
+    if not meal.images:
+        st.add("detect", "Food instance detection", "skipped", "No photo provided.")
+        st.add("classify", "Food classification", "skipped", "No photo provided.")
+    elif not vstat["available"]:
+        st.add("detect", "Food instance detection", "unsupported", f"Vision models unavailable ({vstat['error']}).")
+        st.add("classify", "Food classification", "unsupported", "Manual entry enabled.")
+    else:
+        st.items.append({"key": "detect", "name": "Food instance detection", "status": "done",
+                         "detail": f"{det_name}: {n_inst} food/dish instance(s) segmented"
+                                   + ("" if n_inst else " — whole image used as one region"),
+                         "latency_ms": det_ms,
+                         "per_view": [{"view": r["view"], "instances": r.get("instances", [])} for r in results]})
+        st.items.append({"key": "classify", "name": "Food classification",
+                         "status": "done" if preds else "unsupported",
+                         "detail": (f"{cls_name}: {len(preds)} food(s) identified" if preds else
+                                    f"{cls_name}: no food in the model vocabulary recognised. Add foods manually "
+                                    "or via the description."),
+                         "latency_ms": cls_ms,
+                         "per_view": [{"view": r["view"], "top_labels": r.get("top_labels", [])} for r in results]})
+        st.t = time.perf_counter()
+
+    # 5: portion estimation (+ create items)
+    for f in list(meal.foods):  # re-analysis replaces previous automatic items
         if f.origin in ("model", "description") and not f.user_corrected:
             meal.foods.remove(f)
     containers = {r["view"]: r.get("containers", []) for r in results}
@@ -89,15 +133,16 @@ def run(db: Session, meal: Meal, profile) -> list[dict]:
             key, quality = pk, "provisional"
         ref = nutrition.get(key)
         if ref:
-            grams, pinfo = portion.estimate(ref, bbox=p["bbox"], containers=containers.get(p["view"]),
-                                            reference_object=meal.reference_object, n_views=n_views,
-                                            note=meal.serving_note)
+            grams, pinfo = portion.estimate(ref, bbox=p["bbox"], area_frac=p.get("area_frac"),
+                                            containers=containers.get(p["view"]), reference_object=meal.reference_object,
+                                            n_views=n_views, note=meal.serving_note, instances=p["instances"],
+                                            has_mask=p.get("has_mask", False))
         else:
-            grams, pinfo = 0, {"method": "unknown", "uncertainty": "unknown", "range_g": None,
-                               "notes": ["No nutrition match; enter food and portion manually."]}
-        pred = {k: p[k] for k in ("model_label", "nutrition_key", "score", "bbox", "model", "view", "views")}
-        pred.update(model_name=vision.MODELS[p["model"]]["name"], score_band=vision.score_band(p["score"]),
-                    score_type="raw model score (uncalibrated)", evidence=p["evidence"])
+            grams, pinfo = 0, dict(UNKNOWN_PORTION)
+        pred = {k: p.get(k) for k in ("model_label", "nutrition_key", "score", "bbox", "model", "model_name", "view",
+                                       "views", "instance", "detector_label", "detector_score", "classifier_top",
+                                       "area_frac", "has_mask", "instances")}
+        pred.update(score_band=vision.score_band(p["score"]), score_type="raw model score (uncalibrated)")
         f = MealFood(origin="model", label=label, grams=grams, portion=pinfo, original_prediction=pred)
         apply_mapping(f, key, quality)
         meal.foods.append(f)
@@ -110,43 +155,52 @@ def run(db: Session, meal: Meal, profile) -> list[dict]:
             key, quality = nutrition.lookup(name)
             if not key and (pk := _provisional(name)):
                 key, quality = pk, "provisional"
-            if key in seen and key:
+            if key and key in seen:
                 continue
             ref = nutrition.get(key)
             if ref:
                 grams, pinfo = portion.estimate(ref, n_views=n_views, servings=servings, note=meal.serving_note)
             else:
-                grams, pinfo = 0, {"method": "unknown", "uncertainty": "unknown", "range_g": None,
-                                   "notes": ["No nutrition match; choose a food from the table."]}
+                grams, pinfo = 0, dict(UNKNOWN_PORTION)
             f = MealFood(origin="description", label=ref["name"] if ref else name, grams=grams, portion=pinfo,
                          original_prediction={"description_text": name, "parser": desc_source, "servings": servings})
             apply_mapping(f, key, quality)
             meal.foods.append(f)
             seen.add(key)
     active = [f for f in meal.foods if not f.removed]
-    stages.append({"key": "portion", "name": "Portion estimation", "status": "done" if active else "skipped",
-                   "detail": "Typical-serving priors with uncertainty bands; area scaling only when a reference "
-                             "container is detected. Volume is not measured.",
-                   "latency_ms": round((time.perf_counter() - t1) * 1000, 1)})
+    methods = sorted({f.portion.get("method") for f in active})
+    st.add("portion", "Portion estimation", "done" if active else "skipped",
+           f"Methods: {', '.join(methods) or '—'}. Typical-serving priors with uncertainty bands; mask/box area scaling "
+           "only when a reference container is detected. Volume is not measured.")
+
+    # 6: nutrition mapping (performed per item above, reported here)
     mapped = sum(1 for f in active if f.nutrition_key)
-    stages.append({"key": "nutrition", "name": "Nutrition mapping",
-                   "status": "done" if active else "skipped",
-                   "detail": f"{mapped}/{len(active)} item(s) matched to reference table {nutrition.version()}"
-                             + (f"; description parsed by {desc_source}" if desc_source else ""),
-                   "latency_ms": 0.0})
-    t2 = time.perf_counter()
-    recompute(meal, profile)
-    stages.append({"key": "aggregate", "name": "Meal aggregation", "status": "done",
-                   "detail": f"{meal.totals['calories_kcal'] or 0} kcal across {meal.totals['item_count']} item(s)",
-                   "latency_ms": 0.0})
-    stages.append({"key": "insights", "name": "Review & insights", "status": "done",
-                   "detail": "Explanation by " + (meal.insights["explanation"]["source"]
-                                                  if meal.insights["explanation"]["text"] else
-                                                  "rule-based engine (SLM offline)"),
-                   "latency_ms": round((time.perf_counter() - t2) * 1000, 1)})
-    meal.model_info = {"vision": {k: {kk: v[kk] for kk in ("name", "version", "trained_on")}
-                                  for k, v in vision.MODELS.items()} if vstat["available"] else None,
+    st.add("nutrition", "Nutrition mapping", "done" if active else "skipped",
+           f"{mapped}/{len(active)} item(s) matched to reference table {nutrition.version()}"
+           + (f"; description parsed by {desc_source}" if desc_source else ""))
+
+    # 7 + 9: aggregation, assessments, recommendations (deterministic)
+    foods = [food_dict(f) for f in active]
+    meal.totals, ins = insights.core(foods, profile)
+    st.add("aggregate", "Meal aggregation", "done",
+           f"{meal.totals['calories_kcal'] or 0} kcal · {meal.totals['carbs_g'] or 0} g carbs across "
+           f"{meal.totals['item_count']} item(s)")
+    # 8: AI contextualisation
+    ins["explanation"] = insights.contextualise(foods, meal.totals, ins, profile)
+    st.add("contextualise", "AI contextualisation", "done" if ins["explanation"]["text"] else "fallback",
+           f"Explanation by {ins['explanation']['source'].replace('slm:', 'local SLM ')}" if ins["explanation"]["text"]
+           else "Local SLM offline — composition-grounded rule engine used.")
+    st.items.append({"key": "recommend", "name": "Recommendations", "status": "done",
+                     "detail": f"{len(ins['recommendations'])} recommendation(s), glucose impact {ins['glucose']['level']}",
+                     "latency_ms": 0.0})
+    ins["generated_at"] = datetime.now(timezone.utc).isoformat()
+    meal.insights = ins
+
+    # 10: application output
+    meal.model_info = {"vision": {k: {kk: v[kk] for kk in ("name", "version", "trained_on", "task")}
+                                  for k, v in mods.items()} if vstat["available"] else None,
                        "slm": slm.status()["selected"], "nutrition_table": nutrition.version()}
-    meal.stages = stages
+    st.add("output", "Application output", "done", "Results ready for your review and correction.")
+    meal.stages = st.items
     meal.status = "analyzed"
-    return stages
+    return st.items

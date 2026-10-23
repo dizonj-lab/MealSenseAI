@@ -17,11 +17,34 @@ from app.services import slm, vision
 logging.basicConfig(level=logging.INFO)
 
 
+def register_trained_model():
+    """Record the active fine-tuned classifier's held-out test metrics as an Experiment (once per version)."""
+    import json
+    from app.core.db import SessionLocal
+    from app.models import Experiment
+    card_path = settings.models_dir / "food_classifier" / "model_card.json"
+    if not card_path.exists():
+        return
+    card = json.loads(card_path.read_text())
+    name = f"{card['name']}@{card['version']}"
+    with SessionLocal() as db:
+        if db.query(Experiment).filter(Experiment.name == name).first():
+            return
+        m = card["test_metrics"]
+        db.add(Experiment(name=name, model_name=card["name"], dataset=f"{card['dataset']['name']} "
+                          f"({'+'.join(card['dataset']['sources'])}, hash {card['dataset']['hash'][:12]})",
+                          n_samples=m["n_samples"], has_ground_truth=True,
+                          metrics={k: v for k, v in m.items() if k not in ("confusion_matrix",)},
+                          notes="Held-out test split from ml/training/prepare_dataset.py"))
+        db.commit()
+
+
 @asynccontextmanager
 async def lifespan(_app):
     Base.metadata.create_all(engine)
     settings.data_dir.mkdir(parents=True, exist_ok=True)
     vision.status()  # warm models
+    register_trained_model()
     yield
     vision.close()
 

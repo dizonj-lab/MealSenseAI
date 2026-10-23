@@ -50,6 +50,7 @@ ROWS = [
  ("custard_apple","Custard apple","fruit",101,25.2,1.7,0.6,None,2.4,4,100,"1/2 fruit",None,False,[],["custard apple","sugar apple"],"generic"),
  ("chicken_breast","Chicken breast, grilled","protein",165,0.0,31.0,3.6,0.0,0.0,74,120,"1 piece",None,False,[],["chicken","grilled chicken","chicken breast"],"generic"),
  ("salmon","Salmon, cooked","protein",206,0.0,22.0,12.4,0.0,0.0,61,120,"1 fillet",None,False,["fish"],["salmon","fish"],"generic"),
+ ("sushi","Sushi (nigiri / maki, mixed)","mixed",145,28.0,5.8,0.9,3.5,0.8,450,200,"8 pieces",52,True,["fish","soy"],["sushi","maki","nigiri"],"generic"),
  ("beef_steak","Beef steak (sirloin), cooked","protein",201,0.0,29.0,9.5,0.0,0.0,60,150,"1 steak",None,False,[],["steak","beef"],"generic"),
  ("tofu","Tofu, firm","protein",144,2.8,17.3,8.7,0.6,2.3,14,120,"1/2 cup",None,False,["soy"],["tofu","beancurd","tauhu"],"generic"),
  ("fried_egg","Egg, fried","protein",196,0.8,13.6,14.8,0.4,0.0,207,46,"1 egg",None,False,["egg"],["fried egg","egg"],"generic"),

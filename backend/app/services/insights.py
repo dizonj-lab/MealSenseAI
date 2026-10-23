@@ -157,19 +157,29 @@ def allergy_warnings(foods: list[dict], profile) -> list[str]:
     return out
 
 
-def build(foods: list[dict], profile, use_slm: bool = True) -> tuple[dict, dict]:
+def core(foods: list[dict], profile) -> tuple[dict, dict]:
+    """Stages 7 and 9: aggregation, glucose/energy assessment and rule-based recommendations."""
     t = totals(foods)
     g = glucose(foods, t)
-    e = energy(t, profile)
-    recs = recommendations(foods, t, g, profile)
-    explanation = {"text": None, "source": "none"}
-    if use_slm and foods:
-        facts = {"foods": [{"name": f["label"], "grams": f["grams"]} for f in foods],
-                 "totals": {k: t[k] for k in nutrition.NUTRIENTS}, "glucose_level": g["level"],
-                 "glycemic_load": g["glycemic_load"], "portion_uncertainty": "photo-based estimates, ±35–50%"}
-        res = slm.explain(facts)
-        if res:
-            explanation = {"text": res.summary, "source": f"slm:{slm.status()['selected']}"}
-    return t, {"glucose": g, "energy": e, "recommendations": recs,
-               "allergy_warnings": allergy_warnings(foods, profile), "explanation": explanation,
-               "generated_at": datetime.now(timezone.utc).isoformat()}
+    return t, {"glucose": g, "energy": energy(t, profile), "recommendations": recommendations(foods, t, g, profile),
+               "allergy_warnings": allergy_warnings(foods, profile)}
+
+
+def contextualise(foods: list[dict], t: dict, ins: dict, profile) -> dict:
+    """Stage 8: SLM explanation grounded in the computed numbers and the user's stated goals."""
+    if not foods:
+        return {"text": None, "source": "none"}
+    facts = {"foods": [{"name": f["label"], "grams": f["grams"]} for f in foods],
+             "totals": {k: t[k] for k in nutrition.NUTRIENTS}, "glucose_level": ins["glucose"]["level"],
+             "glycemic_load": ins["glucose"]["glycemic_load"], "portion_uncertainty": "photo-based estimates, ±35–50%",
+             "user_goals": list(profile.goals or []) if profile else [],
+             "recommendations": [r["title"] for r in ins["recommendations"]]}
+    res = slm.explain(facts)
+    return {"text": res.summary, "source": f"slm:{slm.status()['selected']}"} if res else {"text": None, "source": "none"}
+
+
+def build(foods: list[dict], profile, use_slm: bool = True) -> tuple[dict, dict]:
+    t, ins = core(foods, profile)
+    ins["explanation"] = contextualise(foods, t, ins, profile) if use_slm else {"text": None, "source": "none"}
+    ins["generated_at"] = datetime.now(timezone.utc).isoformat()
+    return t, ins

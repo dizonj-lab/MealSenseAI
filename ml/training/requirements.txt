@@ -1,0 +1,11 @@
+torch
+torchvision
+timm
+onnx
+onnxruntime
+ultralytics
+pillow
+pillow-heif
+numpy
+matplotlib
+pyyaml
