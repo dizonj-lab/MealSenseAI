@@ -1,0 +1,8 @@
+[Unit]
+Description=MealSenseAI encrypted backup
+Wants=network-online.target docker.service
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/mealsense/backup.sh

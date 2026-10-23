@@ -1,0 +1,10 @@
+[Unit]
+Description=Nightly MealSenseAI backup
+
+[Timer]
+OnCalendar=*-*-* 03:15
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

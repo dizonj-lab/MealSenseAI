@@ -1,4 +1,5 @@
 import shutil
+from pathlib import Path
 import time
 from datetime import date, datetime, timedelta, timezone
 
@@ -115,7 +116,7 @@ def get_image(view: str, original: bool = False, meal: Meal = Depends(owned_meal
     overlay = view.endswith("_overlay")
     im = next((i for i in meal.images if i["view"] == view.removesuffix("_overlay")), None)
     path = im and (im.get("overlay_path") if overlay else im["original_path"] if original else im["path"])
-    if not path:
+    if not path or not Path(path).is_file():
         raise HTTPException(404, "Image not found")
     return FileResponse(path)
 

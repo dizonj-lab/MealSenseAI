@@ -1,0 +1,62 @@
+# Home-server override: no ports exposed to the network, public access only through Cloudflare Tunnel.
+#   docker compose -f docker-compose.yml -f docker-compose.home.yml up -d --build
+#   (infrastructure/home-server/setup.sh writes COMPOSE_FILE into .env so plain `docker compose` uses both files)
+x-hardening: &hardening
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
+  pids_limit: 512
+  logging: { driver: json-file, options: { max-size: "10m", max-file: "5" } }
+
+services:
+  proxy:
+    <<: *hardening
+    cap_add: [CHOWN, SETUID, SETGID, NET_BIND_SERVICE]     # nginx master drops to the nginx user
+    ports: !override ["127.0.0.1:${HTTP_PORT:-8080}:80"]   # loopback only: Docker bypasses UFW for published ports
+    read_only: true
+    tmpfs: [/var/cache/nginx, /var/run, /tmp]
+    networks: [edge, internal]
+    mem_limit: 256m
+
+  app:
+    <<: *hardening
+    networks: [internal]
+    mem_limit: 4g
+    cpus: ${APP_CPUS:-4}                   # raise on the home server, e.g. 8
+
+  db:
+    <<: *hardening
+    cap_add: [CHOWN, SETUID, SETGID, FOWNER, DAC_OVERRIDE]
+    networks: [internal]
+    mem_limit: 2g
+
+  redis:
+    <<: *hardening
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]   # entrypoint re-chowns /data on restart
+    networks: [internal]
+    mem_limit: 512m
+
+  cloudflared:                       # outbound-only tunnel to Cloudflare; no inbound ports on your router
+    <<: *hardening
+    image: cloudflare/cloudflared:2025.10.0
+    command: ["tunnel", "--no-autoupdate", "--metrics", "0.0.0.0:2000", "run"]
+    environment: { TUNNEL_TOKEN: "${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env}" }
+    read_only: true
+    networks: [edge]
+    depends_on: { proxy: { condition: service_healthy } }
+    restart: unless-stopped
+    mem_limit: 256m
+
+  ollama:                            # local SLM on the RTX GPU (profile slm); set OLLAMA_URL=http://ollama:11434
+    networks: [internal, model_egress]
+    deploy:
+      resources:
+        reservations:
+          devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
+
+  ollama-pull:
+    networks: [model_egress]
+
+networks:
+  edge: {}                           # cloudflared <-> nginx only
+  internal: { internal: true }       # app, db, redis, ollama: no internet egress, unreachable from other projects
+  model_egress: {}                   # only ollama / ollama-pull, to download models

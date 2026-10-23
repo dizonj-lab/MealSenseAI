@@ -28,6 +28,8 @@ from common import ROOT, dataset_dir, load_config, resolve, write_json
 from evaluate import evaluate_split
 
 torch.manual_seed(42)
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+AMP = DEVICE.type == "cuda"  # mixed precision on NVIDIA GPUs
 
 
 class ManifestDataset(Dataset):
@@ -95,8 +97,10 @@ def run_epoch(model, loader, loss_fn, opt=None):
     tot, correct, n = 0.0, 0, 0
     with torch.set_grad_enabled(train):
         for x, y in loader:
-            out = model(x)
-            loss = loss_fn(out, y)
+            x, y = x.to(DEVICE, non_blocking=True), y.to(DEVICE, non_blocking=True)
+            with torch.autocast(DEVICE.type, dtype=torch.bfloat16, enabled=AMP):
+                out = model(x)
+                loss = loss_fn(out, y)
             if train:
                 opt.zero_grad()
                 loss.backward()
@@ -112,7 +116,7 @@ def macro_f1(model, loader, n_classes):
     ys, ps = [], []
     with torch.no_grad():
         for x, y in loader:
-            ps += model(x).argmax(1).tolist()
+            ps += model(x.to(DEVICE)).argmax(1).tolist()
             ys += y.tolist()
     f1s = []
     for c in range(n_classes):
@@ -150,11 +154,14 @@ def main():
         mx = counts.max()
         train_ds.rows = [r for c in range(n) for r in
                          (lambda rs: (rs * math.ceil(mx / max(len(rs), 1)))[:mx])([r for r in train_ds.rows if r[1] == c])]
-    train_dl = DataLoader(train_ds, t["batch_size"], shuffle=sampler is None, sampler=sampler, num_workers=t["num_workers"])
-    val_dl = DataLoader(val_ds, t["batch_size"], num_workers=t["num_workers"])
+    pin = DEVICE.type == "cuda"
+    train_dl = DataLoader(train_ds, t["batch_size"], shuffle=sampler is None, sampler=sampler,
+                          num_workers=t["num_workers"], pin_memory=pin, persistent_workers=t["num_workers"] > 0)
+    val_dl = DataLoader(val_ds, t["batch_size"], num_workers=t["num_workers"], pin_memory=pin)
 
-    model = backbone(cfg, n)
-    loss_fn = nn.CrossEntropyLoss(weight=loss_w, label_smoothing=t["label_smoothing"])
+    model = backbone(cfg, n).to(DEVICE)
+    print(f"[train] device={DEVICE}{' (bf16 autocast)' if AMP else ''}")
+    loss_fn = nn.CrossEntropyLoss(weight=loss_w.to(DEVICE) if loss_w is not None else None, label_smoothing=t["label_smoothing"])
     run_dir = ROOT / "ml/runs" / time.strftime("%Y%m%d-%H%M%S")
     run_dir.mkdir(parents=True)
     history, best, best_f1, bad = [], run_dir / "best.pt", -1.0, 0
@@ -180,10 +187,11 @@ def main():
                 if bad >= t["early_stopping_patience"]:
                     print("[train] early stopping")
                     break
-    model.load_state_dict(torch.load(best))
+    model.load_state_dict(torch.load(best, map_location=DEVICE))
     model.eval()
 
     # 9. evaluation on held-out test split
+    model = model.cpu()  # evaluate latency and export on CPU, matching the app's runtime
     metrics = evaluate_split(model, root, "test.csv", ev_tf, classes, run_dir)
 
     # export for the app (onnxruntime, no torch needed at inference)
