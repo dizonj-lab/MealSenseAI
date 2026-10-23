@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+sqlalchemy>=2
+psycopg[binary]
+redis
+pydantic-settings
+email-validator
+bcrypt
+python-jose[cryptography]
+python-multipart
+pillow
+pillow-heif
+numpy
+mediapipe
+httpx
+pytest

@@ -1,0 +1,2323 @@
+{
+ "version": "mvp-0.1",
+ "foods": [
+  {
+   "key": "white_rice",
+   "name": "White rice, steamed",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 130,
+    "carbs_g": 28.2,
+    "protein_g": 2.7,
+    "fat_g": 0.3,
+    "sugar_g": 0.1,
+    "fiber_g": 0.4,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 158,
+   "serving_desc": "1 cup",
+   "glycemic_index": 73,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "rice",
+    "steamed rice",
+    "plain rice"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "brown_rice",
+   "name": "Brown rice, cooked",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 123,
+    "carbs_g": 25.6,
+    "protein_g": 2.7,
+    "fat_g": 1.0,
+    "sugar_g": 0.4,
+    "fiber_g": 1.6,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 195,
+   "serving_desc": "1 cup",
+   "glycemic_index": 68,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "brown rice"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "white_bread",
+   "name": "White bread",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 265,
+    "carbs_g": 49.0,
+    "protein_g": 9.0,
+    "fat_g": 3.2,
+    "sugar_g": 5.0,
+    "fiber_g": 2.7,
+    "sodium_mg": 490
+   },
+   "default_serving_g": 30,
+   "serving_desc": "1 slice",
+   "glycemic_index": 75,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "bread",
+    "toast",
+    "white toast"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "french_bread",
+   "name": "French bread / baguette",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 274,
+    "carbs_g": 52.0,
+    "protein_g": 11.0,
+    "fat_g": 3.0,
+    "sugar_g": 5.0,
+    "fiber_g": 2.2,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 64,
+   "serving_desc": "1 piece (~15 cm)",
+   "glycemic_index": 75,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "baguette",
+    "french loaf"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "bagel",
+   "name": "Bagel, plain",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 250,
+    "carbs_g": 48.9,
+    "protein_g": 10.0,
+    "fat_g": 1.5,
+    "sugar_g": 6.0,
+    "fiber_g": 2.1,
+    "sodium_mg": 439
+   },
+   "default_serving_g": 105,
+   "serving_desc": "1 bagel",
+   "glycemic_index": 72,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "bagel"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "pretzel",
+   "name": "Soft pretzel, salted",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 338,
+    "carbs_g": 69.0,
+    "protein_g": 8.0,
+    "fat_g": 3.1,
+    "sugar_g": 4.0,
+    "fiber_g": 1.7,
+    "sodium_mg": 1100
+   },
+   "default_serving_g": 115,
+   "serving_desc": "1 pretzel",
+   "glycemic_index": 83,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "pretzel"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "pasta",
+   "name": "Pasta / spaghetti, cooked",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 158,
+    "carbs_g": 31.0,
+    "protein_g": 5.8,
+    "fat_g": 0.9,
+    "sugar_g": 0.6,
+    "fiber_g": 1.8,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 140,
+   "serving_desc": "1 cup",
+   "glycemic_index": 49,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "spaghetti",
+    "pasta",
+    "macaroni"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "egg_noodles",
+   "name": "Egg noodles, cooked",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 138,
+    "carbs_g": 25.0,
+    "protein_g": 4.5,
+    "fat_g": 2.1,
+    "sugar_g": 0.4,
+    "fiber_g": 1.2,
+    "sodium_mg": 5
+   },
+   "default_serving_g": 160,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "noodles",
+    "mee",
+    "egg noodle"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "oatmeal",
+   "name": "Oatmeal (porridge, water)",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 71,
+    "carbs_g": 12.0,
+    "protein_g": 2.5,
+    "fat_g": 1.5,
+    "sugar_g": 0.3,
+    "fiber_g": 1.7,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 234,
+   "serving_desc": "1 cup",
+   "glycemic_index": 55,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "oats",
+    "porridge",
+    "oatmeal"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "corn",
+   "name": "Sweet corn, cooked",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 96,
+    "carbs_g": 21.0,
+    "protein_g": 3.4,
+    "fat_g": 1.5,
+    "sugar_g": 4.5,
+    "fiber_g": 2.4,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 ear",
+   "glycemic_index": 52,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "corn",
+    "sweet corn",
+    "corn on the cob"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "french_fries",
+   "name": "French fries",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 312,
+    "carbs_g": 41.0,
+    "protein_g": 3.4,
+    "fat_g": 15.0,
+    "sugar_g": 0.3,
+    "fiber_g": 3.8,
+    "sodium_mg": 210
+   },
+   "default_serving_g": 117,
+   "serving_desc": "1 medium serving",
+   "glycemic_index": 63,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "fries",
+    "chips",
+    "french fries"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "mashed_potato",
+   "name": "Mashed potato (milk, butter)",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 113,
+    "carbs_g": 17.0,
+    "protein_g": 1.9,
+    "fat_g": 4.2,
+    "sugar_g": 1.5,
+    "fiber_g": 1.5,
+    "sodium_mg": 330
+   },
+   "default_serving_g": 210,
+   "serving_desc": "1 cup",
+   "glycemic_index": 78,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "mashed potato",
+    "mashed potatoes"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "broccoli",
+   "name": "Broccoli, cooked",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 35,
+    "carbs_g": 7.2,
+    "protein_g": 2.4,
+    "fat_g": 0.4,
+    "sugar_g": 1.4,
+    "fiber_g": 3.3,
+    "sodium_mg": 41
+   },
+   "default_serving_g": 90,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "broccoli"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "cauliflower",
+   "name": "Cauliflower, cooked",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 23,
+    "carbs_g": 4.1,
+    "protein_g": 1.8,
+    "fat_g": 0.5,
+    "sugar_g": 2.1,
+    "fiber_g": 2.3,
+    "sodium_mg": 15
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "cauliflower"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "cabbage",
+   "name": "Cabbage, raw",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 25,
+    "carbs_g": 5.8,
+    "protein_g": 1.3,
+    "fat_g": 0.1,
+    "sugar_g": 3.2,
+    "fiber_g": 2.5,
+    "sodium_mg": 18
+   },
+   "default_serving_g": 90,
+   "serving_desc": "1 cup shredded",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "cabbage",
+    "head cabbage"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "cucumber",
+   "name": "Cucumber",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 15,
+    "carbs_g": 3.6,
+    "protein_g": 0.7,
+    "fat_g": 0.1,
+    "sugar_g": 1.7,
+    "fiber_g": 0.5,
+    "sodium_mg": 2
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1/3 cucumber",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "cucumber"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "bell_pepper",
+   "name": "Bell pepper",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 31,
+    "carbs_g": 6.0,
+    "protein_g": 1.0,
+    "fat_g": 0.3,
+    "sugar_g": 4.2,
+    "fiber_g": 2.1,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 medium",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "capsicum",
+    "bell pepper"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "mushroom",
+   "name": "Mushrooms",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 22,
+    "carbs_g": 3.3,
+    "protein_g": 3.1,
+    "fat_g": 0.3,
+    "sugar_g": 2.0,
+    "fiber_g": 1.0,
+    "sodium_mg": 5
+   },
+   "default_serving_g": 70,
+   "serving_desc": "1 cup sliced",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "mushroom",
+    "mushrooms"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "zucchini",
+   "name": "Zucchini",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 17,
+    "carbs_g": 3.1,
+    "protein_g": 1.2,
+    "fat_g": 0.3,
+    "sugar_g": 2.5,
+    "fiber_g": 1.0,
+    "sodium_mg": 8
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "zucchini",
+    "courgette"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "butternut_squash",
+   "name": "Squash (butternut), cooked",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 40,
+    "carbs_g": 10.5,
+    "protein_g": 0.9,
+    "fat_g": 0.1,
+    "sugar_g": 2.2,
+    "fiber_g": 3.2,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 205,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "squash",
+    "pumpkin",
+    "butternut"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "carrot",
+   "name": "Carrot",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 41,
+    "carbs_g": 9.6,
+    "protein_g": 0.9,
+    "fat_g": 0.2,
+    "sugar_g": 4.7,
+    "fiber_g": 2.8,
+    "sodium_mg": 69
+   },
+   "default_serving_g": 61,
+   "serving_desc": "1 medium",
+   "glycemic_index": 39,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "carrot",
+    "carrots"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "artichoke",
+   "name": "Artichoke, cooked",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 53,
+    "carbs_g": 12.0,
+    "protein_g": 2.9,
+    "fat_g": 0.3,
+    "sugar_g": 1.0,
+    "fiber_g": 8.6,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 medium",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "artichoke"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "green_salad",
+   "name": "Mixed green salad (no dressing)",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 17,
+    "carbs_g": 3.3,
+    "protein_g": 1.2,
+    "fat_g": 0.2,
+    "sugar_g": 1.2,
+    "fiber_g": 1.8,
+    "sodium_mg": 28
+   },
+   "default_serving_g": 85,
+   "serving_desc": "1.5 cups",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "salad",
+    "green salad",
+    "lettuce",
+    "greens",
+    "vegetables"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "apple",
+   "name": "Apple",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 52,
+    "carbs_g": 13.8,
+    "protein_g": 0.3,
+    "fat_g": 0.2,
+    "sugar_g": 10.4,
+    "fiber_g": 2.4,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 182,
+   "serving_desc": "1 medium",
+   "glycemic_index": 36,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "apple",
+    "granny smith"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "banana",
+   "name": "Banana",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 89,
+    "carbs_g": 22.8,
+    "protein_g": 1.1,
+    "fat_g": 0.3,
+    "sugar_g": 12.2,
+    "fiber_g": 2.6,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 118,
+   "serving_desc": "1 medium",
+   "glycemic_index": 51,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "banana"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "orange",
+   "name": "Orange",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 47,
+    "carbs_g": 11.8,
+    "protein_g": 0.9,
+    "fat_g": 0.1,
+    "sugar_g": 9.4,
+    "fiber_g": 2.4,
+    "sodium_mg": 0
+   },
+   "default_serving_g": 131,
+   "serving_desc": "1 medium",
+   "glycemic_index": 43,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "orange"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "strawberry",
+   "name": "Strawberries",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 32,
+    "carbs_g": 7.7,
+    "protein_g": 0.7,
+    "fat_g": 0.3,
+    "sugar_g": 4.9,
+    "fiber_g": 2.0,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 cup",
+   "glycemic_index": 40,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "strawberry",
+    "strawberries"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "pineapple",
+   "name": "Pineapple",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 50,
+    "carbs_g": 13.1,
+    "protein_g": 0.5,
+    "fat_g": 0.1,
+    "sugar_g": 9.9,
+    "fiber_g": 1.4,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 165,
+   "serving_desc": "1 cup chunks",
+   "glycemic_index": 59,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "pineapple"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "lemon",
+   "name": "Lemon",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 29,
+    "carbs_g": 9.3,
+    "protein_g": 1.1,
+    "fat_g": 0.3,
+    "sugar_g": 2.5,
+    "fiber_g": 2.8,
+    "sodium_mg": 2
+   },
+   "default_serving_g": 58,
+   "serving_desc": "1 lemon",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "lemon",
+    "lime"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "pomegranate",
+   "name": "Pomegranate arils",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 83,
+    "carbs_g": 18.7,
+    "protein_g": 1.7,
+    "fat_g": 1.2,
+    "sugar_g": 13.7,
+    "fiber_g": 4.0,
+    "sodium_mg": 3
+   },
+   "default_serving_g": 87,
+   "serving_desc": "1/2 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "pomegranate"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "fig",
+   "name": "Fig, fresh",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 74,
+    "carbs_g": 19.2,
+    "protein_g": 0.8,
+    "fat_g": 0.3,
+    "sugar_g": 16.3,
+    "fiber_g": 2.9,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 50,
+   "serving_desc": "1 medium",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "fig"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "jackfruit",
+   "name": "Jackfruit",
+   "category": "fruit",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 95,
+    "carbs_g": 23.2,
+    "protein_g": 1.7,
+    "fat_g": 0.6,
+    "sugar_g": 19.1,
+    "fiber_g": 1.5,
+    "sodium_mg": 2
+   },
+   "default_serving_g": 165,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "jackfruit",
+    "nangka"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "custard_apple",
+   "name": "Custard apple",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 101,
+    "carbs_g": 25.2,
+    "protein_g": 1.7,
+    "fat_g": 0.6,
+    "sugar_g": null,
+    "fiber_g": 2.4,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1/2 fruit",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "custard apple",
+    "sugar apple"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "chicken_breast",
+   "name": "Chicken breast, grilled",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 165,
+    "carbs_g": 0.0,
+    "protein_g": 31.0,
+    "fat_g": 3.6,
+    "sugar_g": 0.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 74
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "chicken",
+    "grilled chicken",
+    "chicken breast"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "salmon",
+   "name": "Salmon, cooked",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 206,
+    "carbs_g": 0.0,
+    "protein_g": 22.0,
+    "fat_g": 12.4,
+    "sugar_g": 0.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 61
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 fillet",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish"
+   ],
+   "aliases": [
+    "salmon",
+    "fish"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "beef_steak",
+   "name": "Beef steak (sirloin), cooked",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 201,
+    "carbs_g": 0.0,
+    "protein_g": 29.0,
+    "fat_g": 9.5,
+    "sugar_g": 0.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 steak",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "steak",
+    "beef"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "tofu",
+   "name": "Tofu, firm",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 144,
+    "carbs_g": 2.8,
+    "protein_g": 17.3,
+    "fat_g": 8.7,
+    "sugar_g": 0.6,
+    "fiber_g": 2.3,
+    "sodium_mg": 14
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1/2 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "tofu",
+    "beancurd",
+    "tauhu"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "fried_egg",
+   "name": "Egg, fried",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 196,
+    "carbs_g": 0.8,
+    "protein_g": 13.6,
+    "fat_g": 14.8,
+    "sugar_g": 0.4,
+    "fiber_g": 0.0,
+    "sodium_mg": 207
+   },
+   "default_serving_g": 46,
+   "serving_desc": "1 egg",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "egg"
+   ],
+   "aliases": [
+    "fried egg",
+    "egg"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "boiled_egg",
+   "name": "Egg, boiled",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 155,
+    "carbs_g": 1.1,
+    "protein_g": 12.6,
+    "fat_g": 10.6,
+    "sugar_g": 1.1,
+    "fiber_g": 0.0,
+    "sodium_mg": 124
+   },
+   "default_serving_g": 50,
+   "serving_desc": "1 egg",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "egg"
+   ],
+   "aliases": [
+    "boiled egg",
+    "hard boiled egg"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "meat_loaf",
+   "name": "Meat loaf",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 185,
+    "carbs_g": 8.0,
+    "protein_g": 13.0,
+    "fat_g": 11.0,
+    "sugar_g": 3.0,
+    "fiber_g": 0.4,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 slice",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "egg",
+    "gluten"
+   ],
+   "aliases": [
+    "meatloaf",
+    "meat loaf"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "pizza",
+   "name": "Pizza, cheese",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 266,
+    "carbs_g": 33.0,
+    "protein_g": 11.0,
+    "fat_g": 10.0,
+    "sugar_g": 3.6,
+    "fiber_g": 2.3,
+    "sodium_mg": 598
+   },
+   "default_serving_g": 107,
+   "serving_desc": "1 slice",
+   "glycemic_index": 60,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "pizza"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "cheeseburger",
+   "name": "Cheeseburger",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 250,
+    "carbs_g": 24.0,
+    "protein_g": 13.0,
+    "fat_g": 11.0,
+    "sugar_g": 5.0,
+    "fiber_g": 1.5,
+    "sodium_mg": 560
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 burger",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "burger",
+    "cheeseburger",
+    "hamburger"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "hot_dog",
+   "name": "Hot dog in bun",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 247,
+    "carbs_g": 18.0,
+    "protein_g": 10.0,
+    "fat_g": 15.0,
+    "sugar_g": 4.0,
+    "fiber_g": 0.8,
+    "sodium_mg": 670
+   },
+   "default_serving_g": 98,
+   "serving_desc": "1 hot dog",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "hot dog",
+    "hotdog"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "burrito",
+   "name": "Burrito (beans and meat)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 190,
+    "carbs_g": 22.0,
+    "protein_g": 9.0,
+    "fat_g": 7.0,
+    "sugar_g": 1.5,
+    "fiber_g": 3.0,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 220,
+   "serving_desc": "1 burrito",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "burrito"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "sandwich",
+   "name": "Sandwich (ham and cheese)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 235,
+    "carbs_g": 25.0,
+    "protein_g": 13.0,
+    "fat_g": 9.0,
+    "sugar_g": 3.5,
+    "fiber_g": 1.6,
+    "sodium_mg": 720
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 sandwich",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "sandwich"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "carbonara",
+   "name": "Spaghetti carbonara",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 190,
+    "carbs_g": 22.0,
+    "protein_g": 8.0,
+    "fat_g": 8.0,
+    "sugar_g": 1.0,
+    "fiber_g": 1.0,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "carbonara"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "pot_pie",
+   "name": "Chicken pot pie",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 220,
+    "carbs_g": 19.0,
+    "protein_g": 7.0,
+    "fat_g": 13.0,
+    "sugar_g": 2.0,
+    "fiber_g": 1.0,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 220,
+   "serving_desc": "1 pie",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "pot pie",
+    "potpie"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "guacamole",
+   "name": "Guacamole",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 8.5,
+    "protein_g": 2.0,
+    "fat_g": 13.0,
+    "sugar_g": 0.7,
+    "fiber_g": 6.0,
+    "sodium_mg": 260
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1/4 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "guacamole",
+    "avocado dip"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "consomme",
+   "name": "Clear soup / consomm\u00e9",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 7,
+    "carbs_g": 0.4,
+    "protein_g": 1.2,
+    "fat_g": 0.0,
+    "sugar_g": 0.4,
+    "fiber_g": 0.0,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 240,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "consomme",
+    "clear soup",
+    "broth",
+    "soup"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "yogurt",
+   "name": "Yogurt, plain low-fat",
+   "category": "dairy",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 63,
+    "carbs_g": 7.0,
+    "protein_g": 5.3,
+    "fat_g": 1.6,
+    "sugar_g": 7.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 70
+   },
+   "default_serving_g": 170,
+   "serving_desc": "1 cup",
+   "glycemic_index": 35,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "yogurt",
+    "yoghurt"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "milk",
+   "name": "Milk, whole",
+   "category": "dairy",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 61,
+    "carbs_g": 4.8,
+    "protein_g": 3.2,
+    "fat_g": 3.3,
+    "sugar_g": 5.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 43
+   },
+   "default_serving_g": 244,
+   "serving_desc": "1 cup",
+   "glycemic_index": 39,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "milk"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "ice_cream",
+   "name": "Ice cream, vanilla",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 207,
+    "carbs_g": 24.0,
+    "protein_g": 3.5,
+    "fat_g": 11.0,
+    "sugar_g": 21.0,
+    "fiber_g": 0.7,
+    "sodium_mg": 80
+   },
+   "default_serving_g": 66,
+   "serving_desc": "1 scoop",
+   "glycemic_index": 51,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "ice cream"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "donut",
+   "name": "Doughnut, glazed",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 421,
+    "carbs_g": 51.3,
+    "protein_g": 5.6,
+    "fat_g": 22.9,
+    "sugar_g": 21.0,
+    "fiber_g": 1.2,
+    "sodium_mg": 330
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 doughnut",
+   "glycemic_index": 76,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "donut",
+    "doughnut"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "chocolate_cake",
+   "name": "Chocolate cake with frosting",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 367,
+    "carbs_g": 55.0,
+    "protein_g": 4.0,
+    "fat_g": 16.0,
+    "sugar_g": 37.0,
+    "fiber_g": 1.8,
+    "sodium_mg": 334
+   },
+   "default_serving_g": 95,
+   "serving_desc": "1 slice",
+   "glycemic_index": 38,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "cake",
+    "chocolate cake"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "trifle",
+   "name": "Trifle",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 24.0,
+    "protein_g": 3.0,
+    "fat_g": 6.0,
+    "sugar_g": 18.0,
+    "fiber_g": 0.5,
+    "sodium_mg": 70
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "trifle"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "coffee_black",
+   "name": "Coffee, black (no sugar)",
+   "category": "beverage",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 2,
+    "carbs_g": 0.0,
+    "protein_g": 0.3,
+    "fat_g": 0.0,
+    "sugar_g": 0.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 2
+   },
+   "default_serving_g": 240,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "coffee",
+    "black coffee",
+    "kopi-o kosong",
+    "americano",
+    "espresso"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "cola",
+   "name": "Soft drink, cola (sugar-sweetened)",
+   "category": "beverage",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 42,
+    "carbs_g": 10.6,
+    "protein_g": 0.0,
+    "fat_g": 0.0,
+    "sugar_g": 10.6,
+    "fiber_g": 0.0,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 330,
+   "serving_desc": "1 can",
+   "glycemic_index": 63,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "coke",
+    "cola",
+    "soda",
+    "soft drink"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "orange_juice",
+   "name": "Orange juice",
+   "category": "beverage",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 45,
+    "carbs_g": 10.4,
+    "protein_g": 0.7,
+    "fat_g": 0.2,
+    "sugar_g": 8.4,
+    "fiber_g": 0.2,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 248,
+   "serving_desc": "1 cup",
+   "glycemic_index": 50,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "orange juice",
+    "oj",
+    "juice"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "red_wine",
+   "name": "Red wine",
+   "category": "beverage",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 85,
+    "carbs_g": 2.6,
+    "protein_g": 0.1,
+    "fat_g": 0.0,
+    "sugar_g": 0.6,
+    "fiber_g": 0.0,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 glass",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "wine",
+    "red wine"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "eggnog",
+   "name": "Eggnog",
+   "category": "beverage",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 88,
+    "carbs_g": 8.1,
+    "protein_g": 4.6,
+    "fat_g": 4.2,
+    "sugar_g": 8.1,
+    "fiber_g": 0.0,
+    "sodium_mg": 54
+   },
+   "default_serving_g": 254,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "eggnog"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "water",
+   "name": "Water",
+   "category": "beverage",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 0,
+    "carbs_g": 0.0,
+    "protein_g": 0.0,
+    "fat_g": 0.0,
+    "sugar_g": 0.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 0
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 glass",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "water",
+    "plain water"
+   ],
+   "source": "USDA FoodData Central (SR Legacy / FNDDS), per 100 g",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "chicken_rice",
+   "name": "Hainanese chicken rice",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 19.7,
+    "protein_g": 6.6,
+    "fat_g": 6.1,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 342
+   },
+   "default_serving_g": 380,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "chicken rice",
+    "hainanese chicken rice"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "nasi_lemak",
+   "name": "Nasi lemak (egg, ikan bilis, peanuts, sambal)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 190,
+    "carbs_g": 22.0,
+    "protein_g": 5.5,
+    "fat_g": 9.0,
+    "sugar_g": 2.0,
+    "fiber_g": 1.5,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 260,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "peanut",
+    "egg",
+    "fish"
+   ],
+   "aliases": [
+    "nasi lemak"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "char_kway_teow",
+   "name": "Char kway teow",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 194,
+    "carbs_g": 23.0,
+    "protein_g": 5.5,
+    "fat_g": 9.5,
+    "sugar_g": 2.5,
+    "fiber_g": 1.0,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 384,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "shellfish",
+    "soy"
+   ],
+   "aliases": [
+    "char kway teow",
+    "ckt",
+    "fried kway teow"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "laksa",
+   "name": "Laksa (curry noodle soup)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 98,
+    "carbs_g": 9.0,
+    "protein_g": 4.3,
+    "fat_g": 5.2,
+    "sugar_g": 1.0,
+    "fiber_g": 0.8,
+    "sodium_mg": 410
+   },
+   "default_serving_g": 600,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "shellfish",
+    "fish"
+   ],
+   "aliases": [
+    "laksa",
+    "curry laksa"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "fish_soup_beehoon",
+   "name": "Sliced fish bee hoon soup",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 54,
+    "carbs_g": 6.0,
+    "protein_g": 4.0,
+    "fat_g": 1.6,
+    "sugar_g": 0.3,
+    "fiber_g": 0.3,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 650,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "fish"
+   ],
+   "aliases": [
+    "fish soup",
+    "fish bee hoon",
+    "sliced fish soup"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "roti_prata",
+   "name": "Roti prata, plain",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 318,
+    "carbs_g": 43.0,
+    "protein_g": 7.5,
+    "fat_g": 13.0,
+    "sugar_g": 2.0,
+    "fiber_g": 2.0,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "prata",
+    "roti prata",
+    "roti canai"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "mee_goreng",
+   "name": "Mee goreng",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 188,
+    "carbs_g": 24.0,
+    "protein_g": 6.0,
+    "fat_g": 7.7,
+    "sugar_g": 3.0,
+    "fiber_g": 1.5,
+    "sodium_mg": 560
+   },
+   "default_serving_g": 350,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "soy"
+   ],
+   "aliases": [
+    "mee goreng",
+    "fried noodles"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "nasi_goreng",
+   "name": "Nasi goreng (fried rice)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 175,
+    "carbs_g": 24.0,
+    "protein_g": 5.5,
+    "fat_g": 6.5,
+    "sugar_g": 1.5,
+    "fiber_g": 1.0,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 330,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "soy"
+   ],
+   "aliases": [
+    "nasi goreng",
+    "fried rice"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "bak_chor_mee",
+   "name": "Bak chor mee (dry)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 170,
+    "carbs_g": 20.0,
+    "protein_g": 8.0,
+    "fat_g": 6.5,
+    "sugar_g": 1.5,
+    "fiber_g": 1.0,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "soy"
+   ],
+   "aliases": [
+    "bak chor mee",
+    "minced meat noodles"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "wanton_mee",
+   "name": "Wanton mee (dry)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 136,
+    "carbs_g": 18.0,
+    "protein_g": 6.5,
+    "fat_g": 4.0,
+    "sugar_g": 1.5,
+    "fiber_g": 0.8,
+    "sodium_mg": 520
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "soy"
+   ],
+   "aliases": [
+    "wanton mee",
+    "wonton noodles"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "hokkien_mee",
+   "name": "Hokkien prawn mee",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 18.0,
+    "protein_g": 6.0,
+    "fat_g": 6.0,
+    "sugar_g": 1.5,
+    "fiber_g": 0.8,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 400,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "shellfish",
+    "egg",
+    "gluten"
+   ],
+   "aliases": [
+    "hokkien mee",
+    "prawn mee"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "fried_carrot_cake",
+   "name": "Fried carrot cake (chai tow kway, white)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 190,
+    "carbs_g": 23.0,
+    "protein_g": 4.0,
+    "fat_g": 9.0,
+    "sugar_g": 1.0,
+    "fiber_g": 0.8,
+    "sodium_mg": 520
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg"
+   ],
+   "aliases": [
+    "carrot cake",
+    "chai tow kway"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "chicken_satay",
+   "name": "Chicken satay with peanut sauce",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 6.0,
+    "protein_g": 22.0,
+    "fat_g": 13.0,
+    "sugar_g": 5.0,
+    "fiber_g": 1.0,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 100,
+   "serving_desc": "~6 sticks",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "peanut"
+   ],
+   "aliases": [
+    "satay",
+    "chicken satay"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "kaya_toast",
+   "name": "Kaya toast with butter",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 340,
+    "carbs_g": 45.0,
+    "protein_g": 6.0,
+    "fat_g": 15.0,
+    "sugar_g": 18.0,
+    "fiber_g": 1.5,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 70,
+   "serving_desc": "1 set (2 slices)",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy",
+    "egg"
+   ],
+   "aliases": [
+    "kaya toast"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "popiah",
+   "name": "Popiah (fresh spring roll)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 145,
+    "carbs_g": 20.0,
+    "protein_g": 4.0,
+    "fat_g": 5.0,
+    "sugar_g": 4.0,
+    "fiber_g": 2.0,
+    "sodium_mg": 380
+   },
+   "default_serving_g": 130,
+   "serving_desc": "1 roll",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "gluten",
+    "egg",
+    "peanut"
+   ],
+   "aliases": [
+    "popiah",
+    "spring roll"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "yong_tau_foo",
+   "name": "Yong tau foo (soup)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 5.0,
+    "protein_g": 4.0,
+    "fat_g": 2.5,
+    "sugar_g": 1.0,
+    "fiber_g": 0.8,
+    "sodium_mg": 330
+   },
+   "default_serving_g": 550,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy",
+    "fish"
+   ],
+   "aliases": [
+    "yong tau foo",
+    "ytf"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "kopi",
+   "name": "Kopi (coffee with condensed milk)",
+   "category": "beverage",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 52,
+    "carbs_g": 8.0,
+    "protein_g": 1.3,
+    "fat_g": 1.6,
+    "sugar_g": 8.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 20
+   },
+   "default_serving_g": 230,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "kopi",
+    "kopi c",
+    "coffee with milk"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "teh_tarik",
+   "name": "Teh tarik / teh (condensed milk)",
+   "category": "beverage",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 55,
+    "carbs_g": 9.0,
+    "protein_g": 1.4,
+    "fat_g": 1.5,
+    "sugar_g": 9.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 22
+   },
+   "default_serving_g": 230,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "teh",
+    "teh tarik",
+    "milk tea"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "bubble_tea",
+   "name": "Bubble milk tea with pearls",
+   "category": "beverage",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 14.0,
+    "protein_g": 0.5,
+    "fat_g": 1.5,
+    "sugar_g": 9.0,
+    "fiber_g": 0.0,
+    "sodium_mg": 20
+   },
+   "default_serving_g": 500,
+   "serving_desc": "1 regular cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "bubble tea",
+    "boba",
+    "pearl milk tea"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  },
+  {
+   "key": "chendol",
+   "name": "Chendol",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 27.0,
+    "protein_g": 1.5,
+    "fat_g": 5.5,
+    "sugar_g": 20.0,
+    "fiber_g": 1.0,
+    "sodium_mg": 40
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "chendol",
+    "cendol"
+   ],
+   "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
+   "verification": "transcribed_unverified"
+  }
+ ]
+}

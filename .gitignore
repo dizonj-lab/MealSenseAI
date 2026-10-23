@@ -1,0 +1,13 @@
+.venv/
+node_modules/
+frontend/dist/
+data/
+data_server.log
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+frontend/*.tsbuildinfo
+datasets/food-101/
+datasets/foodsg/
+ml/models/*.tflite
