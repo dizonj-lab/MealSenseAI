@@ -10,13 +10,14 @@ export default function ModelInsights() {
   if (!d) return <div className="grid place-items-center py-20"><Spinner /></div>
   return (
     <div className="space-y-4">
-      <div className="grid lg:grid-cols-3 gap-4">
+      <div className="grid lg:grid-cols-2 gap-4">
         {d.vision.models.map((m: any) => (
           <Card key={m.name} title={m.name} icon={<Cpu className="size-5 text-brand-600" />} action={<span className={`chip ${d.vision.available ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>{d.vision.available ? 'Active' : 'Unavailable'}</span>}>
-            <Row k="Pipeline stage" v={m.stage} /><Row k="Task" v={m.task} /><Row k="Version" v={m.version} /><Row k="Trained on" v={m.trained_on} /><Row k="Food classes" v={m.food_classes} />
+            <Row k="Pipeline stage" v={m.stage} /><Row k="Inference device" v={(m.device ?? 'cpu').toUpperCase()} /><Row k="Task" v={m.task} /><Row k="Version" v={m.version} /><Row k="Trained on" v={m.trained_on} /><Row k="Food classes" v={m.food_classes} />
             <Row k="Inferences" v={m.latency.count} /><Row k="Latency avg / p95" v={m.latency.count ? `${m.latency.avg_ms} / ${m.latency.p95_ms} ms` : '—'} />
             <Row k="Scores calibrated" v="No (raw scores shown qualitatively)" />
-            <Row k="Accuracy" v={m.test_metrics ? <span className="text-emerald-700">{m.accuracy}</span> : <span className="text-amber-700">{m.accuracy}</span>} />
+            <Row k="Accuracy" v={<span className={m.reported_metrics ? 'text-emerald-700' : 'text-slate-500'}>{m.accuracy}</span>} />
+            {m.sha256 && <Row k="Checkpoint SHA-256" v={<span className="font-mono text-[11px]">{m.sha256.slice(0, 16)}…</span>} />}
           </Card>))}
       </div>
       <div className="grid lg:grid-cols-2 gap-4">
@@ -43,8 +44,9 @@ export default function ModelInsights() {
       <Card title="Experiments" icon={<FlaskConical className="size-5 text-violet-600" />}>
         {d.experiments.length === 0 ? <p className="text-sm text-slate-500">No evaluation runs recorded. Run <code className="text-xs bg-slate-100 px-1 rounded">ml/evaluation/evaluate.py</code> on a labeled dataset (e.g. Food-101) to measure accuracy, precision, recall and F1.</p> :
           <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left text-slate-500"><th className="py-1">Run</th><th>Model</th><th>Dataset</th><th>N</th><th>Metrics</th></tr></thead>
-            <tbody>{d.experiments.map((e: any) => <tr key={e.id} className="border-t border-slate-100 align-top"><td className="py-1.5">{e.name}</td><td>{e.model}</td><td>{e.dataset}</td><td>{e.n_samples}</td>
-              <td className="text-xs">{e.has_ground_truth ? Object.entries(e.metrics).filter(([, v]) => typeof v === 'number').map(([k, v]) => `${k}: ${(v as number).toFixed(3)}`).join(' · ') : 'latency only (no ground truth)'}</td></tr>)}</tbody></table></div>}
+            <tbody>{d.experiments.map((e: any) => <tr key={e.id} className="border-t border-slate-100 align-top"><td className="py-1.5">{e.name}</td><td>{e.model}</td><td>{e.dataset}</td><td>{e.n_samples || '—'}</td>
+              <td className="text-xs">{Object.entries(e.metrics).filter(([, v]) => typeof v === 'number').map(([k, v]) => `${k}: ${(v as number) < 0.001 && (v as number) > 0 ? (v as number).toExponential(1) : (v as number).toFixed(4)}`).join(' · ')}
+                <div className="text-slate-400">{e.notes}</div></td></tr>)}</tbody></table></div>}
       </Card>
     </div>
   )

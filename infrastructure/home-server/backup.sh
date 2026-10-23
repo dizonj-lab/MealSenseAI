@@ -9,7 +9,7 @@ ping_hc() { [ -n "${HEALTHCHECK_URL:-}" ] && curl -fsS -m 10 "$HEALTHCHECK_URL$1
 ping_hc /start
 cd "$REPO_DIR"
 docker compose exec -T db pg_dump -U mealsense -Fc mealsenseai > "$STAGE/mealsenseai.dump"
-docker compose exec -T app tar -czf - -C /data . > "$STAGE/uploads.tgz"   # uploads volume, via the app container
+docker compose exec -T backend tar -czf - -C /data . > "$STAGE/uploads.tgz"   # uploads volume, via the app container
 cp .env "$STAGE/env.backup"
 restic snapshots >/dev/null 2>&1 || restic init
 restic backup --tag mealsenseai "$STAGE"

@@ -48,7 +48,7 @@ Training now uses CUDA automatically: `ml/training/train.py` prints `device=cuda
 ## Step 3 — Domain and Cloudflare Tunnel (20 min)
 1. Create a free Cloudflare account. Buy a domain in **Domain Registration**, or move an existing one to Cloudflare.
 2. **Zero Trust → Networks → Tunnels → Create tunnel → Cloudflared**, name it `home-server`, and **copy the token**. Skip the install command shown; Docker runs cloudflared.
-3. In the same tunnel, open **Public hostnames → Add**: subdomain `mealsense`, your domain, service type `HTTP`, URL `proxy:80`.
+3. In the same tunnel, open **Public hostnames → Add**: subdomain `mealsense`, your domain, service type `HTTP`, URL `frontend:80`.
 
 ## Step 4 — Cloudflare Access: only invited people reach the app (10 min)
 **Zero Trust → Access → Applications → Add → Self-hosted**:
@@ -62,7 +62,7 @@ Training now uses CUDA automatically: `ml/training/train.py` prints `device=cuda
 ```bash
 cd ~/mealsenseai
 SLM=1 ./infrastructure/home-server/deploy.sh   # paste the tunnel token when asked; SLM=1 also runs Ollama on the GPU
-docker compose exec app python -m app.seed      # optional demo account demo@mealsense.ai / demo12345
+docker compose exec backend python -m app.seed      # optional demo account demo@mealsense.ai / demo12345
 ```
 `deploy.sh` does the following:
 - generates `JWT_SECRET` and the database password (stored in `.env`, chmod 600, never committed);
@@ -122,7 +122,7 @@ sudo ./infrastructure/home-server/install-backups.sh /srv/backup
 ## Day-to-day commands
 ```bash
 docker compose ps                     # health of every service
-docker compose logs -f app            # application logs
+docker compose logs -f backend            # application logs
 ./infrastructure/home-server/deploy.sh   # update to the latest code
 sudo systemctl list-timers mealsense-backup.timer
 sudo /opt/mealsense/restore.sh        # restore from the latest backup

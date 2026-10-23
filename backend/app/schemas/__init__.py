@@ -65,6 +65,7 @@ class AnalyzeIn(BaseModel):
 
 
 class FoodUpdateIn(BaseModel):
+    candidate_class_id: int | None = Field(default=None, ge=0, description="Choose an EXP-002 taxonomy class (e.g. a top-3 candidate)")
     nutrition_key: str | None = None
     label: str | None = Field(default=None, max_length=200)
     grams: float | None = Field(default=None, gt=0, le=5000)
@@ -72,6 +73,7 @@ class FoodUpdateIn(BaseModel):
 
 
 class FoodAddIn(BaseModel):
+    candidate_class_id: int | None = Field(default=None, ge=0, description="Add an EXP-002 taxonomy class")
     nutrition_key: str | None = None
     label: str | None = Field(default=None, max_length=200)
     grams: float | None = Field(default=None, gt=0, le=5000)
@@ -88,6 +90,7 @@ class FoodOut(BaseModel):
     id: int
     origin: str
     label: str
+    taxonomy_class: str | None = None
     nutrition_key: str | None
     mapping_quality: str
     original_prediction: dict | None

@@ -1,0 +1,19 @@
+{
+  "classes": 320,
+  "by_match": {
+    "proxy": 66,
+    "exact": 247,
+    "none": 7
+  },
+  "none": [
+    "bruschetta",
+    "cheese plate",
+    "drunken prawn",
+    "escargots",
+    "foie gras",
+    "seaweed snack",
+    "shrimp and grits"
+  ],
+  "nutrition_table_version": "mvp-0.2",
+  "nutrition_records": 281
+}

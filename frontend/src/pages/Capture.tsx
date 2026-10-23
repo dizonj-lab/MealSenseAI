@@ -45,7 +45,7 @@ function StageList({ stages, running }: { stages: Stage[]; running: number }) {
     <ol className="space-y-2.5">
       {STAGES.map(([key, name], i) => {
         const s = stages.find(x => x.key === key)
-        const icon = s ? (s.status === 'done' ? <CheckCircle2 className="size-5 text-emerald-600" /> : s.status === 'unsupported' || s.status === 'fallback' ? <XCircle className="size-5 text-amber-500" /> : <CircleDashed className="size-5 text-slate-400" />)
+        const icon = s ? (s.status === 'done' ? <CheckCircle2 className="size-5 text-emerald-600" /> : s.status === 'unsupported' || s.status === 'fallback' || s.status === 'uncertain' ? <XCircle className="size-5 text-amber-500" /> : <CircleDashed className="size-5 text-slate-400" />)
           : i === running ? <Loader2 className="size-5 text-brand-600 animate-spin" /> : <CircleDashed className="size-5 text-slate-300" />
         return (
           <li key={key} className="flex gap-3">

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { CartesianGrid, Legend, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Activity, AlertTriangle, BookOpen, CheckCircle2, Info, Plus, ShieldAlert, Sigma, Trash2, TrendingDown } from 'lucide-react'
 import { api, fmt } from '../lib/api'
-import { Card, Spinner, Toggle } from './ui'
+import { Card, Spinner, Tag, Toggle } from './ui'
 
 type Scenario = { activity: string; intensity: 'moderate' | 'high'; start_min: number; duration_min: number }
 const COLORS = ['#0d9488', '#6366f1', '#f59e0b']
@@ -94,7 +94,7 @@ export default function Forecast({ mealId, version }: { mealId: number; version:
 
   return (
     <div className="space-y-4">
-      <Card title="Meal advisory" icon={<ShieldAlert className="size-5 text-amber-500" />} action={<span className={`chip ring-1 ${rCls}`}>{rLabel}</span>}>
+      <Card title="Meal advisory" icon={<ShieldAlert className="size-5 text-amber-500" />} action={<span className="flex gap-1.5"><Tag kind="guidance" /><span className={`chip ring-1 ${rCls}`}>{rLabel}</span></span>}>
         {adv.flags.length === 0 ? <p className="text-sm text-slate-600">No public-health reference points exceeded for this meal.</p> :
           <ul className="space-y-2">{adv.flags.map((f: any, i: number) => (
             <li key={i} className="flex gap-2 text-sm"><AlertTriangle className={`size-4 mt-0.5 shrink-0 ${f.severity > 1 ? 'text-rose-500' : 'text-amber-500'}`} />
@@ -103,7 +103,7 @@ export default function Forecast({ mealId, version }: { mealId: number; version:
           <div className="font-semibold mb-1">Healthier next time</div><ul className="list-disc pl-5 space-y-0.5">{adv.tips.map((t: string) => <li key={t}>{t}</li>)}</ul></div>}
       </Card>
 
-      <Card title="Forecast & what-if analysis" icon={<Activity className="size-5 text-brand-600" />} action={busy && <Spinner className="size-4" />}>
+      <Card title="Forecast & what-if analysis" icon={<Activity className="size-5 text-brand-600" />} action={busy ? <Spinner className="size-4" /> : <Tag kind="guidance" />}>
         <p className="text-xs rounded-xl bg-slate-50 ring-1 ring-slate-200 p-3 text-slate-600 flex gap-2"><Info className="size-4 shrink-0" />{d.disclaimer}</p>
 
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">

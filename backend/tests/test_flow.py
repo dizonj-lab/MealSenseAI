@@ -39,7 +39,22 @@ def test_onboarding_consent_minimises(client, auth):
     assert me["profile"]["diabetes_status"] == "type2" and me["profile"]["allergies"] == ["peanut"]
 
 
-def test_real_model_inference_on_photo(client, auth):
+def test_model_loaded_and_taxonomy_aligned(client, auth):
+    import json
+    from app.core.config import settings
+    from app.services import vision
+    st = vision.status()
+    assert st["available"] and st["models"]["classifier"]["food_classes"] == 320
+    tax = json.loads((settings.models_dir / "exp002/class_mapping.json").read_text())
+    for name, idx in tax.items():  # every class id resolves to exactly its canonical name
+        assert vision.taxonomy_class(idx)["name"] == name
+    assert vision.taxonomy_class(320) is None
+    ai = client.get(f"{API}/ai/models", headers=auth).json()
+    names = [e["name"] for e in ai["experiments"]]
+    assert any("reported" in n for n in names) and any("parity" in n for n in names)
+
+
+def test_top3_confirm_override_on_photo(client, auth):
     r = client.post(f"{API}/meals/capture", headers=auth,
                     files={"top": ("coffee.png", (FIX / "coffee.png").read_bytes(), "image/png")})
     assert r.status_code == 201, r.text
@@ -47,16 +62,26 @@ def test_real_model_inference_on_photo(client, auth):
     keys = [s["key"] for s in meal["stages"]]
     assert keys == ["capture", "preprocess", "detect", "classify", "portion", "nutrition", "aggregate",
                     "contextualise", "recommend", "output"]
-    rec = next(s for s in meal["stages"] if s["key"] == "classify")
-    top = rec["per_view"][0]["top_labels"]
-    assert top and rec["latency_ms"] > 0
-    print("top labels:", top)
-    labels = [f["original_prediction"]["model_label"] for f in meal["foods"] if f["origin"] == "model"]
-    assert "espresso" in labels  # verified pretrained ImageNet class on the skimage 'coffee' photo
-    f = next(f for f in meal["foods"] if f["original_prediction"]["model_label"] == "espresso")
-    assert f["original_prediction"]["score_type"].startswith("raw")
-    assert f["nutrition_source"]["source"]
+    top = next(s for s in meal["stages"] if s["key"] == "classify")["per_view"][0]["top_labels"]
+    print("top-3:", top)
+    assert len(top) == 3 and all("class_id" in t for t in top)
+    food = next(f for f in meal["foods"] if f["origin"] == "model")
+    pred = food["original_prediction"]
+    assert len(pred["candidates"]) == 3 and pred["score_type"].startswith("raw softmax")
+    assert food["taxonomy_class"] == pred["candidates"][0]["label"] == "kopi teh milo"
+    assert food["nutrition_source"]["match"] in ("exact", "proxy")
+    # override with the 2nd candidate: label, taxonomy class and nutrition follow; original prediction kept
+    alt = pred["candidates"][1]
+    meal2 = client.put(f"{API}/meals/{meal['id']}/foods/{food['id']}", headers=auth,
+                       json={"candidate_class_id": alt["class_id"]}).json()
+    f2 = next(f for f in meal2["foods"] if f["id"] == food["id"])
+    assert f2["taxonomy_class"] == alt["label"] and f2["user_corrected"]
+    assert f2["original_prediction"]["candidates"][0]["label"] == "kopi teh milo"
+    # add a taxonomy class directly (e.g. from the candidates of an uncertain photo)
+    meal3 = client.post(f"{API}/meals/{meal['id']}/foods", headers=auth, json={"candidate_class_id": 63}).json()
+    assert any(f["taxonomy_class"] == "chicken rice" and f["nutrition_key"] == "chicken_rice" for f in meal3["foods"])
     assert client.get(f"{API}/meals/{meal['id']}/images/top_overlay", headers=auth).status_code == 200
+    assert client.get(f"{API}/taxonomy/search?q=laksa", headers=auth).json()[0]["name"] == "laksa"
 
 
 def test_unsupported_image_then_manual_and_corrections(client, auth):
@@ -71,7 +96,7 @@ def test_unsupported_image_then_manual_and_corrections(client, auth):
     keys = {f["nutrition_key"] for f in meal["foods"]}
     assert {"nasi_lemak", "teh_tarik"} <= keys
     assert not any(f["origin"] == "model" for f in meal["foods"])  # blank image -> no fabricated recognition
-    assert next(s for s in meal["stages"] if s["key"] == "classify")["status"] == "unsupported"
+    assert next(s for s in meal["stages"] if s["key"] == "classify")["status"] == "uncertain"
     nl = next(f for f in meal["foods"] if f["nutrition_key"] == "nasi_lemak")
     assert nl["grams"] == 260 and nl["portion"]["uncertainty"] == "high"
     assert abs(nl["nutrients"]["calories_kcal"] - 494.0) < 0.5

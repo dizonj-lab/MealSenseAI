@@ -8,13 +8,16 @@ os.environ.setdefault("OLLAMA_URL", "http://127.0.0.1:9")  # SLM offline unless 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.core.db import Base, engine
+from sqlalchemy import text
+
+from app.core.db import engine
 from app.main import app
 
 
 @pytest.fixture(scope="session")
 def client():
-    Base.metadata.drop_all(engine)
+    with engine.begin() as c:  # clean slate; the app runs the Alembic migrations on startup
+        c.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public"))
     with TestClient(app) as c:
         yield c
 

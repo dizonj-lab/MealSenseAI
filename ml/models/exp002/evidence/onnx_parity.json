@@ -1,0 +1,16 @@
+{
+  "created_utc": "2026-10-23T13:02:04.985219+00:00",
+  "images": 601,
+  "image_sources": [
+    "backend/tests/fixtures",
+    "datasets/raw/food101_subset"
+  ],
+  "preprocessing_max_abs_diff": 0.0,
+  "logits_max_abs_diff": 0.0001354217529296875,
+  "top1_agreement": 1.0,
+  "top3_set_agreement": 1.0,
+  "onnxruntime_cpu_latency_ms_avg": 11.81,
+  "torch": "2.14.1+cu130",
+  "onnxruntime": "1.31.0",
+  "python": "3.12.3"
+}

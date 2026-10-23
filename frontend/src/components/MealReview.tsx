@@ -5,11 +5,12 @@ import { useAuthImage } from '../lib/hooks'
 import type { Food, Meal } from '../lib/types'
 import FoodPicker from './FoodPicker'
 import Forecast from './Forecast'
-import { Card, ErrorNote, LevelBadge, Progress, Spinner } from './ui'
+import { Card, ErrorNote, LevelBadge, Progress, Spinner, Tag } from './ui'
 
 const ORIGIN: Record<string, string> = { model: 'AI recognised', description: 'From description', manual: 'Added by you', slm: 'SLM suggestion' }
 const MAPQ: Record<string, [string, string]> = {
-  exact: ['Matched', 'bg-emerald-50 text-emerald-700'], fuzzy: ['Approximate match — please confirm', 'bg-amber-50 text-amber-700'],
+  exact: ['Nutrition record matched', 'bg-emerald-50 text-emerald-700'], proxy: ['Nutrition approximated by a similar food', 'bg-amber-50 text-amber-700'],
+  fuzzy: ['Approximate match — please confirm', 'bg-amber-50 text-amber-700'],
   provisional: ['Unverified SLM suggestion — confirm', 'bg-amber-50 text-amber-700'], none: ['No nutrition match', 'bg-rose-50 text-rose-700'],
 }
 const UNC: Record<string, string> = { low: 'text-emerald-700', medium: 'text-amber-700', high: 'text-rose-700', unknown: 'text-slate-500' }
@@ -44,6 +45,7 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
           <div className="flex flex-wrap items-center gap-1.5">
             <h3 className="font-semibold text-slate-900">{f.label}</h3>
             {f.confirmed && <span className="chip bg-emerald-50 text-emerald-700"><Check className="size-3" />Confirmed</span>}
+            {f.nutrition_source?.match === 'proxy' && <span className="chip bg-amber-50 text-amber-700">≈ {f.nutrition_source.name}</span>}
             {f.user_corrected && <span className="chip bg-sky-50 text-sky-700">Corrected</span>}
           </div>
           <div className="mt-1 flex flex-wrap gap-1.5 text-xs">
@@ -54,10 +56,19 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
         {busy && <Spinner className="size-4" />}
       </div>
 
-      {pred?.model_label && <div className="mt-3 text-xs rounded-lg bg-slate-50 px-3 py-2 text-slate-600 space-y-0.5">
-        <div><b>{pred.model_name}</b> predicted “{pred.model_label}” · {pred.score_band} signal (raw score {pred.score.toFixed(2)}, uncalibrated){pred.views?.length > 1 && ' · seen in both views'}</div>
-        {pred.instance && <div className="text-slate-500">Instance: {pred.instance === 'scene' ? 'whole image' : `${pred.detector_label} (${pred.has_mask ? 'mask' : 'box'}, ${(pred.area_frac * 100).toFixed(0)}% of photo)`}{pred.instances > 1 && ` · ×${pred.instances}`}</div>}
-        {pred.classifier_top?.length > 0 && <div className="text-slate-500">Classifier top-3: {pred.classifier_top.map((t: any) => `${t.label} ${t.score.toFixed(2)}`).join(', ')}</div>}
+      {pred?.candidates?.length > 0 && <div className="mt-3 rounded-xl bg-violet-50/40 ring-1 ring-violet-100 px-3 py-2.5">
+        <div className="flex items-center gap-2 text-xs text-slate-600 mb-2"><Tag kind="prediction" />
+          <span>{pred.model_name} · {pred.instance === 'whole photo' ? 'whole photo' : `${pred.instance} region`} · {pred.needs_review ? 'low confidence — please check' : `${pred.score_band} signal`}</span></div>
+        <div className="grid gap-1.5">{pred.candidates.map((c: any, i: number) => {
+          const sel = (f.taxonomy_class ?? f.label) === c.label
+          return (
+            <button key={c.class_id} disabled={readOnly || busy || sel} onClick={() => put({ candidate_class_id: c.class_id })}
+              className={`relative overflow-hidden rounded-lg px-3 py-2 text-left text-sm ring-1 transition ${sel ? 'ring-violet-400 bg-white font-semibold' : 'ring-slate-200 bg-white/70 hover:ring-violet-300'}`}>
+              <span className="absolute inset-y-0 left-0 bg-violet-100" style={{ width: `${Math.max(c.score * 100, 1)}%` }} />
+              <span className="relative flex justify-between gap-2"><span>{i + 1}. {c.label}{c.match === 'none' && <span className="text-[11px] text-rose-600"> · no nutrition record</span>}</span>
+                <span className="text-slate-500 tabular-nums">{(c.score * 100).toFixed(1)}%</span></span>
+            </button>) })}</div>
+        <p className="mt-1.5 text-[11px] text-slate-500">Tap a candidate to change the food. Percentages are raw model scores, not calibrated probabilities.</p>
       </div>}
       {pred?.description_text && <div className="mt-3 text-xs rounded-lg bg-slate-50 px-3 py-2 text-slate-600">From your description: “{pred.description_text}” ({pred.parser})</div>}
 
@@ -65,7 +76,8 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
         {[['Portion', `${fmt(f.grams)} g`], ['Calories', `${fmt(n.calories_kcal)}`], ['Carbs', `${fmt(n.carbs_g, 1)} g`], ['Protein', `${fmt(n.protein_g, 1)} g`]].map(([l, v]) => (
           <div key={l} className="rounded-xl bg-slate-50 py-2"><div className="text-[11px] text-slate-500">{l}</div><div className="font-semibold text-slate-800">{v}</div></div>))}
       </div>
-      <div className="mt-2 text-xs text-slate-500 flex flex-wrap gap-x-3 gap-y-1">
+      <div className="mt-2 text-xs text-slate-500 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <Tag kind={f.portion.method === 'user_entered' ? 'measured' : 'estimate'} />
         <span>Fat {fmt(n.fat_g, 1)} g</span><span>Sugar {fmt(n.sugar_g, 1)} g</span><span>Fibre {fmt(n.fiber_g, 1)} g</span><span>Sodium {fmt(n.sodium_mg)} mg</span>
       </div>
       <div className="mt-2 text-xs">
@@ -73,7 +85,7 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
         {f.portion.range_g && <span className="text-slate-500"> · likely {f.portion.range_g[0]}–{f.portion.range_g[1]} g</span>}
         <details className="text-slate-500 mt-1"><summary className="cursor-pointer">How was this estimated?</summary>
           <ul className="list-disc pl-4 mt-1 space-y-0.5">{f.portion.notes.map((x, i) => <li key={i}>{x}</li>)}</ul>
-          {f.nutrition_source && <p className="mt-1">Nutrition: {f.nutrition_source.source} — record “{f.nutrition_source.name}” ({f.nutrition_source.verification.replace('_', ' ')}).</p>}
+          {f.nutrition_source && <p className="mt-1">Nutrition estimate from “{f.nutrition_source.name}”{f.nutrition_source.match === 'proxy' && ' (closest available food — correct it if you know better)'}. Source: {f.nutrition_source.source} ({f.nutrition_source.verification.replace(/_/g, ' ')}).</p>}
         </details>
       </div>
 
@@ -105,7 +117,7 @@ export function InsightCards({ meal }: { meal: Meal }) {
         <div className="font-semibold flex items-center gap-2 mb-1"><AlertTriangle className="size-4" />Allergy check</div>
         <ul className="list-disc pl-5">{ins.allergy_warnings.map(w => <li key={w}>{w}</li>)}</ul></div>}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card title="Potential Glucose Impact" icon={<Droplet className="size-5 text-sky-600" />} action={<LevelBadge level={g.level} />}>
+        <Card title="Potential Glucose Impact" icon={<Droplet className="size-5 text-sky-600" />} action={<span className="flex gap-1.5"><Tag kind="estimate" /><LevelBadge level={g.level} /></span>}>
           <div className="grid grid-cols-3 gap-2 text-center mb-3">
             {[['Carbs', g.carbs_g, 'g'], ['Sugar', g.sugar_g, 'g'], ['Fibre', g.fiber_g, 'g']].map(([l, v, u]) => (
               <div key={l as string} className="rounded-xl bg-sky-50/60 py-2"><div className="text-[11px] text-slate-500">{l}</div><div className="font-bold text-slate-800">{fmt(v as number, 1)}<span className="text-xs font-normal text-slate-400"> {u}</span></div></div>))}
@@ -114,7 +126,7 @@ export function InsightCards({ meal }: { meal: Meal }) {
           <ul className="text-sm text-slate-600 space-y-1.5 list-disc pl-4">{g.reasoning.map((r, i) => <li key={i}>{r}</li>)}</ul>
           <p className="mt-3 text-[11px] text-slate-400 flex gap-1"><Info className="size-3.5 shrink-0" />{g.disclaimer}</p>
         </Card>
-        <Card title="Energy & Nutrition" icon={<Flame className="size-5 text-amber-500" />}>
+        <Card title="Energy & Nutrition" icon={<Flame className="size-5 text-amber-500" />} action={<Tag kind="estimate" />}>
           <div className="text-3xl font-bold text-slate-900">{fmt(e.calories_kcal)}<span className="text-sm font-medium text-slate-400"> kcal</span></div>
           <div className="mt-3 flex h-3 rounded-full overflow-hidden bg-slate-100">
             <div className="bg-sky-500" style={{ width: `${e.macro_energy_pct.carbs ?? 0}%` }} />
@@ -133,7 +145,7 @@ export function InsightCards({ meal }: { meal: Meal }) {
           </div>}
           {e.notes.map(n => <p key={n} className="mt-3 text-xs text-slate-500">{n}</p>)}
         </Card>
-        <Card title="Practical Recommendations" icon={<Lightbulb className="size-5 text-emerald-600" />}>
+        <Card title="Practical Recommendations" icon={<Lightbulb className="size-5 text-emerald-600" />} action={<Tag kind="guidance" />}>
           <ul className="space-y-3">{ins.recommendations.map(r => (
             <li key={r.tag} className="flex gap-3"><span className="mt-0.5 size-6 shrink-0 rounded-lg bg-emerald-50 text-emerald-700 grid place-items-center"><Check className="size-3.5" /></span>
               <div><div className="text-sm font-semibold text-slate-800">{r.title}</div><div className="text-sm text-slate-600">{r.detail}</div></div></li>))}</ul>
@@ -155,6 +167,8 @@ export default function MealReview({ meal, onChange, onSaved, readOnly = false }
   const [err, setErr] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const active = meal.foods.filter(f => !f.removed)
+  const cls = meal.stages.find(st => st.key === 'classify')
+  const uncertain = cls?.status === 'uncertain' && !active.some(f => f.origin === 'model') ? (cls.per_view?.[0]?.top_labels ?? []) : []
   const t = meal.totals
   const save = async () => {
     setSaving(true); setErr(null)
@@ -177,6 +191,14 @@ export default function MealReview({ meal, onChange, onSaved, readOnly = false }
           </div>
         </div>
         <div className="space-y-3">
+          {!readOnly && uncertain.length > 0 && <div className="card p-4 ring-1 ring-amber-200">
+            <div className="flex items-center gap-2 text-sm font-semibold text-slate-800"><Tag kind="prediction" />Not sure what this is — is it one of these?</div>
+            <div className="mt-2 flex flex-wrap gap-1.5">{uncertain.map((c: any) => (
+              <button key={c.class_id} className="chip ring-1 ring-slate-200 bg-white px-3 py-1.5 text-sm hover:ring-violet-300"
+                onClick={async () => { try { onChange(await api(`/meals/${meal.id}/foods`, { method: 'POST', json: { candidate_class_id: c.class_id } })) } catch (e: any) { setErr(e.message) } }}>
+                {c.label} <span className="text-slate-400">{(c.score * 100).toFixed(0)}%</span></button>))}</div>
+            <p className="mt-1.5 text-[11px] text-slate-500">Low model confidence. Otherwise use “Add missing food”.</p>
+          </div>}
           {active.length === 0 && <div className="card p-4 text-sm text-slate-600">No foods yet. Use <b>Add missing food</b> to enter what you ate.</div>}
           {active.map(f => <FoodCard key={f.id} f={f} meal={meal} onChange={onChange} readOnly={readOnly} />)}
           {!readOnly && <button className="btn-ghost w-full border-dashed py-3" onClick={() => setAdding(true)}><Plus className="size-4" />Add missing food</button>}

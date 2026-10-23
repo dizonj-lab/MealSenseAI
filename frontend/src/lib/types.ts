@@ -8,8 +8,8 @@ export type Profile = {
 export type User = { id: number; email: string; name: string; onboarded: boolean; created_at: string; profile: Profile | null }
 export type BBox = { x: number; y: number; w: number; h: number }
 export type Food = {
-  id: number; origin: 'model' | 'description' | 'manual' | 'slm'; label: string; nutrition_key: string | null
-  mapping_quality: 'exact' | 'fuzzy' | 'provisional' | 'none'; original_prediction: any; grams: number
+  id: number; origin: 'model' | 'description' | 'manual' | 'slm'; label: string; taxonomy_class?: string | null; nutrition_key: string | null
+  mapping_quality: 'exact' | 'proxy' | 'fuzzy' | 'provisional' | 'none'; original_prediction: any; grams: number
   portion: { method: string; uncertainty: string; range_g: [number, number] | null; relative_error?: string; notes: string[] }
   nutrients: Nutrients; nutrition_source: any; confirmed: boolean; user_corrected: boolean; removed: boolean
 }

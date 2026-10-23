@@ -11,7 +11,8 @@ from app import models  # noqa: F401  (register tables)
 from app.api import ai, auth, dashboard, meals, users
 from app.core import cache
 from app.core.config import settings
-from app.core.db import Base, engine
+from app.core.db import engine
+from app.core.migrate import upgrade_db
 from app.services import slm, vision
 
 logging.basicConfig(level=logging.INFO)
@@ -22,28 +23,35 @@ def register_trained_model():
     import json
     from app.core.db import SessionLocal
     from app.models import Experiment
-    card_path = settings.models_dir / "food_classifier" / "model_card.json"
+    card_path = settings.models_dir / "exp002" / "model_card.json"
     if not card_path.exists():
         return
     card = json.loads(card_path.read_text())
-    name = f"{card['name']}@{card['version']}"
+    name = f"{card['version']} (reported)"
+    parity = settings.models_dir / "exp002" / "evidence" / "onnx_parity.json"
     with SessionLocal() as db:
         if db.query(Experiment).filter(Experiment.name == name).first():
             return
-        m = card["test_metrics"]
-        db.add(Experiment(name=name, model_name=card["name"], dataset=f"{card['dataset']['name']} "
-                          f"({'+'.join(card['dataset']['sources'])}, hash {card['dataset']['hash'][:12]})",
-                          n_samples=m["n_samples"], has_ground_truth=True,
-                          metrics={k: v for k, v in m.items() if k not in ("confusion_matrix",)},
-                          notes="Held-out test split from ml/training/prepare_dataset.py"))
+        rep = card["metrics"]["reported_by_developer"]
+        db.add(Experiment(name=name, model_name=card["name"], dataset=" + ".join(card["training_data"]) + " (developer test split)",
+                          n_samples=0, has_ground_truth=True,
+                          metrics={k: rep[k] for k in ("top1_accuracy", "top3_accuracy", "macro_f1")},
+                          notes=rep["source"]))
+        if parity.exists():
+            pj = json.loads(parity.read_text())
+            db.add(Experiment(name=f"{card['version']} ONNX parity", model_name=card["name"], dataset="; ".join(pj["image_sources"]),
+                              n_samples=pj["images"], has_ground_truth=False,
+                              metrics={k: pj[k] for k in ("preprocessing_max_abs_diff", "logits_max_abs_diff",
+                                                         "top1_agreement", "top3_set_agreement")},
+                              notes="Equivalence of the deployed runtime with the PyTorch checkpoint (not an accuracy measure)"))
         db.commit()
 
 
 @asynccontextmanager
 async def lifespan(_app):
-    Base.metadata.create_all(engine)
+    upgrade_db()
     settings.data_dir.mkdir(parents=True, exist_ok=True)
-    vision.status()  # warm models
+    vision.warmup()  # load models once at startup
     register_trained_model()
     yield
     vision.close()

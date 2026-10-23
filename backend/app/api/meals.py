@@ -14,13 +14,13 @@ from app.core.db import get_db
 from app.core.security import current_user
 from app.models import Correction, Meal, MealFood, User
 from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut
-from app.services import analysis, forecast, imaging, nutrition, portion
+from app.services import analysis, forecast, imaging, nutrition, portion, vision
 
 router = APIRouter(prefix="/meals", tags=["meals"])
 
 
 def _snapshot(f: MealFood) -> dict:
-    return {"label": f.label, "nutrition_key": f.nutrition_key, "grams": f.grams,
+    return {"label": f.label, "taxonomy_class": f.taxonomy_class, "nutrition_key": f.nutrition_key, "grams": f.grams,
             "mapping_quality": f.mapping_quality, "nutrients": f.nutrients}
 
 
@@ -64,8 +64,9 @@ async def capture(top: UploadFile | None = File(None), side: UploadFile | None =
                    + (f"; reference: {portion.REFERENCE_OBJECTS[reference_object]}" if reference_object else "")},
         {"key": "preprocess", "name": "Image pre-processing", "status": "done" if images else "skipped",
          "latency_ms": capture_ms,
-         "detail": (f"{len(images)} image(s) validated, orientation corrected, converted to RGB, resized ≤1024 px "
-                    "(models normalise internally); originals retained." if images else "No photo provided.")
+         "detail": (f"{len(images)} image(s) validated and orientation-corrected; originals retained. The classifier "
+                    "uses the original with the EXP-002 evaluation preprocessing (resize 256, centre-crop 224, "
+                    "ImageNet normalisation); a ≤1024 px copy is kept for display." if images else "No photo provided.")
                    + (" Warnings: " + "; ".join(warn) if warn else "")}]
     db.commit()
     db.refresh(meal)
@@ -164,7 +165,20 @@ def update_food(food_id: int, body: FoodUpdateIn, meal: Meal = Depends(owned_mea
         raise HTTPException(404, "Food not found")
     before = _snapshot(f)
     kinds = []
-    if body.nutrition_key is not None and body.nutrition_key != f.nutrition_key:
+    if body.candidate_class_id is not None:
+        cls = vision.taxonomy_class(body.candidate_class_id)
+        if not cls:
+            raise HTTPException(422, "Unknown taxonomy class id")
+        if cls["name"] != f.taxonomy_class:
+            f.label, f.taxonomy_class = cls["name"], cls["name"]
+            ref = nutrition.get(cls["nutrition_key"])
+            if ref and (not f.grams or f.nutrition_key != ref["key"]):
+                f.grams, f.portion = portion.estimate(ref)
+            analysis.apply_mapping(f, cls["nutrition_key"], cls["match"])
+            if not ref:
+                f.grams, f.portion = 0, dict(analysis.UNKNOWN_PORTION)
+            kinds.append("edit_food")
+    elif body.nutrition_key is not None and body.nutrition_key != f.nutrition_key:
         ref = nutrition.get(body.nutrition_key)
         if not ref:
             raise HTTPException(422, "Unknown nutrition_key")
@@ -199,12 +213,19 @@ def update_food(food_id: int, body: FoodUpdateIn, meal: Meal = Depends(owned_mea
 @router.post("/{meal_id}/foods", response_model=MealOut, status_code=201, summary="Add a missing food")
 def add_food(body: FoodAddIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user),
              db: Session = Depends(get_db)):
-    key, quality = (body.nutrition_key, "exact") if body.nutrition_key else nutrition.lookup(body.label or "")
+    tax = None
+    if body.candidate_class_id is not None:
+        tax = vision.taxonomy_class(body.candidate_class_id)
+        if not tax:
+            raise HTTPException(422, "Unknown taxonomy class id")
+        key, quality = tax["nutrition_key"], tax["match"]
+    else:
+        key, quality = (body.nutrition_key, "exact") if body.nutrition_key else nutrition.lookup(body.label or "")
     ref = nutrition.get(key)
     if body.nutrition_key and not ref:
         raise HTTPException(422, "Unknown nutrition_key")
-    if not ref and not body.label:
-        raise HTTPException(422, "Provide nutrition_key or label")
+    if not ref and not body.label and not tax:
+        raise HTTPException(422, "Provide candidate_class_id, nutrition_key or label")
     if body.grams:
         grams, pinfo = body.grams, portion.user_entered(body.grams)
     elif ref:
@@ -212,8 +233,8 @@ def add_food(body: FoodAddIn, meal: Meal = Depends(owned_meal), user: User = Dep
         pinfo["method"] = "typical_serving_manual"
     else:
         grams, pinfo = 0, {"method": "unknown", "uncertainty": "unknown", "range_g": None, "notes": []}
-    f = MealFood(origin="manual", label=body.label or ref["name"], grams=grams, portion=pinfo,
-                 user_corrected=True, original_prediction=None)
+    f = MealFood(origin="manual", label=(tax and tax["name"]) or body.label or ref["name"], grams=grams, portion=pinfo,
+                 taxonomy_class=tax["name"] if tax else None, user_corrected=True, original_prediction=None)
     analysis.apply_mapping(f, key, quality)
     meal.foods.append(f)
     db.flush()

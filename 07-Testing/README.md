@@ -1,25 +1,11 @@
 # 07 · Testing
 
-## One-command test environment (Docker)
-```bash
-./infrastructure/test.sh            # build, run all tests, tear down
-KEEP=1 ./infrastructure/test.sh     # ...and keep the test stack at http://localhost:8081 with a seeded demo user
-```
-It uses a separate Compose project (`mealsenseai-test`) with throwaway databases (tmpfs), so it never touches your real data.
-
-| Step | What it checks |
+| Command | What it checks |
 |---|---|
-| `api-tests` (pytest, 7 tests) | health; register/login/401s; consent-based data minimisation; **real model inference** on a photo; unsupported image → manual entry; edit portion/food → recalculation; add/remove; confirm; history; dashboard; corrections log; owner-only images; capture validation; portion maths (box/mask ratio, instance counts) |
-| `e2e` (Playwright, Chromium, 390×844 phone viewport) | register → onboarding (4 steps) → capture with photo + description → 10-stage analysis → edit portion → add food → save → history → dashboard → AI insights → nutrition insights → menu drawer → desktop login and meal view, all **through the nginx proxy**; fails on any JS error |
-| health | DB, Redis, vision models loaded |
+| `./scripts/acceptance.sh [--offline] [--image photo.jpg]` | NUS acceptance tests 1, 3–10 against the real Compose stack, including restart persistence and the offline mode |
+| `./scripts/test.sh` | Isolated stack: 15 pytest API/pipeline tests and a Playwright phone-sized UI flow through nginx |
+| `cd backend && pytest -q` | API tests without Docker (needs local Postgres with a `mealsenseai_test` database) |
+| `python ml/export/export_exp002.py <image dirs>` | ONNX vs PyTorch parity and exact-preprocessing evidence |
+| `python ml/evaluation/evaluate.py <labelled dir>` | Pipeline accuracy on labelled photos |
 
-Screenshots: `test-results/screenshots/`.
-
-## Model evaluation
-- Classifier (held-out test split): `ml/training/train.py` writes `metrics.json` and `confusion_matrix.png`.
-- Whole pipeline: `python ml/evaluation/evaluate.py datasets/processed/<ds> --manifest test.csv`.
-Results are stored as Experiments and shown on the **AI Model Insights** page.
-
-## Without Docker
-`cd backend && pytest -q` (needs local Postgres with a `mealsenseai_test` database), then
-`python tests/e2e/ui_flow.py http://localhost:8000 /tmp/shots`.
+Actual results from this build: `docs/TEST_REPORT.md`.

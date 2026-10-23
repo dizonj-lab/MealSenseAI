@@ -74,8 +74,9 @@ class MealFood(Base):
     meal_id: Mapped[int] = mapped_column(ForeignKey("meals.id", ondelete="CASCADE"), index=True)
     origin: Mapped[str] = mapped_column(String(20))  # model|description|manual|slm
     label: Mapped[str] = mapped_column(String(200))
+    taxonomy_class: Mapped[str | None] = mapped_column(String(120))  # EXP-002 class finally chosen (model or user)
     nutrition_key: Mapped[str | None] = mapped_column(String(80))
-    mapping_quality: Mapped[str] = mapped_column(String(20), default="none")  # matched|provisional|none
+    mapping_quality: Mapped[str] = mapped_column(String(20), default="none")  # exact|proxy|fuzzy|provisional|none
     original_prediction: Mapped[dict | None] = mapped_column(JSON)
     grams: Mapped[float] = mapped_column(Float, default=0)
     portion: Mapped[dict] = mapped_column(JSON, default=dict)  # method, uncertainty, range, notes

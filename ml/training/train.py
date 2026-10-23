@@ -4,7 +4,7 @@
 - 6 Balancing strategy: weighted sampler | class-weighted loss | oversampling | none
 - 8 ImageNet-pretrained EfficientNet (timm): train head with frozen backbone, then fine-tune the last blocks
 - 9 Evaluation on the held-out test split (see evaluate.py)
-- Export: ONNX + labels + model card to ml/models/food_classifier/, picked up by the app at startup.
+- Export: ONNX + labels + model card to ml/models/food_classifier/ (candidate model; the app serves ml/models/exp002/).
 Usage: python ml/training/train.py [--config ...] [--dataset datasets/processed/<name>-v<version>]
 """
 import argparse

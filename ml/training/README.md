@@ -10,8 +10,8 @@ cd ml/training
 ../../.venv-train/bin/python train.py                      # stages 5, 6, 8, 9 + ONNX export
 ../../.venv-train/bin/python export_yolo_seg.py            # instance segmentation model for inference stage 3
 ```
-Restart the app afterwards. It loads `ml/models/food_classifier/` and records the test metrics as an Experiment,
-which appears on the **AI Model Insights** page.
+The deployed model is EXP-002 (`ml/models/exp002/`, trained on the development workstation). This pipeline exports
+candidate models to `ml/models/food_classifier/`. To deploy one instead of EXP-002, follow `ml/export/` and keep the taxonomy file.
 
 | Diagram stage | Where | What |
 |---|---|---|

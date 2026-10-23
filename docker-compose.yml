@@ -1,59 +1,59 @@
-# MealSenseAI local infrastructure (single machine, Docker Compose)
-#   docker compose up -d --build                 -> http://localhost:8080
-#   docker compose --profile slm up -d --build   -> also runs Ollama in a container
+# MealSenseAI — Docker Compose (CPU by default; no external APIs or runtime downloads needed)
+#   ./scripts/start.sh            or   docker compose up -d --build      -> http://localhost:8080
+#   GPU (optional, NVIDIA):          docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
 name: mealsenseai
 
-x-app-env: &app-env
-  DATABASE_URL: postgresql+psycopg://mealsense:${POSTGRES_PASSWORD:-mealsense}@db:5432/mealsenseai
-  REDIS_URL: redis://redis:6379/0
-  JWT_SECRET: ${JWT_SECRET:-change-me-local-only}
-  OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
-  OLLAMA_MODEL: ${OLLAMA_MODEL:-}
-  DATA_DIR: /data
-
 services:
-  proxy:                                    # reverse proxy / single entry point
-    image: nginx:1.27-alpine
-    ports: ["${HTTP_PORT:-8080}:80"]
-    volumes: ["./infrastructure/nginx.conf:/etc/nginx/conf.d/default.conf:ro"]
-    depends_on: { app: { condition: service_healthy } }
-    healthcheck: { test: ["CMD", "wget", "-qO-", "http://localhost/nginx-health"], interval: 10s, retries: 5 }
+  frontend:                         # React UI + nginx reverse proxy (single entry point)
+    build: { context: ., dockerfile: frontend/Dockerfile }
+    image: mealsenseai/frontend:local
+    ports: ["${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-8080}:80"]
+    depends_on: { backend: { condition: service_healthy } }
     restart: unless-stopped
 
-  app:                                      # web UI + FastAPI API + vision inference (CPU)
-    build: { context: ., dockerfile: infrastructure/Dockerfile, target: runtime }
-    image: mealsenseai/app:local
-    environment: *app-env
-    extra_hosts: ["host.docker.internal:host-gateway"]
-    volumes:
-      - uploads:/data                       # meal images (local object storage)
-      - ./ml/models:/app/ml/models:ro       # model store (retrain -> restart app)
-    depends_on:
-      db: { condition: service_healthy }
-      redis: { condition: service_healthy }
+  backend:                          # FastAPI, EXP-002 classifier, nutrition & insights, migrations on start
+    build: { context: ., dockerfile: backend/Dockerfile, target: cpu }
+    image: mealsenseai/backend:local
+    environment:
+      DATABASE_URL: postgresql+psycopg://mealsense:${POSTGRES_PASSWORD:-mealsense}@db:5432/mealsenseai
+      JWT_SECRET: ${JWT_SECRET:-change-me-local-only}
+      REDIS_URL: ${REDIS_URL:-}
+      OLLAMA_URL: ${OLLAMA_URL:-http://127.0.0.1:9}     # optional local SLM; unreachable = rule-based fallback
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+      INFERENCE_DEVICE: ${INFERENCE_DEVICE:-auto}
+    volumes: ["uploads:/data"]      # meal photos
+    depends_on: { db: { condition: service_healthy }, init-perms: { condition: service_completed_successfully } }
     restart: unless-stopped
 
-  db:                                       # users, profiles, meals, corrections, metrics
+  init-perms:                       # one-shot: photo volume owned by the non-root backend user (also fixes old volumes)
+    image: mealsenseai/backend:local
+    user: root
+    entrypoint: ["sh", "-c", "chown -R 10001:10001 /data"]
+    volumes: ["uploads:/data"]
+    restart: "no"
+
+  db:
     image: postgres:16-alpine
     environment: { POSTGRES_USER: mealsense, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-mealsense}", POSTGRES_DB: mealsenseai }
-    volumes: [pgdata:/var/lib/postgresql/data]
-    healthcheck: { test: ["CMD-SHELL", "pg_isready -U mealsense -d mealsenseai"], interval: 5s, retries: 10 }
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U mealsense -d mealsenseai"], interval: 5s, retries: 20 }
     restart: unless-stopped
 
-  redis:                                    # cache for nutrition lookups and SLM responses
+  redis:                            # optional cache (profile "cache"); set REDIS_URL=redis://redis:6379/0
     image: redis:7-alpine
+    profiles: [cache]
     command: ["redis-server", "--appendonly", "yes"]
-    volumes: [redisdata:/data]
+    volumes: ["redisdata:/data"]
     healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, retries: 10 }
     restart: unless-stopped
 
-  ollama:                                   # optional local SLM (set OLLAMA_URL=http://ollama:11434)
+  ollama:                           # optional local SLM (profile "slm"); set OLLAMA_URL=http://ollama:11434
     image: ollama/ollama:0.12.6
     profiles: [slm]
-    volumes: [ollama:/root/.ollama]
+    volumes: ["ollama:/root/.ollama"]
     restart: unless-stopped
 
-  ollama-pull:                              # one-shot: download the SLM model into the ollama volume
+  ollama-pull:
     image: ollama/ollama:0.12.6
     profiles: [slm]
     environment: { OLLAMA_HOST: "http://ollama:11434" }
@@ -61,4 +61,4 @@ services:
     depends_on: [ollama]
     restart: "no"
 
-volumes: { pgdata: {}, redisdata: {}, uploads: {}, ollama: {} }
+volumes: { pgdata: {}, uploads: {}, redisdata: {}, ollama: {} }

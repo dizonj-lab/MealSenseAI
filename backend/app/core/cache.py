@@ -14,6 +14,8 @@ stats = {"hits": 0, "misses": 0, "backend": "unknown"}
 
 def _redis():
     global _client
+    if _client is None and not settings.redis_url:
+        _client, stats["backend"] = False, "memory"
     if _client is None:
         try:
             c = redis.Redis.from_url(settings.redis_url, socket_timeout=0.5, socket_connect_timeout=0.5)

@@ -2,8 +2,8 @@
 
  1 Meal capture            (capture endpoint)
  2 Image pre-processing    (capture endpoint)
- 3 Food instance detection (YOLO11n-seg masks / EfficientDet boxes)
- 4 Food classification     (per-instance crops: fine-tuned classifier or ImageNet fallback)
+ 3 Food instance detection (YOLO11n-seg masks; supporting)
+ 4 Food classification     (EXP-002 EfficientNet-B0, 320 classes, top-3 candidates)
  5 Portion estimation
  6 Nutrition mapping
  7 Meal aggregation
@@ -24,6 +24,11 @@ UNKNOWN_PORTION = {"method": "unknown", "uncertainty": "unknown", "range_g": Non
                    "notes": ["No nutrition match; choose a food from the table and enter the portion."]}
 
 
+def vision_auto_accept() -> float:
+    card = (vision.models().get("classifier") or {})
+    return 0.5 if not card else float(vision._state["cls"]["card"].get("auto_accept_min_score", 0.5))
+
+
 def food_dict(f: MealFood) -> dict:
     return {"label": f.label, "grams": f.grams, "nutrients": f.nutrients or {}, "nutrition_key": f.nutrition_key}
 
@@ -32,7 +37,7 @@ def apply_mapping(f: MealFood, key: str | None, quality: str):
     f.nutrition_key, f.mapping_quality = key, quality if key else "none"
     if key:
         f.nutrients = nutrition.compute(key, f.grams)
-        f.nutrition_source = nutrition.source_info(key)
+        f.nutrition_source = {**nutrition.source_info(key), "match": quality}
     else:
         f.nutrients, f.nutrition_source = nutrition.empty_nutrients(), None
 
@@ -80,21 +85,23 @@ def run(db: Session, meal: Meal, profile) -> list[dict]:
     mods = vstat["models"]
 
     # 3 + 4: detection and classification (run together per image; latencies reported separately)
-    results = [vision.analyze(im["path"], im["view"]) for im in meal.images]
+    results = [vision.analyze(im["path"], im["view"], im.get("original_path")) for im in meal.images]
     meal.images = [{**im, "overlay_path": r.get("overlay_path")} for im, r in zip(meal.images, results)]
     for im, r in zip(meal.images, results):
         if not r["ok"]:
             continue
-        for role, task in (("detector", "detector"), ("classifier", "classifier")):
-            m = mods.get(role) or mods.get("classifier_imagenet")
-            db.add(InferenceLog(meal_id=meal.id, model_name=m["name"], model_version=m["version"], task=m["task"],
-                                latency_ms=r["latency_ms"][task], extra={"view": im["view"]}))
+        for role in ("detector", "classifier"):
+            m = mods.get(role)
+            if m:
+                db.add(InferenceLog(meal_id=meal.id, model_name=m["name"], model_version=m["version"], task=m["task"],
+                                    latency_ms=r["latency_ms"][role], extra={"view": im["view"], "device": r.get("device")}))
     preds = vision.merge(results)
     det_ms = sum(r.get("latency_ms", {}).get("detector", 0) for r in results)
     cls_ms = sum(r.get("latency_ms", {}).get("classifier", 0) for r in results)
     n_inst = sum(1 for r in results for i in r.get("instances", []) if i["kind"] in ("food", "container"))
-    det_name = mods.get("detector", {}).get("name", "unavailable")
-    cls_name = (mods.get("classifier") or mods.get("classifier_imagenet") or {}).get("name", "unavailable")
+    det_name = mods.get("detector", {}).get("name", "detector unavailable")
+    cls_name = mods.get("classifier", {}).get("name", "unavailable")
+    device = next((r.get("device") for r in results if r.get("device")), None)
     if not meal.images:
         st.add("detect", "Food instance detection", "skipped", "No photo provided.")
         st.add("classify", "Food classification", "skipped", "No photo provided.")
@@ -102,16 +109,15 @@ def run(db: Session, meal: Meal, profile) -> list[dict]:
         st.add("detect", "Food instance detection", "unsupported", f"Vision models unavailable ({vstat['error']}).")
         st.add("classify", "Food classification", "unsupported", "Manual entry enabled.")
     else:
-        st.items.append({"key": "detect", "name": "Food instance detection", "status": "done",
-                         "detail": f"{det_name}: {n_inst} food/dish instance(s) segmented"
-                                   + ("" if n_inst else " — whole image used as one region"),
-                         "latency_ms": det_ms,
+        st.items.append({"key": "detect", "name": "Food instance detection", "status": "done" if "detector" in mods else "skipped",
+                         "detail": f"{det_name}: {n_inst} food/dish region(s) outlined (supporting step; the whole photo "
+                                   "is always classified)", "latency_ms": det_ms,
                          "per_view": [{"view": r["view"], "instances": r.get("instances", [])} for r in results]})
-        st.items.append({"key": "classify", "name": "Food classification",
-                         "status": "done" if preds else "unsupported",
-                         "detail": (f"{cls_name}: {len(preds)} food(s) identified" if preds else
-                                    f"{cls_name}: no food in the model vocabulary recognised. Add foods manually "
-                                    "or via the description."),
+        weak = all(r.get("top_labels") and r["top_labels"][0]["score"] < vision.PROPOSE_MIN for r in results if r["ok"])
+        st.items.append({"key": "classify", "name": "Food classification", "status": "uncertain" if weak else "done",
+                         "detail": f"{cls_name} on {device or 'cpu'}: top-3 candidates per photo"
+                                   + (f"; {len(preds) - 1} additional item(s) proposed from crops" if len(preds) > 1 else "")
+                                   + ("; low confidence — choose one of the candidates or add the food manually" if weak else ""),
                          "latency_ms": cls_ms,
                          "per_view": [{"view": r["view"], "top_labels": r.get("top_labels", [])} for r in results]})
         st.t = time.perf_counter()
@@ -121,16 +127,14 @@ def run(db: Session, meal: Meal, profile) -> list[dict]:
         if f.origin in ("model", "description") and not f.user_corrected:
             meal.foods.remove(f)
     containers = {r["view"]: r.get("containers", []) for r in results}
-    seen = {f.nutrition_key for f in meal.foods if not f.removed}
+    seen = {f.nutrition_key for f in meal.foods if not f.removed and f.nutrition_key}
     n_views = len(meal.images)
+    uncertain = [p for p in preds if p["instance"] == "whole photo" and p["score"] < vision.PROPOSE_MIN]
+    preds = [p for p in preds if p not in uncertain]
     for p in preds:
-        key = p["nutrition_key"]
-        if key and key in seen:
+        key, quality = p["nutrition_key"], p["match"]
+        if key and key in seen and p["instance"] != "whole photo":
             continue
-        label = (nutrition.get(key) or {}).get("name") or p["model_label"]
-        quality = "exact" if key else "none"
-        if not key and (pk := _provisional(p["model_label"])):
-            key, quality = pk, "provisional"
         ref = nutrition.get(key)
         if ref:
             grams, pinfo = portion.estimate(ref, bbox=p["bbox"], area_frac=p.get("area_frac"),
@@ -139,14 +143,17 @@ def run(db: Session, meal: Meal, profile) -> list[dict]:
                                             has_mask=p.get("has_mask", False))
         else:
             grams, pinfo = 0, dict(UNKNOWN_PORTION)
-        pred = {k: p.get(k) for k in ("model_label", "nutrition_key", "score", "bbox", "model", "model_name", "view",
-                                       "views", "instance", "detector_label", "detector_score", "classifier_top",
-                                       "area_frac", "has_mask", "instances", "deferred_from")}
-        pred.update(score_band=vision.score_band(p["score"]), score_type="raw model score (uncalibrated)")
-        f = MealFood(origin="model", label=label, grams=grams, portion=pinfo, original_prediction=pred)
+        pred = {k: p.get(k) for k in ("model_label", "class_id", "nutrition_key", "match", "score", "candidates", "bbox",
+                                       "view", "views", "instance", "area_frac", "has_mask", "instances")}
+        pred.update(model_name=cls_name, model_version=mods.get("classifier", {}).get("version"), device=device,
+                    score_band=vision.score_band(p["score"]), score_type="raw softmax score (uncalibrated)",
+                    needs_review=p["score"] < vision_auto_accept())
+        f = MealFood(origin="model", label=p["model_label"], taxonomy_class=p["model_label"], grams=grams,
+                     portion=pinfo, original_prediction=pred)
         apply_mapping(f, key, quality)
         meal.foods.append(f)
-        seen.add(key)
+        if key:
+            seen.add(key)
 
     desc_source = None
     if meal.description:

@@ -7,6 +7,6 @@ restic restore "$SNAP" --tag mealsenseai --target "$OUT"
 DUMP="$(find "$OUT" -name mealsenseai.dump)"; TGZ="$(find "$OUT" -name uploads.tgz)"
 cd "$REPO_DIR"
 docker compose exec -T db pg_restore -U mealsense -d mealsenseai --clean --if-exists < "$DUMP"
-docker compose exec -T app tar -xzf - -C /data < "$TGZ"
-docker compose restart app
+docker compose exec -T backend tar -xzf - -C /data < "$TGZ"
+docker compose restart backend
 echo "restored snapshot $SNAP"

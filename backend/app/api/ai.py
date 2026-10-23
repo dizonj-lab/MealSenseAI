@@ -36,10 +36,12 @@ def models(user: User = Depends(current_user), db: Session = Depends(get_db)):
                           .where(InferenceLog.model_version == "ollama")).one()
     return {
         "vision": {"available": v["available"], "error": v["error"],
+                   "device": v.get("device"),
                    "models": [{**m, "latency": _latency(db, m["name"]), "score_calibrated": False,
-                               "accuracy": (f"test accuracy {m['test_metrics']['accuracy']:.3f}, macro-F1 "
-                                            f"{m['test_metrics']['macro_f1']:.3f} (held-out split)")
-                               if m.get("test_metrics") else "not measured on food data"}
+                               "accuracy": (f"top-1 {m['reported_metrics']['top1_accuracy']:.2%}, top-3 "
+                                            f"{m['reported_metrics']['top3_accuracy']:.2%}, macro-F1 "
+                                            f"{m['reported_metrics']['macro_f1']:.2%} (reported by developer)")
+                               if m.get("reported_metrics") else "not evaluated on food classes (supporting detector)"}
                               for m in v["models"].values()]},
         "slm": {**s, "role": "text-only: label normalisation, provisional matches, explanations",
                 "calls": slm_rows[0], "avg_latency_ms": round(slm_rows[1] or 0, 1), "tokens": int(slm_rows[2] or 0),
@@ -59,6 +61,11 @@ def models(user: User = Depends(current_user), db: Session = Depends(get_db)):
                          "notes": e.notes, "created_at": e.created_at}
                         for e in db.scalars(select(Experiment).order_by(Experiment.id.desc()).limit(20))],
     }
+
+
+@router.get("/taxonomy/search", tags=["foods"])
+def search_taxonomy(q: str = Query("", max_length=100), user: User = Depends(current_user)):
+    return vision.search_taxonomy(q)
 
 
 @router.get("/foods/search", tags=["foods"])

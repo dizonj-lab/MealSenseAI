@@ -11,7 +11,6 @@ python-multipart
 pillow
 pillow-heif
 numpy
-mediapipe
 httpx
-pytest
 onnxruntime
+alembic

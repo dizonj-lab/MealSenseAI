@@ -57,6 +57,18 @@ with sync_playwright() as p:
     expect(page.get_by_text("Potential Glucose Impact")).to_be_visible(timeout=30000)
     page.wait_for_timeout(800)
     shot(page, "06_analysis_review")
+    # top-3 candidates: switch to candidate 2, verify, switch back (confirm/override workflow)
+    cands = page.locator("button", has_text="%").filter(has_text=". ")
+    expect(cands.first).to_be_visible()
+    assert cands.count() >= 3, f"expected top-3 candidates, got {cands.count()}"
+    first_label = cands.nth(0).inner_text().split("\n")[0]
+    second = cands.nth(1).inner_text().split("\n")[0]
+    print("top-3:", [cands.nth(i).inner_text().replace("\n", " ") for i in range(3)])
+    cands.nth(1).click()
+    expect(page.locator("h3", has_text=second.split(". ", 1)[1].split(" ·")[0])).to_be_visible(timeout=15000)
+    shot(page, "06b_candidate_override")
+    page.locator("button", has_text=first_label).click()
+    expect(page.locator("h3", has_text=first_label.split(". ", 1)[1].split(" ·")[0])).to_be_visible(timeout=15000)
 
     # correct portion of kaya toast
     card = page.locator(".card", has=page.get_by_role("heading", name="Kaya toast with butter"))
@@ -91,7 +103,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(600)
     shot(page, "10_dashboard")
     page.goto(f"{BASE}/ai")
-    expect(page.get_by_text("YOLO11n-seg").first).to_be_visible()
+    expect(page.get_by_text("EXP-002").first).to_be_visible()
     shot(page, "11_ai_insights")
     page.goto(f"{BASE}/insights")
     page.wait_for_timeout(600)

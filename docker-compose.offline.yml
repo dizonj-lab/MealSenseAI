@@ -1,0 +1,10 @@
+# Verification override: backend and database get NO internet access (internal network only).
+# Used by ./scripts/acceptance.sh --offline to prove the core workflow has no external dependencies.
+services:
+  frontend: { networks: [public, internal] }
+  backend: { networks: [internal] }
+  init-perms: { networks: [internal] }
+  db: { networks: [internal] }
+networks:
+  public: {}
+  internal: { internal: true }

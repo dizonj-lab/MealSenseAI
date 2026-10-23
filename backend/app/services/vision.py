@@ -1,145 +1,172 @@
-"""Stages 3-4 of the inference pipeline: food instance detection (segmentation) and per-instance classification.
+"""Stages 3-4 of the inference pipeline: food instance detection and food classification.
 
-Stage 3 — instance detection/segmentation
-  YOLO11n-seg (COCO-2017, ONNX via onnxruntime): instance masks + boxes for 10 COCO food classes and the
-  containers (bowl, cup, plate-like table) that hold dishes. Fallback: EfficientDet-Lite0 (boxes only).
-Stage 4 — classification of each instance crop
-  Fine-tuned food classifier (ml/models/food_classifier/model.onnx, from ml/training) when present,
-  otherwise EfficientNet-Lite0 ImageNet-1k (~40 food classes).
-Scores are raw softmax/sigmoid outputs, NOT calibrated probabilities.
+Stage 4 — classification (primary): MealSenseAI EXP-002, EfficientNet-B0 fine-tuned on Food-101 + FoodSG,
+  320 canonical classes. Runs as ONNX (exported from best_model.pth; parity evidence in
+  ml/models/exp002/evidence/onnx_parity.json) with the exact evaluation preprocessing (services/preprocess.py).
+  The whole photo is classified (as in evaluation) and the top-3 candidates are returned for confirmation.
+Stage 3 — detection (supporting): YOLO11n-seg (COCO, ONNX) outlines food items and dish containers. Crops of
+  detected items are classified too, so a second, different dish in the same photo can be proposed.
+Inference device: CUDA when onnxruntime exposes it (GPU image) and INFERENCE_DEVICE allows it, else CPU.
+Models are loaded once at startup. Scores are raw softmax outputs, NOT calibrated probabilities.
 """
 import ast
 import json
 import logging
+import os
 import threading
 import time
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 
 from app.core.config import settings
+from app.services.preprocess import to_input
 
 log = logging.getLogger(__name__)
 
-# ImageNet label -> nutrition table key (None = food but no reliable composition match)
-IMAGENET_FOOD = {
-    "pizza": "pizza", "cheeseburger": "cheeseburger", "hotdog": "hot_dog", "burrito": "burrito",
-    "bagel": "bagel", "pretzel": "pretzel", "French loaf": "french_bread", "ice cream": "ice_cream",
-    "guacamole": "guacamole", "carbonara": "carbonara", "mashed potato": "mashed_potato",
-    "head cabbage": "cabbage", "broccoli": "broccoli", "cauliflower": "cauliflower",
-    "zucchini": "zucchini", "spaghetti squash": "butternut_squash", "acorn squash": "butternut_squash",
-    "butternut squash": "butternut_squash", "cucumber": "cucumber", "artichoke": "artichoke",
-    "bell pepper": "bell_pepper", "mushroom": "mushroom", "Granny Smith": "apple",
-    "strawberry": "strawberry", "orange": "orange", "lemon": "lemon", "fig": "fig",
-    "pineapple": "pineapple", "banana": "banana", "jackfruit": "jackfruit",
-    "custard apple": "custard_apple", "pomegranate": "pomegranate", "meat loaf": "meat_loaf",
-    "potpie": "pot_pie", "red wine": "red_wine", "espresso": "coffee_black", "eggnog": "eggnog",
-    "consomme": "consomme", "trifle": "trifle", "corn": "corn", "ear": "corn",
-    "hot pot": None, "chocolate sauce": None, "dough": None,
-}
-COCO_FOOD = {
-    "banana": "banana", "apple": "apple", "sandwich": "sandwich", "orange": "orange",
-    "broccoli": "broccoli", "carrot": "carrot", "hot dog": "hot_dog", "pizza": "pizza",
-    "donut": "donut", "cake": "chocolate_cake",
-}
-COCO_DISH_CONTAINERS = {"bowl", "cup", "wine glass"}  # their contents get classified
+COCO_FOOD = {"banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake"}
+COCO_DISH_CONTAINERS = {"bowl", "cup", "wine glass"}
 COCO_REFERENCE = {"dining table", "bowl", "fork", "knife", "spoon"}
 DET_MIN = 0.30
-IMAGENET_MIN = 0.12
-FINETUNED_MIN = 0.70  # closed-set model: below this, defer to the open-vocabulary ImageNet classifier
-SCENE_MIN = {"imagenet": 0.30, "finetuned": 0.75}
+PROPOSE_MIN = 0.20       # below this the photo's top-1 is not added automatically; the user picks from the top-3
+CROP_MIN = 0.60          # a crop proposes an extra item only when confident and different from the photo's top-3
 PALETTE = [(20, 184, 166), (14, 165, 233), (245, 158, 11), (16, 185, 129), (139, 92, 246), (244, 63, 94)]
 
 _lock = threading.RLock()
 _state: dict = {"loaded": False}
 
 
-# ---------------------------------------------------------------- model loading
+def _providers() -> list[str]:
+    import onnxruntime as ort
+    want = os.environ.get("INFERENCE_DEVICE", "auto").lower()
+    avail = ort.get_available_providers()
+    if want in ("auto", "cuda") and "CUDAExecutionProvider" in avail:
+        return ["CUDAExecutionProvider", "CPUExecutionProvider"]
+    if want == "cuda":
+        log.warning("INFERENCE_DEVICE=cuda but CUDAExecutionProvider is unavailable; using CPU")
+    return ["CPUExecutionProvider"]
+
+
 def _load():
     if _state["loaded"]:
         return
-    _state.update(loaded=True, seg=None, det=None, cls=None, ft=None, errors={})
-    d = settings.models_dir
+    _state.update(loaded=True, seg=None, cls=None, errors={}, device="cpu")
     import onnxruntime as ort
     opts = ort.SessionOptions()
     opts.log_severity_level = 3
+    prov = _providers()
+    d = settings.models_dir
+    cdir = d / "exp002"
+    try:
+        card = json.loads((cdir / "model_card.json").read_text())
+        taxonomy = json.loads((cdir / "class_mapping.json").read_text())
+        sess = ort.InferenceSession(str(cdir / "model.onnx"), opts, providers=prov)
+        n_out = sess.get_outputs()[0].shape[-1]
+        if n_out != len(taxonomy) or sorted(taxonomy.values()) != list(range(len(taxonomy))):
+            raise ValueError(f"taxonomy mismatch: model outputs {n_out}, taxonomy has {len(taxonomy)} classes")
+        names = [None] * len(taxonomy)
+        for name, i in taxonomy.items():
+            names[i] = name
+        by_id = {c["id"]: c for c in card["classes"]}
+        _state["cls"] = {"session": sess, "card": card, "names": names, "map": by_id}
+        _state["device"] = "cuda" if sess.get_providers()[0] == "CUDAExecutionProvider" else "cpu"
+    except Exception as e:
+        _state["errors"]["classifier"] = f"{type(e).__name__}: {e}"
+        log.exception("food classifier failed to load")
     seg_path = d / "yolo11n-seg.onnx"
     if seg_path.exists():
         try:
-            s = ort.InferenceSession(str(seg_path), opts, providers=["CPUExecutionProvider"])
+            s = ort.InferenceSession(str(seg_path), opts, providers=prov)
             names = ast.literal_eval(s.get_modelmeta().custom_metadata_map.get("names", "{}"))
             _state["seg"] = {"session": s, "names": names, "imgsz": s.get_inputs()[0].shape[2] or 640}
         except Exception as e:
             _state["errors"]["segmenter"] = str(e)
-    ft_dir = d / "food_classifier"
-    if (ft_dir / "model.onnx").exists():
-        try:
-            card = json.loads((ft_dir / "model_card.json").read_text())
-            _state["ft"] = {"session": ort.InferenceSession(str(ft_dir / "model.onnx"), opts,
-                                                            providers=["CPUExecutionProvider"]), "card": card}
-        except Exception as e:
-            _state["errors"]["finetuned"] = str(e)
-    try:
-        from mediapipe.tasks.python import BaseOptions, vision as mpv
-        _state["cls"] = mpv.ImageClassifier.create_from_options(mpv.ImageClassifierOptions(
-            base_options=BaseOptions(model_asset_path=str(d / "efficientnet_lite0.tflite")), max_results=10))
-        if _state["seg"] is None:
-            _state["det"] = mpv.ObjectDetector.create_from_options(mpv.ObjectDetectorOptions(
-                base_options=BaseOptions(model_asset_path=str(d / "efficientdet_lite0.tflite")),
-                max_results=15, score_threshold=0.25))
-    except Exception as e:
-        _state["errors"]["mediapipe"] = f"{type(e).__name__}: {e}"
-        log.exception("MediaPipe models failed to load")
+    else:
+        _state["errors"]["segmenter"] = "yolo11n-seg.onnx not found (detection disabled; classification still works)"
+
+
+def warmup():
+    """Load models once at startup and run one inference so the first request is fast."""
+    with _lock:
+        _load()
+        if _state["cls"]:
+            _state["cls"]["session"].run(None, {"input": np.zeros((1, 3, 224, 224), np.float32)})
 
 
 def close():
     with _lock:
-        for k in ("cls", "det"):
-            if _state.get(k) is not None:
-                _state[k].close()
         _state.clear()
         _state["loaded"] = False
 
 
 def models() -> dict:
-    """Active model descriptors (for UI, persistence and the AI insights page)."""
     with _lock:
         _load()
     out = {}
+    if _state["cls"]:
+        c = _state["cls"]["card"]
+        m = c["metrics"]["reported_by_developer"]
+        out["classifier"] = {"name": c["name"], "version": c["version"], "trained_on": " + ".join(c["training_data"]),
+                             "task": f"food classification ({c['num_classes']} classes)", "food_classes": c["num_classes"], "stage": "4 · Food classification",
+                             "device": _state["device"], "reported_metrics": {k: m[k] for k in ("top1_accuracy", "top3_accuracy", "macro_f1")},
+                             "metrics_source": m["source"], "sha256": c["files"]["best_model.pth"]["sha256"]}
     if _state["seg"]:
         out["detector"] = {"name": "YOLO11n-seg", "version": "ultralytics-8.3 / ONNX", "trained_on": "COCO-2017",
                            "task": "instance segmentation", "food_classes": len(COCO_FOOD),
-                           "stage": "3 · Food instance detection"}
-    elif _state["det"]:
-        out["detector"] = {"name": "EfficientDet-Lite0", "version": "mediapipe-float32-latest", "trained_on": "COCO-2017",
-                           "task": "object detection (boxes only)", "food_classes": len(COCO_FOOD),
-                           "stage": "3 · Food instance detection"}
-    if _state["ft"]:
-        c = _state["ft"]["card"]
-        out["classifier"] = {"name": c["name"], "version": c["version"], "trained_on": "+".join(c["dataset"]["sources"]),
-                             "task": c["task"], "food_classes": len(c["classes"]), "stage": "4 · Food classification",
-                             "test_metrics": {k: v for k, v in c["test_metrics"].items() if isinstance(v, (int, float))},
-                             "dataset_hash": c["dataset"]["hash"]}
-    if _state["cls"]:
-        out["classifier_imagenet"] = {"name": "EfficientNet-Lite0", "version": "mediapipe-float32-latest",
-                                      "trained_on": "ImageNet-1k", "task": "image classification",
-                                      "food_classes": sum(1 for v in IMAGENET_FOOD.values() if v),
-                                      "stage": "4 · Food classification" + (" (fallback)" if _state["ft"] else "")}
+                           "stage": "3 · Food instance detection", "device": _state["device"]}
     return out
 
 
 def status() -> dict:
     m = models()
-    return {"available": "detector" in m and ("classifier" in m or "classifier_imagenet" in m),
-            "error": "; ".join(f"{k}: {v}" for k, v in _state["errors"].items()) or None, "models": m}
+    return {"available": "classifier" in m, "device": _state.get("device"),
+            "error": "; ".join(f"{k}: {v}" for k, v in _state.get("errors", {}).items()) or None, "models": m}
+
+
+def taxonomy_class(class_id: int) -> dict | None:
+    with _lock:
+        _load()
+    c = _state.get("cls")
+    if not c or not 0 <= class_id < len(c["names"]):
+        return None
+    meta = c["map"].get(class_id, {})
+    return {"id": class_id, "name": c["names"][class_id], "nutrition_key": meta.get("nutrition_key"),
+            "match": meta.get("match", "none")}
+
+
+def search_taxonomy(q: str, limit: int = 15) -> list[dict]:
+    import difflib
+    with _lock:
+        _load()
+    c = _state.get("cls")
+    if not c:
+        return []
+    ql = q.lower().strip()
+    scored = sorted(((difflib.SequenceMatcher(None, ql, n).ratio() + (0.6 if ql and ql in n else 0), i)
+                     for i, n in enumerate(c["names"])), reverse=True)
+    return [taxonomy_class(i) for _, i in scored[:limit]]
 
 
 def score_band(score: float) -> str:
     return "strong" if score >= 0.6 else "moderate" if score >= 0.3 else "weak"
 
 
-# ---------------------------------------------------------------- stage 3: instances
+# ---------------------------------------------------------------- classification
+def classify(img: Image.Image, k: int = 3) -> list[dict]:
+    c = _state["cls"]
+    logits = c["session"].run(None, {"input": to_input(img)})[0][0]
+    p = np.exp(logits - logits.max())
+    p /= p.sum()
+    out = []
+    for i in p.argsort()[::-1][:k]:
+        meta = c["map"].get(int(i), {})
+        out.append({"class_id": int(i), "label": c["names"][i], "score": round(float(p[i]), 4),
+                    "nutrition_key": meta.get("nutrition_key"), "match": meta.get("match", "none")})
+    return out
+
+
+# ---------------------------------------------------------------- detection (YOLO-seg)
 def _letterbox(img: Image.Image, size: int):
     r = min(size / img.width, size / img.height)
     nw, nh = round(img.width * r), round(img.height * r)
@@ -151,14 +178,15 @@ def _letterbox(img: Image.Image, size: int):
 
 def _nms(boxes: np.ndarray, scores: np.ndarray, iou: float = 0.5) -> list[int]:
     order, keep = scores.argsort()[::-1], []
+    area = lambda b: (b[..., 2] - b[..., 0]) * (b[..., 3] - b[..., 1])
     while order.size:
         i = order[0]
         keep.append(int(i))
-        xx1 = np.maximum(boxes[i, 0], boxes[order[1:], 0]); yy1 = np.maximum(boxes[i, 1], boxes[order[1:], 1])
-        xx2 = np.minimum(boxes[i, 2], boxes[order[1:], 2]); yy2 = np.minimum(boxes[i, 3], boxes[order[1:], 3])
+        rest = order[1:]
+        xx1 = np.maximum(boxes[i, 0], boxes[rest, 0]); yy1 = np.maximum(boxes[i, 1], boxes[rest, 1])
+        xx2 = np.minimum(boxes[i, 2], boxes[rest, 2]); yy2 = np.minimum(boxes[i, 3], boxes[rest, 3])
         inter = np.clip(xx2 - xx1, 0, None) * np.clip(yy2 - yy1, 0, None)
-        area = lambda b: (b[..., 2] - b[..., 0]) * (b[..., 3] - b[..., 1])
-        order = order[1:][inter / (area(boxes[i]) + area(boxes[order[1:]]) - inter + 1e-9) < iou]
+        order = rest[inter / (area(boxes[i]) + area(boxes[rest]) - inter + 1e-9) < iou]
     return keep
 
 
@@ -167,7 +195,7 @@ def _segment(img: Image.Image) -> list[dict]:
     size = seg["imgsz"]
     x, r, px, py = _letterbox(img, size)
     out0, protos = seg["session"].run(None, {seg["session"].get_inputs()[0].name: x})
-    pred = out0[0].T  # (8400, 4 + nc + 32)
+    pred = out0[0].T
     nc = pred.shape[1] - 4 - protos.shape[1]
     cls_scores = pred[:, 4:4 + nc]
     cls_id, score = cls_scores.argmax(1), cls_scores.max(1)
@@ -178,11 +206,11 @@ def _segment(img: Image.Image) -> list[dict]:
     b = pred[:, :4]
     boxes = np.stack([b[:, 0] - b[:, 2] / 2, b[:, 1] - b[:, 3] / 2, b[:, 0] + b[:, 2] / 2, b[:, 1] + b[:, 3] / 2], 1)
     keep = []
-    for c in np.unique(cls_id):  # class-wise NMS
+    for c in np.unique(cls_id):
         idx = np.where(cls_id == c)[0]
         keep += [idx[k] for k in _nms(boxes[idx], score[idx])]
     keep = sorted(keep, key=lambda i: -score[i])[:20]
-    P = protos[0]  # (32, mh, mw)
+    P = protos[0]
     mh, mw = P.shape[1:]
     out = []
     for i in keep:
@@ -191,78 +219,15 @@ def _segment(img: Image.Image) -> list[dict]:
         x1, y1, x2, y2 = boxes[i] * (mw / size)
         crop = np.zeros_like(mask)
         crop[max(int(y1), 0):int(np.ceil(y2)), max(int(x1), 0):int(np.ceil(x2))] = 1
-        mask = mask * crop
-        # back to original image coordinates
-        m_img = Image.fromarray((mask * 255).astype(np.uint8)).resize((size, size), Image.BILINEAR)
+        m_img = Image.fromarray((mask * crop * 255).astype(np.uint8)).resize((size, size), Image.BILINEAR)
         m_img = m_img.crop((px, py, px + round(img.width * r), py + round(img.height * r))).resize(img.size, Image.BILINEAR)
         mask_np = np.asarray(m_img) > 127
-        bx = (boxes[i] - [px, py, px, py]) / r
-        bx = np.clip(bx, 0, [img.width, img.height, img.width, img.height])
+        bx = np.clip((boxes[i] - [px, py, px, py]) / r, 0, [img.width, img.height, img.width, img.height])
         out.append({"label": seg["names"].get(int(cls_id[i]), str(cls_id[i])), "score": float(score[i]),
                     "bbox": {"x": bx[0] / img.width, "y": bx[1] / img.height,
                              "w": (bx[2] - bx[0]) / img.width, "h": (bx[3] - bx[1]) / img.height},
                     "mask": mask_np, "area_frac": float(mask_np.mean())})
     return out
-
-
-def _detect_boxes(img: Image.Image) -> list[dict]:
-    import mediapipe as mp
-    res = _state["det"].detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(img)))
-    out = []
-    for d in res.detections:
-        b, c = d.bounding_box, d.categories[0]
-        box = {"x": b.origin_x / img.width, "y": b.origin_y / img.height, "w": b.width / img.width, "h": b.height / img.height}
-        out.append({"label": c.category_name, "score": float(c.score), "bbox": box, "mask": None,
-                    "area_frac": box["w"] * box["h"]})
-    return out
-
-
-# ---------------------------------------------------------------- stage 4: classification
-def _classify(crop: Image.Image) -> dict:
-    """Top-5 food candidates for one crop: fine-tuned model first, ImageNet model when it is not confident."""
-    if _state["ft"]:
-        c = _classify_finetuned(crop)
-        if c["top"][0]["score"] >= FINETUNED_MIN or not _state["cls"]:
-            return c
-        im = _classify_imagenet(crop)
-        im["deferred_from"] = {"model_name": c["model_name"], "top": c["top"][:3]}
-        return im
-    return _classify_imagenet(crop)
-
-
-def _classify_finetuned(crop: Image.Image) -> dict:
-    ft = _state["ft"]
-    inp = ft["card"]["input"]
-    s = inp["resize"] / min(crop.size)
-    im = crop.resize((max(inp["size"], round(crop.width * s)), max(inp["size"], round(crop.height * s))), Image.BILINEAR)
-    l, t = (im.width - inp["size"]) // 2, (im.height - inp["size"]) // 2
-    arr = np.asarray(im.crop((l, t, l + inp["size"], t + inp["size"])), dtype=np.float32) / 255.0
-    arr = ((arr - inp["mean"]) / inp["std"]).transpose(2, 0, 1)[None].astype(np.float32)
-    logits = ft["session"].run(None, {"input": arr})[0][0]
-    p = np.exp(logits - logits.max()); p /= p.sum()
-    classes = ft["card"]["classes"]
-    top = [{"label": classes[i]["name"], "nutrition_key": classes[i]["nutrition_key"], "score": round(float(p[i]), 3)}
-           for i in p.argsort()[::-1][:5]]
-    return {"model": "finetuned", "model_name": ft["card"]["name"], "top": top, "min_score": FINETUNED_MIN}
-
-
-def _classify_imagenet(crop: Image.Image) -> dict:
-    import mediapipe as mp
-    cats = _state["cls"].classify(mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(crop))).classifications[0].categories
-    top = [{"label": c.category_name, "nutrition_key": IMAGENET_FOOD.get(c.category_name),
-            "is_food": c.category_name in IMAGENET_FOOD, "score": round(float(c.score), 3)} for c in cats]
-    return {"model": "imagenet", "model_name": "EfficientNet-Lite0", "top": top[:5], "all": top, "min_score": IMAGENET_MIN}
-
-
-def _best_food(c: dict, min_score: float | None = None) -> dict | None:
-    thr = c["min_score"] if min_score is None else min_score
-    pool = c.get("all", c["top"])
-    for t in pool:
-        if (c["model"] == "finetuned" or t.get("is_food")) and t["score"] >= thr:
-            return t
-        if c["model"] == "finetuned":
-            break  # closed-set model: only accept its top-1
-    return None
 
 
 def _crop(img: Image.Image, box: dict, pad: float = 0.08) -> Image.Image:
@@ -275,101 +240,84 @@ def _overlay(img: Image.Image, instances: list[dict], path: Path) -> None:
     base = img.convert("RGBA")
     layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(layer)
-    for k, it in enumerate(i for i in instances if i.get("food")):
+    for k, it in enumerate(i for i in instances if i.get("label_shown")):
         col = PALETTE[k % len(PALETTE)]
         if it.get("mask") is not None:
-            m = Image.fromarray((it["mask"] * 110).astype(np.uint8))
-            layer.paste(Image.new("RGBA", img.size, col + (110,)), (0, 0), m)
+            layer.paste(Image.new("RGBA", img.size, col + (110,)), (0, 0), Image.fromarray((it["mask"] * 110).astype(np.uint8)))
         b = it["bbox"]
         xy = [b["x"] * img.width, b["y"] * img.height, (b["x"] + b["w"]) * img.width, (b["y"] + b["h"]) * img.height]
         draw.rectangle(xy, outline=col + (255,), width=3)
-        draw.rectangle([xy[0], max(0, xy[1] - 18), xy[0] + 8 + 7 * len(it["food"]["label"]), xy[1]], fill=col + (230,))
-        draw.text((xy[0] + 4, max(0, xy[1] - 16)), it["food"]["label"], fill=(255, 255, 255, 255))
+        draw.rectangle([xy[0], max(0, xy[1] - 18), xy[0] + 8 + 7 * len(it["label_shown"]), xy[1]], fill=col + (230,))
+        draw.text((xy[0] + 4, max(0, xy[1] - 16)), it["label_shown"], fill=(255, 255, 255, 255))
     Image.alpha_composite(base, layer).convert("RGB").save(path, "JPEG", quality=88)
 
 
 # ---------------------------------------------------------------- pipeline entry
-def analyze(path: str, view: str) -> dict:
+def analyze(path: str, view: str, original_path: str | None = None) -> dict:
+    """Classify the photo (evaluation preprocessing on the original upload) and propose extra items from crops."""
     with _lock:
         _load()
-        if not (_state["seg"] or _state["det"]) or not (_state["cls"] or _state["ft"]):
+        if not _state["cls"]:
             return {"view": view, "ok": False, "error": status()["error"], "items": [], "instances": [], "top_labels": []}
-        img = Image.open(path).convert("RGB")
+        src = original_path if original_path and Path(original_path).exists() else path
+        img = ImageOps.exif_transpose(Image.open(src)).convert("RGB")
         t0 = time.perf_counter()
-        dets = _segment(img) if _state["seg"] else _detect_boxes(img)
+        dets = [d for d in (_segment(img) if _state["seg"] else []) if d["score"] >= DET_MIN]
         t1 = time.perf_counter()
-
+        top3 = classify(img)
+        items = [{"model_label": top3[0]["label"], "class_id": top3[0]["class_id"], "nutrition_key": top3[0]["nutrition_key"],
+                  "match": top3[0]["match"], "score": top3[0]["score"], "candidates": top3, "bbox": None, "area_frac": 1.0,
+                  "instance": "whole photo", "has_mask": False, "view": view, "model": "classifier"}]
+        seen = {c["class_id"] for c in top3}
         instances = []
         for d in dets:
-            if d["score"] < DET_MIN:
-                continue
             kind = "food" if d["label"] in COCO_FOOD else "container" if d["label"] in COCO_DISH_CONTAINERS else \
                 "reference" if d["label"] in COCO_REFERENCE else None
-            if kind:
-                instances.append({**d, "kind": kind})
-        scene = {"label": "whole image", "score": 1.0, "bbox": {"x": 0, "y": 0, "w": 1, "h": 1}, "mask": None,
-                 "area_frac": 1.0, "kind": "scene"}
-        items = []
-        for inst in instances + [scene]:
-            if inst["kind"] == "reference":
+            if not kind:
                 continue
-            c = _classify(img if inst["kind"] == "scene" else _crop(img, inst["bbox"]))
-            inst["classification"] = {k: c[k] for k in ("model", "model_name", "top")}
-            if c.get("deferred_from"):
-                inst["classification"]["deferred_from"] = c["deferred_from"]
-            if inst["kind"] == "food":
-                best = _best_food(c)
-                if c["model"] == "finetuned" and best and best["nutrition_key"]:
-                    food = {"label": best["label"], "nutrition_key": best["nutrition_key"], "score": best["score"],
-                            "source": "classifier"}
-                else:  # detector label is the most reliable evidence for COCO food classes
-                    food = {"label": inst["label"], "nutrition_key": COCO_FOOD[inst["label"]], "score": inst["score"],
-                            "source": "detector"}
-            else:
-                best = _best_food(c, SCENE_MIN[c["model"]] if inst["kind"] == "scene" else None)
-                food = best and {"label": best["label"], "nutrition_key": best["nutrition_key"], "score": best["score"],
-                                 "source": "classifier"}
-            inst["food"] = food
-            if food:
-                items.append({"model_label": food["label"], "nutrition_key": food["nutrition_key"], "score": food["score"],
-                              "bbox": None if inst["kind"] == "scene" else inst["bbox"], "area_frac": inst["area_frac"],
-                              "instance": inst["kind"], "detector_label": inst["label"], "detector_score": round(inst["score"], 3),
-                              "has_mask": inst["mask"] is not None,
-                              "model": "detector" if food["source"] == "detector" else "classifier",
-                              "model_name": (models()["detector"]["name"] if food["source"] == "detector" else c["model_name"]),
-                              "classifier_top": c["top"][:3], "deferred_from": c.get("deferred_from"), "view": view})
+            inst = {**d, "kind": kind}
+            instances.append(inst)
+            if kind == "reference":
+                continue
+            c3 = classify(_crop(img, d["bbox"]))
+            inst["top"] = c3
+            if c3[0]["score"] >= CROP_MIN and c3[0]["class_id"] not in seen:
+                seen.add(c3[0]["class_id"])
+                inst["label_shown"] = c3[0]["label"]
+                items.append({"model_label": c3[0]["label"], "class_id": c3[0]["class_id"], "nutrition_key": c3[0]["nutrition_key"],
+                              "match": c3[0]["match"], "score": c3[0]["score"], "candidates": c3, "bbox": d["bbox"],
+                              "area_frac": d["area_frac"], "instance": d["label"], "has_mask": True, "view": view,
+                              "model": "classifier"})
+            elif c3[0]["class_id"] in {c["class_id"] for c in top3}:
+                inst["label_shown"] = c3[0]["label"]
         t2 = time.perf_counter()
         overlay = str(Path(path).with_name(f"{view}_overlay.jpg"))
         _overlay(img, instances, Path(overlay))
-
     refs = [{"label": i["label"], "score": round(i["score"], 3), "bbox": i["bbox"], "area_frac": round(i["area_frac"], 4)}
             for i in instances if i["kind"] in ("reference", "container")]
     return {
         "view": view, "ok": True, "items": items, "containers": refs, "overlay_path": overlay,
-        "instances": [{"label": i["label"], "kind": i["kind"], "score": round(i["score"], 3),
-                       "area_frac": round(i["area_frac"], 4), "food": i.get("food")} for i in instances],
-        "top_labels": [{"label": t["label"], "score": t["score"]} for t in scene["classification"]["top"]],
+        "instances": [{"label": i["label"], "kind": i["kind"], "score": round(i["score"], 3), "area_frac": round(i["area_frac"], 4),
+                       "top": (i.get("top") or [None])[0]} for i in instances],
+        "top_labels": [{"label": c["label"], "score": c["score"], "class_id": c["class_id"]} for c in top3],
         "latency_ms": {"detector": round((t1 - t0) * 1000, 1), "classifier": round((t2 - t1) * 1000, 1)},
+        "device": _state["device"],
     }
 
 
 def merge(results: list[dict]) -> list[dict]:
-    """Merge the same food across instances and views; keep the best evidence."""
-    merged: dict[str, dict] = {}
+    """Merge the same class across views (top & side photo); keep the strongest evidence and its candidates."""
+    merged: dict[int, dict] = {}
     for r in results:
         for it in r["items"]:
-            k = it["nutrition_key"] or f"unmapped:{it['model_label']}"
-            cur = merged.get(k)
+            cur = merged.get(it["class_id"])
             if cur is None:
-                merged[k] = {**it, "views": [it["view"]], "evidence": [it], "instances": 1}
+                merged[it["class_id"]] = {**it, "views": [it["view"]], "instances": 1}
                 continue
-            cur["evidence"].append(it)
             if it["view"] not in cur["views"]:
                 cur["views"].append(it["view"])
-            elif it["instance"] != "scene" and cur["instance"] != "scene":
-                cur["instances"] += 1  # e.g. two bananas in the same photo
-            if it["bbox"] and not cur["bbox"]:
-                cur.update(bbox=it["bbox"], area_frac=it["area_frac"], view=it["view"], instance=it["instance"])
             if it["score"] > cur["score"]:
-                cur.update(score=it["score"], model_label=it["model_label"], model=it["model"], model_name=it["model_name"])
+                cur.update({k: it[k] for k in ("score", "candidates", "view")})
+            if it["bbox"] and not cur["bbox"]:
+                cur.update(bbox=it["bbox"], area_frac=it["area_frac"], has_mask=it["has_mask"], instance=it["instance"])
     return sorted(merged.values(), key=lambda x: -x["score"])

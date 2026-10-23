@@ -1,0 +1,2242 @@
+{
+ "alcoholic beverage": {
+  "class_id": 0,
+  "nutrition_key": "alcoholic_beverage",
+  "match": "proxy",
+  "record_name": "Alcoholic beverage (beer)",
+  "record_verification": "approximate_unverified"
+ },
+ "apple": {
+  "class_id": 1,
+  "nutrition_key": "apple",
+  "match": "exact",
+  "record_name": "Apple",
+  "record_verification": "transcribed_unverified"
+ },
+ "apple pie": {
+  "class_id": 2,
+  "nutrition_key": "apple_pie",
+  "match": "exact",
+  "record_name": "Apple pie",
+  "record_verification": "approximate_unverified"
+ },
+ "apricot": {
+  "class_id": 3,
+  "nutrition_key": "apricot",
+  "match": "exact",
+  "record_name": "Apricot",
+  "record_verification": "approximate_unverified"
+ },
+ "assam pedas": {
+  "class_id": 4,
+  "nutrition_key": "assam_pedas",
+  "match": "exact",
+  "record_name": "Assam pedas (sour spicy fish)",
+  "record_verification": "approximate_unverified"
+ },
+ "avocados": {
+  "class_id": 5,
+  "nutrition_key": "avocado",
+  "match": "exact",
+  "record_name": "Avocado",
+  "record_verification": "approximate_unverified"
+ },
+ "ayam penyet": {
+  "class_id": 6,
+  "nutrition_key": "ayam_penyet",
+  "match": "exact",
+  "record_name": "Ayam penyet with rice",
+  "record_verification": "approximate_unverified"
+ },
+ "baby back ribs": {
+  "class_id": 7,
+  "nutrition_key": "char_siew",
+  "match": "proxy",
+  "record_name": "Char siew (barbecued pork)",
+  "record_verification": "approximate_unverified"
+ },
+ "bagel & croissant": {
+  "class_id": 8,
+  "nutrition_key": "bagel",
+  "match": "proxy",
+  "record_name": "Bagel, plain",
+  "record_verification": "transcribed_unverified"
+ },
+ "bak chor mee": {
+  "class_id": 9,
+  "nutrition_key": "bak_chor_mee",
+  "match": "exact",
+  "record_name": "Bak chor mee (dry)",
+  "record_verification": "transcribed_unverified"
+ },
+ "bak kut teh": {
+  "class_id": 10,
+  "nutrition_key": "bak_kut_teh",
+  "match": "exact",
+  "record_name": "Bak kut teh (pork rib soup)",
+  "record_verification": "approximate_unverified"
+ },
+ "bak kwa": {
+  "class_id": 11,
+  "nutrition_key": "bak_kwa",
+  "match": "exact",
+  "record_name": "Bak kwa (barbecued dried pork)",
+  "record_verification": "approximate_unverified"
+ },
+ "baked beans": {
+  "class_id": 12,
+  "nutrition_key": "baked_beans",
+  "match": "exact",
+  "record_name": "Baked beans",
+  "record_verification": "approximate_unverified"
+ },
+ "baklava": {
+  "class_id": 13,
+  "nutrition_key": "baklava",
+  "match": "exact",
+  "record_name": "Baklava",
+  "record_verification": "approximate_unverified"
+ },
+ "bakso": {
+  "class_id": 14,
+  "nutrition_key": "bakso",
+  "match": "exact",
+  "record_name": "Bakso (meatball noodle soup)",
+  "record_verification": "approximate_unverified"
+ },
+ "ban mian": {
+  "class_id": 15,
+  "nutrition_key": "ban_mian",
+  "match": "exact",
+  "record_name": "Ban mian (soup)",
+  "record_verification": "approximate_unverified"
+ },
+ "banana": {
+  "class_id": 16,
+  "nutrition_key": "banana",
+  "match": "exact",
+  "record_name": "Banana",
+  "record_verification": "transcribed_unverified"
+ },
+ "barley": {
+  "class_id": 17,
+  "nutrition_key": "barley",
+  "match": "exact",
+  "record_name": "Barley, cooked",
+  "record_verification": "approximate_unverified"
+ },
+ "bee hoon": {
+  "class_id": 18,
+  "nutrition_key": "bee_hoon_fried",
+  "match": "exact",
+  "record_name": "Fried bee hoon (plain)",
+  "record_verification": "approximate_unverified"
+ },
+ "bee hoon, goreng": {
+  "class_id": 19,
+  "nutrition_key": "bee_hoon_goreng",
+  "match": "exact",
+  "record_name": "Bee hoon goreng",
+  "record_verification": "approximate_unverified"
+ },
+ "bee hoon, soto": {
+  "class_id": 20,
+  "nutrition_key": "soto_bee_hoon",
+  "match": "exact",
+  "record_name": "Bee hoon soto",
+  "record_verification": "approximate_unverified"
+ },
+ "beef carpaccio": {
+  "class_id": 21,
+  "nutrition_key": "beef_steak",
+  "match": "proxy",
+  "record_name": "Beef steak (sirloin), cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "beef noodle soup": {
+  "class_id": 22,
+  "nutrition_key": "pho",
+  "match": "proxy",
+  "record_name": "Pho (beef noodle soup)",
+  "record_verification": "approximate_unverified"
+ },
+ "beef tartare": {
+  "class_id": 23,
+  "nutrition_key": "beef_steak",
+  "match": "proxy",
+  "record_name": "Beef steak (sirloin), cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "beet salad": {
+  "class_id": 24,
+  "nutrition_key": "green_salad",
+  "match": "proxy",
+  "record_name": "Mixed green salad (no dressing)",
+  "record_verification": "transcribed_unverified"
+ },
+ "begedil": {
+  "class_id": 25,
+  "nutrition_key": "begedil",
+  "match": "exact",
+  "record_name": "Begedil (potato patty)",
+  "record_verification": "approximate_unverified"
+ },
+ "beignets": {
+  "class_id": 26,
+  "nutrition_key": "donut",
+  "match": "proxy",
+  "record_name": "Doughnut, glazed",
+  "record_verification": "transcribed_unverified"
+ },
+ "bibimbap": {
+  "class_id": 27,
+  "nutrition_key": "bibimbap",
+  "match": "exact",
+  "record_name": "Bibimbap",
+  "record_verification": "approximate_unverified"
+ },
+ "biscuit": {
+  "class_id": 28,
+  "nutrition_key": "biscuit",
+  "match": "exact",
+  "record_name": "Biscuits / cookies",
+  "record_verification": "approximate_unverified"
+ },
+ "black pepper crab": {
+  "class_id": 29,
+  "nutrition_key": "black_pepper_crab",
+  "match": "exact",
+  "record_name": "Black pepper crab",
+  "record_verification": "approximate_unverified"
+ },
+ "blackberry": {
+  "class_id": 30,
+  "nutrition_key": "blackberry",
+  "match": "exact",
+  "record_name": "Blackberries",
+  "record_verification": "approximate_unverified"
+ },
+ "blueberries": {
+  "class_id": 31,
+  "nutrition_key": "blueberries",
+  "match": "exact",
+  "record_name": "Blueberries",
+  "record_verification": "approximate_unverified"
+ },
+ "bread pudding": {
+  "class_id": 32,
+  "nutrition_key": "bread_pudding",
+  "match": "exact",
+  "record_name": "Bread pudding",
+  "record_verification": "approximate_unverified"
+ },
+ "breakfast burrito": {
+  "class_id": 33,
+  "nutrition_key": "burrito",
+  "match": "proxy",
+  "record_name": "Burrito (beans and meat)",
+  "record_verification": "transcribed_unverified"
+ },
+ "breakfast cereal": {
+  "class_id": 34,
+  "nutrition_key": "breakfast_cereal",
+  "match": "exact",
+  "record_name": "Breakfast cereal",
+  "record_verification": "approximate_unverified"
+ },
+ "bruschetta": {
+  "class_id": 35,
+  "nutrition_key": null,
+  "match": "none",
+  "record_name": null,
+  "record_verification": null
+ },
+ "bubble milk tea": {
+  "class_id": 36,
+  "nutrition_key": "bubble_tea",
+  "match": "exact",
+  "record_name": "Bubble milk tea with pearls",
+  "record_verification": "transcribed_unverified"
+ },
+ "buckwheat": {
+  "class_id": 37,
+  "nutrition_key": "buckwheat",
+  "match": "exact",
+  "record_name": "Buckwheat, cooked",
+  "record_verification": "approximate_unverified"
+ },
+ "burger": {
+  "class_id": 38,
+  "nutrition_key": "cheeseburger",
+  "match": "proxy",
+  "record_name": "Cheeseburger",
+  "record_verification": "transcribed_unverified"
+ },
+ "caesar salad": {
+  "class_id": 39,
+  "nutrition_key": "caesar_salad",
+  "match": "exact",
+  "record_name": "Caesar salad (with dressing)",
+  "record_verification": "approximate_unverified"
+ },
+ "cake": {
+  "class_id": 40,
+  "nutrition_key": "chocolate_cake",
+  "match": "proxy",
+  "record_name": "Chocolate cake with frosting",
+  "record_verification": "transcribed_unverified"
+ },
+ "cake rolls": {
+  "class_id": 41,
+  "nutrition_key": "chocolate_cake",
+  "match": "proxy",
+  "record_name": "Chocolate cake with frosting",
+  "record_verification": "transcribed_unverified"
+ },
+ "canned fruit salad": {
+  "class_id": 42,
+  "nutrition_key": "canned_fruit",
+  "match": "exact",
+  "record_name": "Canned fruit salad (in syrup)",
+  "record_verification": "approximate_unverified"
+ },
+ "cannoli": {
+  "class_id": 43,
+  "nutrition_key": "cheesecake",
+  "match": "proxy",
+  "record_name": "Cheesecake",
+  "record_verification": "approximate_unverified"
+ },
+ "caprese salad": {
+  "class_id": 44,
+  "nutrition_key": "green_salad",
+  "match": "proxy",
+  "record_name": "Mixed green salad (no dressing)",
+  "record_verification": "transcribed_unverified"
+ },
+ "carrot cake": {
+  "class_id": 45,
+  "nutrition_key": "carrot_cake_dessert",
+  "match": "exact",
+  "record_name": "Carrot cake (dessert, with frosting)",
+  "record_verification": "approximate_unverified"
+ },
+ "cereal prawns": {
+  "class_id": 46,
+  "nutrition_key": "cereal_prawns",
+  "match": "exact",
+  "record_name": "Cereal prawns",
+  "record_verification": "approximate_unverified"
+ },
+ "ceviche": {
+  "class_id": 47,
+  "nutrition_key": "sashimi",
+  "match": "proxy",
+  "record_name": "Sashimi",
+  "record_verification": "approximate_unverified"
+ },
+ "chai tow kuay": {
+  "class_id": 48,
+  "nutrition_key": "fried_carrot_cake",
+  "match": "exact",
+  "record_name": "Fried carrot cake (chai tow kway, white)",
+  "record_verification": "transcribed_unverified"
+ },
+ "chap chye, nonya": {
+  "class_id": 49,
+  "nutrition_key": "chap_chye",
+  "match": "exact",
+  "record_name": "Chap chye (braised mixed vegetables)",
+  "record_verification": "approximate_unverified"
+ },
+ "char siew": {
+  "class_id": 50,
+  "nutrition_key": "char_siew",
+  "match": "exact",
+  "record_name": "Char siew (barbecued pork)",
+  "record_verification": "approximate_unverified"
+ },
+ "char siew pau": {
+  "class_id": 51,
+  "nutrition_key": "char_siew_pau",
+  "match": "exact",
+  "record_name": "Char siew pau (steamed bun)",
+  "record_verification": "approximate_unverified"
+ },
+ "chawanmushi": {
+  "class_id": 52,
+  "nutrition_key": "chawanmushi",
+  "match": "exact",
+  "record_name": "Chawanmushi (steamed egg)",
+  "record_verification": "approximate_unverified"
+ },
+ "cheese fries": {
+  "class_id": 53,
+  "nutrition_key": "french_fries",
+  "match": "proxy",
+  "record_name": "French fries",
+  "record_verification": "transcribed_unverified"
+ },
+ "cheese plate": {
+  "class_id": 54,
+  "nutrition_key": null,
+  "match": "none",
+  "record_name": null,
+  "record_verification": null
+ },
+ "cheesecake": {
+  "class_id": 55,
+  "nutrition_key": "cheesecake",
+  "match": "exact",
+  "record_name": "Cheesecake",
+  "record_verification": "approximate_unverified"
+ },
+ "cheng tng": {
+  "class_id": 56,
+  "nutrition_key": "cheng_tng",
+  "match": "exact",
+  "record_name": "Cheng tng (dessert soup)",
+  "record_verification": "approximate_unverified"
+ },
+ "cherries": {
+  "class_id": 57,
+  "nutrition_key": "cherries",
+  "match": "exact",
+  "record_name": "Cherries",
+  "record_verification": "approximate_unverified"
+ },
+ "chicken chop": {
+  "class_id": 58,
+  "nutrition_key": "chicken_chop",
+  "match": "exact",
+  "record_name": "Chicken chop",
+  "record_verification": "approximate_unverified"
+ },
+ "chicken curry": {
+  "class_id": 59,
+  "nutrition_key": "chicken_curry",
+  "match": "exact",
+  "record_name": "Chicken curry",
+  "record_verification": "approximate_unverified"
+ },
+ "chicken masala": {
+  "class_id": 60,
+  "nutrition_key": "chicken_curry",
+  "match": "proxy",
+  "record_name": "Chicken curry",
+  "record_verification": "approximate_unverified"
+ },
+ "chicken pie": {
+  "class_id": 61,
+  "nutrition_key": "pot_pie",
+  "match": "exact",
+  "record_name": "Chicken pot pie",
+  "record_verification": "transcribed_unverified"
+ },
+ "chicken quesadilla": {
+  "class_id": 62,
+  "nutrition_key": "burrito",
+  "match": "proxy",
+  "record_name": "Burrito (beans and meat)",
+  "record_verification": "transcribed_unverified"
+ },
+ "chicken rice": {
+  "class_id": 63,
+  "nutrition_key": "chicken_rice",
+  "match": "exact",
+  "record_name": "Hainanese chicken rice",
+  "record_verification": "transcribed_unverified"
+ },
+ "chicken soup": {
+  "class_id": 64,
+  "nutrition_key": "chicken_soup",
+  "match": "exact",
+  "record_name": "Chicken soup",
+  "record_verification": "approximate_unverified"
+ },
+ "chicken wing": {
+  "class_id": 65,
+  "nutrition_key": "chicken_wing",
+  "match": "exact",
+  "record_name": "Chicken wings (fried / roasted)",
+  "record_verification": "approximate_unverified"
+ },
+ "chilli crab": {
+  "class_id": 66,
+  "nutrition_key": "chilli_crab",
+  "match": "exact",
+  "record_name": "Chilli crab",
+  "record_verification": "approximate_unverified"
+ },
+ "chin chow drink": {
+  "class_id": 67,
+  "nutrition_key": "chin_chow",
+  "match": "exact",
+  "record_name": "Chin chow (grass jelly drink)",
+  "record_verification": "approximate_unverified"
+ },
+ "chinese fritters": {
+  "class_id": 68,
+  "nutrition_key": "you_tiao",
+  "match": "exact",
+  "record_name": "Chinese fritters (you tiao)",
+  "record_verification": "approximate_unverified"
+ },
+ "chocolate": {
+  "class_id": 69,
+  "nutrition_key": "chocolate_bar",
+  "match": "exact",
+  "record_name": "Chocolate (milk)",
+  "record_verification": "approximate_unverified"
+ },
+ "chocolate cake": {
+  "class_id": 70,
+  "nutrition_key": "chocolate_cake",
+  "match": "exact",
+  "record_name": "Chocolate cake with frosting",
+  "record_verification": "transcribed_unverified"
+ },
+ "chocolate mousse": {
+  "class_id": 71,
+  "nutrition_key": "chocolate_mousse",
+  "match": "exact",
+  "record_name": "Chocolate mousse",
+  "record_verification": "approximate_unverified"
+ },
+ "churros": {
+  "class_id": 72,
+  "nutrition_key": "churros",
+  "match": "exact",
+  "record_name": "Churros",
+  "record_verification": "approximate_unverified"
+ },
+ "chwee kueh": {
+  "class_id": 73,
+  "nutrition_key": "chwee_kueh",
+  "match": "exact",
+  "record_name": "Chwee kueh",
+  "record_verification": "approximate_unverified"
+ },
+ "clam chowder": {
+  "class_id": 74,
+  "nutrition_key": "cream_soup",
+  "match": "proxy",
+  "record_name": "Cream soup (e.g. mushroom, chowder)",
+  "record_verification": "approximate_unverified"
+ },
+ "claypot rice": {
+  "class_id": 75,
+  "nutrition_key": "claypot_rice",
+  "match": "exact",
+  "record_name": "Claypot rice",
+  "record_verification": "approximate_unverified"
+ },
+ "club sandwich": {
+  "class_id": 76,
+  "nutrition_key": "sandwich",
+  "match": "proxy",
+  "record_name": "Sandwich (ham and cheese)",
+  "record_verification": "transcribed_unverified"
+ },
+ "cny love letter": {
+  "class_id": 77,
+  "nutrition_key": "love_letter",
+  "match": "exact",
+  "record_name": "CNY love letter (egg roll)",
+  "record_verification": "approximate_unverified"
+ },
+ "cooked brown rice": {
+  "class_id": 78,
+  "nutrition_key": "brown_rice",
+  "match": "exact",
+  "record_name": "Brown rice, cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "cooked white rice": {
+  "class_id": 79,
+  "nutrition_key": "white_rice",
+  "match": "exact",
+  "record_name": "White rice, steamed",
+  "record_verification": "transcribed_unverified"
+ },
+ "corn": {
+  "class_id": 80,
+  "nutrition_key": "corn",
+  "match": "exact",
+  "record_name": "Sweet corn, cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "crab cakes": {
+  "class_id": 81,
+  "nutrition_key": "fried_prawn",
+  "match": "proxy",
+  "record_name": "Fried prawns",
+  "record_verification": "approximate_unverified"
+ },
+ "cream soup": {
+  "class_id": 82,
+  "nutrition_key": "cream_soup",
+  "match": "exact",
+  "record_name": "Cream soup (e.g. mushroom, chowder)",
+  "record_verification": "approximate_unverified"
+ },
+ "creme brulee": {
+  "class_id": 83,
+  "nutrition_key": "creme_brulee",
+  "match": "exact",
+  "record_name": "Crème brûlée",
+  "record_verification": "approximate_unverified"
+ },
+ "croque madame": {
+  "class_id": 84,
+  "nutrition_key": "sandwich",
+  "match": "proxy",
+  "record_name": "Sandwich (ham and cheese)",
+  "record_verification": "transcribed_unverified"
+ },
+ "cucumber": {
+  "class_id": 85,
+  "nutrition_key": "cucumber",
+  "match": "exact",
+  "record_name": "Cucumber",
+  "record_verification": "transcribed_unverified"
+ },
+ "cup cakes": {
+  "class_id": 86,
+  "nutrition_key": "cupcake",
+  "match": "exact",
+  "record_name": "Cupcake",
+  "record_verification": "approximate_unverified"
+ },
+ "curry puff": {
+  "class_id": 87,
+  "nutrition_key": "curry_puff",
+  "match": "exact",
+  "record_name": "Curry puff",
+  "record_verification": "approximate_unverified"
+ },
+ "deviled eggs": {
+  "class_id": 88,
+  "nutrition_key": "boiled_egg",
+  "match": "proxy",
+  "record_name": "Egg, boiled",
+  "record_verification": "transcribed_unverified"
+ },
+ "don, chicken teriyaki": {
+  "class_id": 89,
+  "nutrition_key": "chicken_rice",
+  "match": "proxy",
+  "record_name": "Hainanese chicken rice",
+  "record_verification": "transcribed_unverified"
+ },
+ "don, unagi": {
+  "class_id": 90,
+  "nutrition_key": "duck_rice",
+  "match": "proxy",
+  "record_name": "Braised duck rice",
+  "record_verification": "approximate_unverified"
+ },
+ "donuts": {
+  "class_id": 91,
+  "nutrition_key": "donut",
+  "match": "exact",
+  "record_name": "Doughnut, glazed",
+  "record_verification": "transcribed_unverified"
+ },
+ "drunken prawn": {
+  "class_id": 92,
+  "nutrition_key": null,
+  "match": "none",
+  "record_name": null,
+  "record_verification": null
+ },
+ "duck rice": {
+  "class_id": 93,
+  "nutrition_key": "duck_rice",
+  "match": "exact",
+  "record_name": "Braised duck rice",
+  "record_verification": "approximate_unverified"
+ },
+ "dumpling": {
+  "class_id": 94,
+  "nutrition_key": "dumpling",
+  "match": "exact",
+  "record_name": "Dumplings (boiled)",
+  "record_verification": "approximate_unverified"
+ },
+ "dumpling noodle soup": {
+  "class_id": 95,
+  "nutrition_key": "ban_mian",
+  "match": "proxy",
+  "record_name": "Ban mian (soup)",
+  "record_verification": "approximate_unverified"
+ },
+ "durian": {
+  "class_id": 96,
+  "nutrition_key": "durian",
+  "match": "exact",
+  "record_name": "Durian",
+  "record_verification": "approximate_unverified"
+ },
+ "edamame": {
+  "class_id": 97,
+  "nutrition_key": "edamame",
+  "match": "exact",
+  "record_name": "Edamame",
+  "record_verification": "approximate_unverified"
+ },
+ "egg tart": {
+  "class_id": 98,
+  "nutrition_key": "egg_tart",
+  "match": "exact",
+  "record_name": "Egg tart",
+  "record_verification": "approximate_unverified"
+ },
+ "eggs benedict": {
+  "class_id": 99,
+  "nutrition_key": "eggs_benedict",
+  "match": "exact",
+  "record_name": "Eggs benedict",
+  "record_verification": "approximate_unverified"
+ },
+ "escargots": {
+  "class_id": 100,
+  "nutrition_key": null,
+  "match": "none",
+  "record_name": null,
+  "record_verification": null
+ },
+ "falafel": {
+  "class_id": 101,
+  "nutrition_key": "falafel",
+  "match": "exact",
+  "record_name": "Falafel",
+  "record_verification": "approximate_unverified"
+ },
+ "filet mignon": {
+  "class_id": 102,
+  "nutrition_key": "beef_steak",
+  "match": "proxy",
+  "record_name": "Beef steak (sirloin), cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "fish and chips": {
+  "class_id": 103,
+  "nutrition_key": "fish_and_chips",
+  "match": "exact",
+  "record_name": "Fish and chips",
+  "record_verification": "approximate_unverified"
+ },
+ "fish ball noodles": {
+  "class_id": 104,
+  "nutrition_key": "fishball_noodles",
+  "match": "exact",
+  "record_name": "Fishball noodles / mee pok (dry)",
+  "record_verification": "approximate_unverified"
+ },
+ "fish head curry": {
+  "class_id": 105,
+  "nutrition_key": "fish_head_curry",
+  "match": "exact",
+  "record_name": "Fish head curry",
+  "record_verification": "approximate_unverified"
+ },
+ "foie gras": {
+  "class_id": 106,
+  "nutrition_key": null,
+  "match": "none",
+  "record_name": null,
+  "record_verification": null
+ },
+ "french fries": {
+  "class_id": 107,
+  "nutrition_key": "french_fries",
+  "match": "exact",
+  "record_name": "French fries",
+  "record_verification": "transcribed_unverified"
+ },
+ "french onion soup": {
+  "class_id": 108,
+  "nutrition_key": "vegetable_soup",
+  "match": "proxy",
+  "record_name": "Vegetable soup",
+  "record_verification": "approximate_unverified"
+ },
+ "french toast": {
+  "class_id": 109,
+  "nutrition_key": "french_toast",
+  "match": "exact",
+  "record_name": "French toast",
+  "record_verification": "approximate_unverified"
+ },
+ "fried calamari": {
+  "class_id": 110,
+  "nutrition_key": "fried_calamari",
+  "match": "exact",
+  "record_name": "Fried calamari",
+  "record_verification": "approximate_unverified"
+ },
+ "fried chicken": {
+  "class_id": 111,
+  "nutrition_key": "fried_chicken",
+  "match": "exact",
+  "record_name": "Fried chicken",
+  "record_verification": "approximate_unverified"
+ },
+ "fried fish": {
+  "class_id": 112,
+  "nutrition_key": "fried_fish",
+  "match": "exact",
+  "record_name": "Fried fish",
+  "record_verification": "approximate_unverified"
+ },
+ "fried noodles": {
+  "class_id": 113,
+  "nutrition_key": "mee_goreng",
+  "match": "proxy",
+  "record_name": "Mee goreng",
+  "record_verification": "transcribed_unverified"
+ },
+ "fried prawn": {
+  "class_id": 114,
+  "nutrition_key": "fried_prawn",
+  "match": "exact",
+  "record_name": "Fried prawns",
+  "record_verification": "approximate_unverified"
+ },
+ "fried rice": {
+  "class_id": 115,
+  "nutrition_key": "nasi_goreng",
+  "match": "exact",
+  "record_name": "Nasi goreng (fried rice)",
+  "record_verification": "transcribed_unverified"
+ },
+ "frozen yogurt": {
+  "class_id": 116,
+  "nutrition_key": "frozen_yogurt",
+  "match": "exact",
+  "record_name": "Frozen yogurt",
+  "record_verification": "approximate_unverified"
+ },
+ "fruit juice": {
+  "class_id": 117,
+  "nutrition_key": "fruit_juice",
+  "match": "exact",
+  "record_name": "Fruit juice (mixed)",
+  "record_verification": "approximate_unverified"
+ },
+ "garlic bread": {
+  "class_id": 118,
+  "nutrition_key": "garlic_bread",
+  "match": "exact",
+  "record_name": "Garlic bread",
+  "record_verification": "approximate_unverified"
+ },
+ "gnocchi": {
+  "class_id": 119,
+  "nutrition_key": "gnocchi",
+  "match": "exact",
+  "record_name": "Gnocchi",
+  "record_verification": "approximate_unverified"
+ },
+ "goreng pisang": {
+  "class_id": 120,
+  "nutrition_key": "goreng_pisang",
+  "match": "exact",
+  "record_name": "Goreng pisang (banana fritter)",
+  "record_verification": "approximate_unverified"
+ },
+ "grape": {
+  "class_id": 121,
+  "nutrition_key": "grape",
+  "match": "exact",
+  "record_name": "Grapes",
+  "record_verification": "approximate_unverified"
+ },
+ "grapefruit": {
+  "class_id": 122,
+  "nutrition_key": "grapefruit",
+  "match": "exact",
+  "record_name": "Grapefruit",
+  "record_verification": "approximate_unverified"
+ },
+ "greek salad": {
+  "class_id": 123,
+  "nutrition_key": "green_salad",
+  "match": "proxy",
+  "record_name": "Mixed green salad (no dressing)",
+  "record_verification": "transcribed_unverified"
+ },
+ "green leafy vegetables": {
+  "class_id": 124,
+  "nutrition_key": "stir_fried_greens",
+  "match": "exact",
+  "record_name": "Stir-fried leafy greens",
+  "record_verification": "approximate_unverified"
+ },
+ "grilled cheese sandwich": {
+  "class_id": 125,
+  "nutrition_key": "sandwich",
+  "match": "proxy",
+  "record_name": "Sandwich (ham and cheese)",
+  "record_verification": "transcribed_unverified"
+ },
+ "grilled salmon": {
+  "class_id": 126,
+  "nutrition_key": "salmon",
+  "match": "exact",
+  "record_name": "Salmon, cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "guacamole": {
+  "class_id": 127,
+  "nutrition_key": "guacamole",
+  "match": "exact",
+  "record_name": "Guacamole",
+  "record_verification": "transcribed_unverified"
+ },
+ "guava": {
+  "class_id": 128,
+  "nutrition_key": "guava",
+  "match": "exact",
+  "record_name": "Guava",
+  "record_verification": "approximate_unverified"
+ },
+ "gulai daun ubi": {
+  "class_id": 129,
+  "nutrition_key": "gulai_daun_ubi",
+  "match": "exact",
+  "record_name": "Gulai daun ubi (tapioca leaf curry)",
+  "record_verification": "approximate_unverified"
+ },
+ "gyoza": {
+  "class_id": 130,
+  "nutrition_key": "gyoza",
+  "match": "exact",
+  "record_name": "Gyoza (pan-fried dumplings)",
+  "record_verification": "approximate_unverified"
+ },
+ "hamburger": {
+  "class_id": 131,
+  "nutrition_key": "cheeseburger",
+  "match": "proxy",
+  "record_name": "Cheeseburger",
+  "record_verification": "transcribed_unverified"
+ },
+ "har cheong gai": {
+  "class_id": 132,
+  "nutrition_key": "har_cheong_gai",
+  "match": "exact",
+  "record_name": "Har cheong gai (prawn paste chicken)",
+  "record_verification": "approximate_unverified"
+ },
+ "hokkien prawn mee": {
+  "class_id": 133,
+  "nutrition_key": "hokkien_mee",
+  "match": "exact",
+  "record_name": "Hokkien prawn mee",
+  "record_verification": "transcribed_unverified"
+ },
+ "honeydew": {
+  "class_id": 134,
+  "nutrition_key": "honeydew",
+  "match": "exact",
+  "record_name": "Honeydew",
+  "record_verification": "approximate_unverified"
+ },
+ "hor fun": {
+  "class_id": 135,
+  "nutrition_key": "hor_fun",
+  "match": "exact",
+  "record_name": "Hor fun (wat tan)",
+  "record_verification": "approximate_unverified"
+ },
+ "hot and sour soup": {
+  "class_id": 136,
+  "nutrition_key": "vegetable_soup",
+  "match": "proxy",
+  "record_name": "Vegetable soup",
+  "record_verification": "approximate_unverified"
+ },
+ "hot dog": {
+  "class_id": 137,
+  "nutrition_key": "hot_dog",
+  "match": "exact",
+  "record_name": "Hot dog in bun",
+  "record_verification": "transcribed_unverified"
+ },
+ "hotplate tofu": {
+  "class_id": 138,
+  "nutrition_key": "hotplate_tofu",
+  "match": "exact",
+  "record_name": "Hotplate tofu",
+  "record_verification": "approximate_unverified"
+ },
+ "huevos rancheros": {
+  "class_id": 139,
+  "nutrition_key": "omelette",
+  "match": "proxy",
+  "record_name": "Omelette",
+  "record_verification": "approximate_unverified"
+ },
+ "hummus": {
+  "class_id": 140,
+  "nutrition_key": "hummus",
+  "match": "exact",
+  "record_name": "Hummus",
+  "record_verification": "approximate_unverified"
+ },
+ "ice cream": {
+  "class_id": 141,
+  "nutrition_key": "ice_cream",
+  "match": "exact",
+  "record_name": "Ice cream, vanilla",
+  "record_verification": "transcribed_unverified"
+ },
+ "ice cream chocolate": {
+  "class_id": 142,
+  "nutrition_key": "ice_cream",
+  "match": "proxy",
+  "record_name": "Ice cream, vanilla",
+  "record_verification": "transcribed_unverified"
+ },
+ "ice cream vanilla": {
+  "class_id": 143,
+  "nutrition_key": "ice_cream",
+  "match": "exact",
+  "record_name": "Ice cream, vanilla",
+  "record_verification": "transcribed_unverified"
+ },
+ "ice kacang": {
+  "class_id": 144,
+  "nutrition_key": "ice_kacang",
+  "match": "exact",
+  "record_name": "Ice kacang",
+  "record_verification": "approximate_unverified"
+ },
+ "indian pancake": {
+  "class_id": 145,
+  "nutrition_key": "indian_pancake",
+  "match": "exact",
+  "record_name": "Thosai / dosa (plain)",
+  "record_verification": "approximate_unverified"
+ },
+ "indian prata": {
+  "class_id": 146,
+  "nutrition_key": "roti_prata",
+  "match": "exact",
+  "record_name": "Roti prata, plain",
+  "record_verification": "transcribed_unverified"
+ },
+ "instant cereal drink": {
+  "class_id": 147,
+  "nutrition_key": "milo",
+  "match": "proxy",
+  "record_name": "Milo / malted chocolate drink",
+  "record_verification": "approximate_unverified"
+ },
+ "jackfruit": {
+  "class_id": 148,
+  "nutrition_key": "jackfruit",
+  "match": "exact",
+  "record_name": "Jackfruit",
+  "record_verification": "transcribed_unverified"
+ },
+ "katsudon": {
+  "class_id": 149,
+  "nutrition_key": "katsudon",
+  "match": "exact",
+  "record_name": "Katsudon (pork cutlet rice bowl)",
+  "record_verification": "approximate_unverified"
+ },
+ "kaya toast": {
+  "class_id": 150,
+  "nutrition_key": "kaya_toast",
+  "match": "exact",
+  "record_name": "Kaya toast with butter",
+  "record_verification": "transcribed_unverified"
+ },
+ "kebab beef": {
+  "class_id": 151,
+  "nutrition_key": "beef_steak",
+  "match": "proxy",
+  "record_name": "Beef steak (sirloin), cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "kebab chicken": {
+  "class_id": 152,
+  "nutrition_key": "roast_chicken",
+  "match": "proxy",
+  "record_name": "Roast chicken",
+  "record_verification": "approximate_unverified"
+ },
+ "kiwi": {
+  "class_id": 153,
+  "nutrition_key": "kiwi",
+  "match": "exact",
+  "record_name": "Kiwi",
+  "record_verification": "approximate_unverified"
+ },
+ "kopi teh milo": {
+  "class_id": 154,
+  "nutrition_key": "kopi",
+  "match": "proxy",
+  "record_name": "Kopi (coffee with condensed milk)",
+  "record_verification": "transcribed_unverified"
+ },
+ "kueh lapis baked": {
+  "class_id": 155,
+  "nutrition_key": "kueh_lapis",
+  "match": "exact",
+  "record_name": "Kueh lapis",
+  "record_verification": "approximate_unverified"
+ },
+ "kueh lapis rainbow": {
+  "class_id": 156,
+  "nutrition_key": "kueh_lapis",
+  "match": "proxy",
+  "record_name": "Kueh lapis",
+  "record_verification": "approximate_unverified"
+ },
+ "kueh salat": {
+  "class_id": 157,
+  "nutrition_key": "kueh_salat",
+  "match": "exact",
+  "record_name": "Kueh salat",
+  "record_verification": "approximate_unverified"
+ },
+ "kuih bahulu": {
+  "class_id": 158,
+  "nutrition_key": "kuih_bahulu",
+  "match": "exact",
+  "record_name": "Kuih bahulu",
+  "record_verification": "approximate_unverified"
+ },
+ "kway chap": {
+  "class_id": 159,
+  "nutrition_key": "kway_chap",
+  "match": "exact",
+  "record_name": "Kway chap",
+  "record_verification": "approximate_unverified"
+ },
+ "kway teow": {
+  "class_id": 160,
+  "nutrition_key": "kway_teow_plain",
+  "match": "exact",
+  "record_name": "Kway teow (flat rice noodles, cooked)",
+  "record_verification": "approximate_unverified"
+ },
+ "laksa": {
+  "class_id": 161,
+  "nutrition_key": "laksa",
+  "match": "exact",
+  "record_name": "Laksa (curry noodle soup)",
+  "record_verification": "transcribed_unverified"
+ },
+ "lamb chops": {
+  "class_id": 162,
+  "nutrition_key": "lamb_chops",
+  "match": "exact",
+  "record_name": "Lamb chops",
+  "record_verification": "approximate_unverified"
+ },
+ "lasagna": {
+  "class_id": 163,
+  "nutrition_key": "lasagna",
+  "match": "exact",
+  "record_name": "Lasagna",
+  "record_verification": "approximate_unverified"
+ },
+ "lobster bisque": {
+  "class_id": 164,
+  "nutrition_key": "cream_soup",
+  "match": "proxy",
+  "record_name": "Cream soup (e.g. mushroom, chowder)",
+  "record_verification": "approximate_unverified"
+ },
+ "lobster roll sandwich": {
+  "class_id": 165,
+  "nutrition_key": "sandwich",
+  "match": "proxy",
+  "record_name": "Sandwich (ham and cheese)",
+  "record_verification": "transcribed_unverified"
+ },
+ "longan": {
+  "class_id": 166,
+  "nutrition_key": "longan",
+  "match": "exact",
+  "record_name": "Longan",
+  "record_verification": "approximate_unverified"
+ },
+ "lontong": {
+  "class_id": 167,
+  "nutrition_key": "lontong",
+  "match": "exact",
+  "record_name": "Lontong (sayur lodeh)",
+  "record_verification": "approximate_unverified"
+ },
+ "lontong with sayur lodeh": {
+  "class_id": 168,
+  "nutrition_key": "lontong",
+  "match": "exact",
+  "record_name": "Lontong (sayur lodeh)",
+  "record_verification": "approximate_unverified"
+ },
+ "lor mee": {
+  "class_id": 169,
+  "nutrition_key": "lor_mee",
+  "match": "exact",
+  "record_name": "Lor mee",
+  "record_verification": "approximate_unverified"
+ },
+ "lychee": {
+  "class_id": 170,
+  "nutrition_key": "lychee",
+  "match": "exact",
+  "record_name": "Lychee",
+  "record_verification": "approximate_unverified"
+ },
+ "macaroni": {
+  "class_id": 171,
+  "nutrition_key": "pasta",
+  "match": "exact",
+  "record_name": "Pasta / spaghetti, cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "macaroni and cheese": {
+  "class_id": 172,
+  "nutrition_key": "mac_and_cheese",
+  "match": "exact",
+  "record_name": "Macaroni and cheese",
+  "record_verification": "approximate_unverified"
+ },
+ "macarons": {
+  "class_id": 173,
+  "nutrition_key": "macarons",
+  "match": "exact",
+  "record_name": "Macarons",
+  "record_verification": "approximate_unverified"
+ },
+ "mango pudding": {
+  "class_id": 174,
+  "nutrition_key": "mango_pudding",
+  "match": "exact",
+  "record_name": "Mango pudding",
+  "record_verification": "approximate_unverified"
+ },
+ "mangosteen": {
+  "class_id": 175,
+  "nutrition_key": "mangosteen",
+  "match": "exact",
+  "record_name": "Mangosteen",
+  "record_verification": "approximate_unverified"
+ },
+ "meatball": {
+  "class_id": 176,
+  "nutrition_key": "meatball",
+  "match": "exact",
+  "record_name": "Meatballs",
+  "record_verification": "approximate_unverified"
+ },
+ "mee bandung": {
+  "class_id": 177,
+  "nutrition_key": "mee_bandung",
+  "match": "exact",
+  "record_name": "Mee bandung",
+  "record_verification": "approximate_unverified"
+ },
+ "mee goreng": {
+  "class_id": 178,
+  "nutrition_key": "mee_goreng",
+  "match": "exact",
+  "record_name": "Mee goreng",
+  "record_verification": "transcribed_unverified"
+ },
+ "mee kuah": {
+  "class_id": 179,
+  "nutrition_key": "mee_kuah",
+  "match": "exact",
+  "record_name": "Mee kuah",
+  "record_verification": "approximate_unverified"
+ },
+ "mee pok": {
+  "class_id": 180,
+  "nutrition_key": "fishball_noodles",
+  "match": "exact",
+  "record_name": "Fishball noodles / mee pok (dry)",
+  "record_verification": "approximate_unverified"
+ },
+ "mee rebus": {
+  "class_id": 181,
+  "nutrition_key": "mee_rebus",
+  "match": "exact",
+  "record_name": "Mee rebus",
+  "record_verification": "approximate_unverified"
+ },
+ "mee siam": {
+  "class_id": 182,
+  "nutrition_key": "mee_siam",
+  "match": "exact",
+  "record_name": "Mee siam",
+  "record_verification": "approximate_unverified"
+ },
+ "mee siam, fried": {
+  "class_id": 183,
+  "nutrition_key": "mee_siam",
+  "match": "proxy",
+  "record_name": "Mee siam",
+  "record_verification": "approximate_unverified"
+ },
+ "mee soto": {
+  "class_id": 184,
+  "nutrition_key": "mee_soto",
+  "match": "exact",
+  "record_name": "Mee soto",
+  "record_verification": "approximate_unverified"
+ },
+ "milk": {
+  "class_id": 185,
+  "nutrition_key": "milk",
+  "match": "exact",
+  "record_name": "Milk, whole",
+  "record_verification": "transcribed_unverified"
+ },
+ "miso ramen, with fishcake": {
+  "class_id": 186,
+  "nutrition_key": "ramen",
+  "match": "exact",
+  "record_name": "Ramen (with broth)",
+  "record_verification": "approximate_unverified"
+ },
+ "miso soup": {
+  "class_id": 187,
+  "nutrition_key": "consomme",
+  "match": "proxy",
+  "record_name": "Clear soup / consommé",
+  "record_verification": "transcribed_unverified"
+ },
+ "mixed grills": {
+  "class_id": 188,
+  "nutrition_key": "mixed_grill",
+  "match": "exact",
+  "record_name": "Mixed grill",
+  "record_verification": "approximate_unverified"
+ },
+ "mixed vegetables": {
+  "class_id": 189,
+  "nutrition_key": "mixed_vegetables",
+  "match": "exact",
+  "record_name": "Mixed vegetables (stir-fried)",
+  "record_verification": "approximate_unverified"
+ },
+ "muesli": {
+  "class_id": 190,
+  "nutrition_key": "muesli",
+  "match": "exact",
+  "record_name": "Muesli",
+  "record_verification": "approximate_unverified"
+ },
+ "murtabak": {
+  "class_id": 191,
+  "nutrition_key": "murtabak",
+  "match": "exact",
+  "record_name": "Murtabak",
+  "record_verification": "approximate_unverified"
+ },
+ "mushroom soup": {
+  "class_id": 192,
+  "nutrition_key": "cream_soup",
+  "match": "proxy",
+  "record_name": "Cream soup (e.g. mushroom, chowder)",
+  "record_verification": "approximate_unverified"
+ },
+ "mussels": {
+  "class_id": 193,
+  "nutrition_key": "mussels",
+  "match": "exact",
+  "record_name": "Mussels",
+  "record_verification": "approximate_unverified"
+ },
+ "nachos": {
+  "class_id": 194,
+  "nutrition_key": "nachos",
+  "match": "exact",
+  "record_name": "Nachos with cheese",
+  "record_verification": "approximate_unverified"
+ },
+ "nasi ambeng": {
+  "class_id": 195,
+  "nutrition_key": "nasi_ambeng",
+  "match": "exact",
+  "record_name": "Nasi ambeng",
+  "record_verification": "approximate_unverified"
+ },
+ "nasi lemak": {
+  "class_id": 196,
+  "nutrition_key": "nasi_lemak",
+  "match": "exact",
+  "record_name": "Nasi lemak (egg, ikan bilis, peanuts, sambal)",
+  "record_verification": "transcribed_unverified"
+ },
+ "nasi pattaya": {
+  "class_id": 197,
+  "nutrition_key": "nasi_pattaya",
+  "match": "exact",
+  "record_name": "Nasi pattaya",
+  "record_verification": "approximate_unverified"
+ },
+ "ngoh hiang": {
+  "class_id": 198,
+  "nutrition_key": "ngoh_hiang",
+  "match": "exact",
+  "record_name": "Ngoh hiang",
+  "record_verification": "approximate_unverified"
+ },
+ "nuts": {
+  "class_id": 199,
+  "nutrition_key": "mixed_nuts",
+  "match": "exact",
+  "record_name": "Mixed nuts",
+  "record_verification": "approximate_unverified"
+ },
+ "omelette": {
+  "class_id": 200,
+  "nutrition_key": "omelette",
+  "match": "exact",
+  "record_name": "Omelette",
+  "record_verification": "approximate_unverified"
+ },
+ "onion rings": {
+  "class_id": 201,
+  "nutrition_key": "onion_rings",
+  "match": "exact",
+  "record_name": "Onion rings",
+  "record_verification": "approximate_unverified"
+ },
+ "orange": {
+  "class_id": 202,
+  "nutrition_key": "orange",
+  "match": "exact",
+  "record_name": "Orange",
+  "record_verification": "transcribed_unverified"
+ },
+ "otak": {
+  "class_id": 203,
+  "nutrition_key": "otak",
+  "match": "exact",
+  "record_name": "Otak-otak",
+  "record_verification": "approximate_unverified"
+ },
+ "oyster omelette": {
+  "class_id": 204,
+  "nutrition_key": "oyster_omelette",
+  "match": "exact",
+  "record_name": "Oyster omelette (orh luak)",
+  "record_verification": "approximate_unverified"
+ },
+ "oysters": {
+  "class_id": 205,
+  "nutrition_key": "oysters",
+  "match": "exact",
+  "record_name": "Oysters",
+  "record_verification": "approximate_unverified"
+ },
+ "pad thai": {
+  "class_id": 206,
+  "nutrition_key": "pad_thai",
+  "match": "exact",
+  "record_name": "Pad thai",
+  "record_verification": "approximate_unverified"
+ },
+ "paella": {
+  "class_id": 207,
+  "nutrition_key": "paella",
+  "match": "exact",
+  "record_name": "Paella",
+  "record_verification": "approximate_unverified"
+ },
+ "paella seafood": {
+  "class_id": 208,
+  "nutrition_key": "paella",
+  "match": "exact",
+  "record_name": "Paella",
+  "record_verification": "approximate_unverified"
+ },
+ "pancake": {
+  "class_id": 209,
+  "nutrition_key": "pancake",
+  "match": "exact",
+  "record_name": "Pancakes",
+  "record_verification": "approximate_unverified"
+ },
+ "panna cotta": {
+  "class_id": 210,
+  "nutrition_key": "panna_cotta",
+  "match": "exact",
+  "record_name": "Panna cotta",
+  "record_verification": "approximate_unverified"
+ },
+ "papaya": {
+  "class_id": 211,
+  "nutrition_key": "papaya",
+  "match": "exact",
+  "record_name": "Papaya",
+  "record_verification": "approximate_unverified"
+ },
+ "parfait": {
+  "class_id": 212,
+  "nutrition_key": "parfait",
+  "match": "exact",
+  "record_name": "Yogurt parfait",
+  "record_verification": "approximate_unverified"
+ },
+ "passion fruit": {
+  "class_id": 213,
+  "nutrition_key": "passion_fruit",
+  "match": "exact",
+  "record_name": "Passion fruit",
+  "record_verification": "approximate_unverified"
+ },
+ "pasta fettuccine": {
+  "class_id": 214,
+  "nutrition_key": "pasta",
+  "match": "proxy",
+  "record_name": "Pasta / spaghetti, cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "pasta red sauce": {
+  "class_id": 215,
+  "nutrition_key": "spaghetti_bolognese",
+  "match": "proxy",
+  "record_name": "Spaghetti bolognese",
+  "record_verification": "approximate_unverified"
+ },
+ "peanut pancake": {
+  "class_id": 216,
+  "nutrition_key": "peanut_pancake",
+  "match": "exact",
+  "record_name": "Peanut pancake (min jiang kueh)",
+  "record_verification": "approximate_unverified"
+ },
+ "pear": {
+  "class_id": 217,
+  "nutrition_key": "pear",
+  "match": "exact",
+  "record_name": "Pear",
+  "record_verification": "approximate_unverified"
+ },
+ "peking duck": {
+  "class_id": 218,
+  "nutrition_key": "peking_duck",
+  "match": "exact",
+  "record_name": "Peking duck",
+  "record_verification": "approximate_unverified"
+ },
+ "persimmon": {
+  "class_id": 219,
+  "nutrition_key": "persimmon",
+  "match": "exact",
+  "record_name": "Persimmon",
+  "record_verification": "approximate_unverified"
+ },
+ "pho": {
+  "class_id": 220,
+  "nutrition_key": "pho",
+  "match": "exact",
+  "record_name": "Pho (beef noodle soup)",
+  "record_verification": "approximate_unverified"
+ },
+ "pig organ soup": {
+  "class_id": 221,
+  "nutrition_key": "pig_organ_soup",
+  "match": "exact",
+  "record_name": "Pig organ soup",
+  "record_verification": "approximate_unverified"
+ },
+ "pilaf, pea": {
+  "class_id": 222,
+  "nutrition_key": "nasi_goreng",
+  "match": "proxy",
+  "record_name": "Nasi goreng (fried rice)",
+  "record_verification": "transcribed_unverified"
+ },
+ "pineapple": {
+  "class_id": 223,
+  "nutrition_key": "pineapple",
+  "match": "exact",
+  "record_name": "Pineapple",
+  "record_verification": "transcribed_unverified"
+ },
+ "pineapple tarts": {
+  "class_id": 224,
+  "nutrition_key": "pineapple_tarts",
+  "match": "exact",
+  "record_name": "Pineapple tarts",
+  "record_verification": "approximate_unverified"
+ },
+ "pitaya": {
+  "class_id": 225,
+  "nutrition_key": "dragon_fruit",
+  "match": "exact",
+  "record_name": "Dragon fruit (pitaya)",
+  "record_verification": "approximate_unverified"
+ },
+ "pizza": {
+  "class_id": 226,
+  "nutrition_key": "pizza",
+  "match": "exact",
+  "record_name": "Pizza, cheese",
+  "record_verification": "transcribed_unverified"
+ },
+ "pomegranate": {
+  "class_id": 227,
+  "nutrition_key": "pomegranate",
+  "match": "exact",
+  "record_name": "Pomegranate arils",
+  "record_verification": "transcribed_unverified"
+ },
+ "pomelo": {
+  "class_id": 228,
+  "nutrition_key": "pomelo",
+  "match": "exact",
+  "record_name": "Pomelo",
+  "record_verification": "approximate_unverified"
+ },
+ "popcorn": {
+  "class_id": 229,
+  "nutrition_key": "popcorn",
+  "match": "exact",
+  "record_name": "Popcorn (air-popped)",
+  "record_verification": "approximate_unverified"
+ },
+ "popiah": {
+  "class_id": 230,
+  "nutrition_key": "popiah",
+  "match": "exact",
+  "record_name": "Popiah (fresh spring roll)",
+  "record_verification": "transcribed_unverified"
+ },
+ "pork chop": {
+  "class_id": 231,
+  "nutrition_key": "pork_chop",
+  "match": "exact",
+  "record_name": "Pork chop",
+  "record_verification": "approximate_unverified"
+ },
+ "porridge": {
+  "class_id": 232,
+  "nutrition_key": "porridge",
+  "match": "exact",
+  "record_name": "Porridge (rice congee)",
+  "record_verification": "approximate_unverified"
+ },
+ "poutine": {
+  "class_id": 233,
+  "nutrition_key": "french_fries",
+  "match": "proxy",
+  "record_name": "French fries",
+  "record_verification": "transcribed_unverified"
+ },
+ "prawn noodle": {
+  "class_id": 234,
+  "nutrition_key": "prawn_noodle_soup",
+  "match": "exact",
+  "record_name": "Prawn noodle soup",
+  "record_verification": "approximate_unverified"
+ },
+ "preserved fruit snacks": {
+  "class_id": 235,
+  "nutrition_key": "preserved_fruit",
+  "match": "exact",
+  "record_name": "Preserved fruit snacks",
+  "record_verification": "approximate_unverified"
+ },
+ "prime rib": {
+  "class_id": 236,
+  "nutrition_key": "beef_steak",
+  "match": "proxy",
+  "record_name": "Beef steak (sirloin), cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "pulled pork sandwich": {
+  "class_id": 237,
+  "nutrition_key": "sandwich",
+  "match": "proxy",
+  "record_name": "Sandwich (ham and cheese)",
+  "record_verification": "transcribed_unverified"
+ },
+ "pung kueh": {
+  "class_id": 238,
+  "nutrition_key": "pung_kueh",
+  "match": "exact",
+  "record_name": "Pung kueh / ang ku kueh",
+  "record_verification": "approximate_unverified"
+ },
+ "rambutan": {
+  "class_id": 239,
+  "nutrition_key": "rambutan",
+  "match": "exact",
+  "record_name": "Rambutan",
+  "record_verification": "approximate_unverified"
+ },
+ "ramen": {
+  "class_id": 240,
+  "nutrition_key": "ramen",
+  "match": "exact",
+  "record_name": "Ramen (with broth)",
+  "record_verification": "approximate_unverified"
+ },
+ "raspberry": {
+  "class_id": 241,
+  "nutrition_key": "raspberry",
+  "match": "exact",
+  "record_name": "Raspberries",
+  "record_verification": "approximate_unverified"
+ },
+ "ravioli": {
+  "class_id": 242,
+  "nutrition_key": "ravioli",
+  "match": "exact",
+  "record_name": "Ravioli",
+  "record_verification": "approximate_unverified"
+ },
+ "red velvet cake": {
+  "class_id": 243,
+  "nutrition_key": "chocolate_cake",
+  "match": "proxy",
+  "record_name": "Chocolate cake with frosting",
+  "record_verification": "transcribed_unverified"
+ },
+ "rice dumpling": {
+  "class_id": 244,
+  "nutrition_key": "rice_dumpling",
+  "match": "exact",
+  "record_name": "Rice dumpling (bak chang)",
+  "record_verification": "approximate_unverified"
+ },
+ "rice, chicken katsu with japanese curry": {
+  "class_id": 245,
+  "nutrition_key": "katsudon",
+  "match": "proxy",
+  "record_name": "Katsudon (pork cutlet rice bowl)",
+  "record_verification": "approximate_unverified"
+ },
+ "rice, korean bulgogi beef": {
+  "class_id": 246,
+  "nutrition_key": "duck_rice",
+  "match": "proxy",
+  "record_name": "Braised duck rice",
+  "record_verification": "approximate_unverified"
+ },
+ "rice, with dakgalbi": {
+  "class_id": 247,
+  "nutrition_key": "duck_rice",
+  "match": "proxy",
+  "record_name": "Braised duck rice",
+  "record_verification": "approximate_unverified"
+ },
+ "risotto": {
+  "class_id": 248,
+  "nutrition_key": "risotto",
+  "match": "exact",
+  "record_name": "Risotto",
+  "record_verification": "approximate_unverified"
+ },
+ "roasted chicken": {
+  "class_id": 249,
+  "nutrition_key": "roast_chicken",
+  "match": "exact",
+  "record_name": "Roast chicken",
+  "record_verification": "approximate_unverified"
+ },
+ "rock melon": {
+  "class_id": 250,
+  "nutrition_key": "rock_melon",
+  "match": "exact",
+  "record_name": "Rock melon (cantaloupe)",
+  "record_verification": "approximate_unverified"
+ },
+ "rojak": {
+  "class_id": 251,
+  "nutrition_key": "rojak",
+  "match": "exact",
+  "record_name": "Rojak",
+  "record_verification": "approximate_unverified"
+ },
+ "roti john": {
+  "class_id": 252,
+  "nutrition_key": "roti_john",
+  "match": "exact",
+  "record_name": "Roti john",
+  "record_verification": "approximate_unverified"
+ },
+ "salad": {
+  "class_id": 253,
+  "nutrition_key": "green_salad",
+  "match": "proxy",
+  "record_name": "Mixed green salad (no dressing)",
+  "record_verification": "transcribed_unverified"
+ },
+ "salmon grilled": {
+  "class_id": 254,
+  "nutrition_key": "salmon",
+  "match": "exact",
+  "record_name": "Salmon, cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "sambal": {
+  "class_id": 255,
+  "nutrition_key": "sambal",
+  "match": "exact",
+  "record_name": "Sambal chilli paste",
+  "record_verification": "approximate_unverified"
+ },
+ "sambal kangkong": {
+  "class_id": 256,
+  "nutrition_key": "sambal_kangkong",
+  "match": "exact",
+  "record_name": "Sambal kangkong",
+  "record_verification": "approximate_unverified"
+ },
+ "sambal stingray": {
+  "class_id": 257,
+  "nutrition_key": "sambal_stingray",
+  "match": "exact",
+  "record_name": "Sambal stingray (BBQ)",
+  "record_verification": "approximate_unverified"
+ },
+ "samosa": {
+  "class_id": 258,
+  "nutrition_key": "samosa",
+  "match": "exact",
+  "record_name": "Samosa",
+  "record_verification": "approximate_unverified"
+ },
+ "sandwich": {
+  "class_id": 259,
+  "nutrition_key": "sandwich",
+  "match": "proxy",
+  "record_name": "Sandwich (ham and cheese)",
+  "record_verification": "transcribed_unverified"
+ },
+ "sashimi": {
+  "class_id": 260,
+  "nutrition_key": "sashimi",
+  "match": "exact",
+  "record_name": "Sashimi",
+  "record_verification": "approximate_unverified"
+ },
+ "satay": {
+  "class_id": 261,
+  "nutrition_key": "chicken_satay",
+  "match": "exact",
+  "record_name": "Chicken satay with peanut sauce",
+  "record_verification": "transcribed_unverified"
+ },
+ "satay bee hoon": {
+  "class_id": 262,
+  "nutrition_key": "satay_bee_hoon",
+  "match": "exact",
+  "record_name": "Satay bee hoon",
+  "record_verification": "approximate_unverified"
+ },
+ "sausage rolls": {
+  "class_id": 263,
+  "nutrition_key": "sausage_roll",
+  "match": "exact",
+  "record_name": "Sausage roll",
+  "record_verification": "approximate_unverified"
+ },
+ "scallops": {
+  "class_id": 264,
+  "nutrition_key": "scallops",
+  "match": "exact",
+  "record_name": "Scallops",
+  "record_verification": "approximate_unverified"
+ },
+ "seafood noodles soup": {
+  "class_id": 265,
+  "nutrition_key": "prawn_noodle_soup",
+  "match": "proxy",
+  "record_name": "Prawn noodle soup",
+  "record_verification": "approximate_unverified"
+ },
+ "seaweed salad": {
+  "class_id": 266,
+  "nutrition_key": "green_salad",
+  "match": "proxy",
+  "record_name": "Mixed green salad (no dressing)",
+  "record_verification": "transcribed_unverified"
+ },
+ "seaweed snack": {
+  "class_id": 267,
+  "nutrition_key": null,
+  "match": "none",
+  "record_name": null,
+  "record_verification": null
+ },
+ "shrimp and grits": {
+  "class_id": 268,
+  "nutrition_key": null,
+  "match": "none",
+  "record_name": null,
+  "record_verification": null
+ },
+ "siew mai": {
+  "class_id": 269,
+  "nutrition_key": "siew_mai",
+  "match": "exact",
+  "record_name": "Siew mai",
+  "record_verification": "approximate_unverified"
+ },
+ "singapore sling": {
+  "class_id": 270,
+  "nutrition_key": "singapore_sling",
+  "match": "exact",
+  "record_name": "Singapore sling (cocktail)",
+  "record_verification": "approximate_unverified"
+ },
+ "sirloin steak": {
+  "class_id": 271,
+  "nutrition_key": "beef_steak",
+  "match": "exact",
+  "record_name": "Beef steak (sirloin), cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "sliced fish soup": {
+  "class_id": 272,
+  "nutrition_key": "sliced_fish_soup",
+  "match": "exact",
+  "record_name": "Sliced fish soup (no noodles)",
+  "record_verification": "approximate_unverified"
+ },
+ "snacks and chips": {
+  "class_id": 273,
+  "nutrition_key": "potato_chips",
+  "match": "exact",
+  "record_name": "Potato chips / snacks",
+  "record_verification": "approximate_unverified"
+ },
+ "soft boiled eggs": {
+  "class_id": 274,
+  "nutrition_key": "boiled_egg",
+  "match": "exact",
+  "record_name": "Egg, boiled",
+  "record_verification": "transcribed_unverified"
+ },
+ "soto ayam": {
+  "class_id": 275,
+  "nutrition_key": "soto_ayam",
+  "match": "exact",
+  "record_name": "Soto ayam",
+  "record_verification": "approximate_unverified"
+ },
+ "soursop": {
+  "class_id": 276,
+  "nutrition_key": "soursop",
+  "match": "exact",
+  "record_name": "Soursop",
+  "record_verification": "approximate_unverified"
+ },
+ "spaghetti bolognese": {
+  "class_id": 277,
+  "nutrition_key": "spaghetti_bolognese",
+  "match": "exact",
+  "record_name": "Spaghetti bolognese",
+  "record_verification": "approximate_unverified"
+ },
+ "spaghetti carbonara": {
+  "class_id": 278,
+  "nutrition_key": "carbonara",
+  "match": "exact",
+  "record_name": "Spaghetti carbonara",
+  "record_verification": "transcribed_unverified"
+ },
+ "spring rolls": {
+  "class_id": 279,
+  "nutrition_key": "spring_roll_fried",
+  "match": "exact",
+  "record_name": "Spring rolls (fried)",
+  "record_verification": "approximate_unverified"
+ },
+ "starfruit": {
+  "class_id": 280,
+  "nutrition_key": "starfruit",
+  "match": "exact",
+  "record_name": "Starfruit",
+  "record_verification": "approximate_unverified"
+ },
+ "steak": {
+  "class_id": 281,
+  "nutrition_key": "beef_steak",
+  "match": "exact",
+  "record_name": "Beef steak (sirloin), cooked",
+  "record_verification": "transcribed_unverified"
+ },
+ "steamed buns": {
+  "class_id": 282,
+  "nutrition_key": "steamed_bun",
+  "match": "exact",
+  "record_name": "Steamed bun (plain mantou)",
+  "record_verification": "approximate_unverified"
+ },
+ "steamed grouper": {
+  "class_id": 283,
+  "nutrition_key": "steamed_fish",
+  "match": "exact",
+  "record_name": "Steamed fish (e.g. grouper)",
+  "record_verification": "approximate_unverified"
+ },
+ "strawberry": {
+  "class_id": 284,
+  "nutrition_key": "strawberry",
+  "match": "exact",
+  "record_name": "Strawberries",
+  "record_verification": "transcribed_unverified"
+ },
+ "strawberry shortcake": {
+  "class_id": 285,
+  "nutrition_key": "chocolate_cake",
+  "match": "proxy",
+  "record_name": "Chocolate cake with frosting",
+  "record_verification": "transcribed_unverified"
+ },
+ "sushi": {
+  "class_id": 286,
+  "nutrition_key": "sushi",
+  "match": "exact",
+  "record_name": "Sushi (nigiri / maki, mixed)",
+  "record_verification": "transcribed_unverified"
+ },
+ "sweets": {
+  "class_id": 287,
+  "nutrition_key": "candy",
+  "match": "exact",
+  "record_name": "Sweets / candy",
+  "record_verification": "approximate_unverified"
+ },
+ "tacos": {
+  "class_id": 288,
+  "nutrition_key": "tacos",
+  "match": "exact",
+  "record_name": "Tacos",
+  "record_verification": "approximate_unverified"
+ },
+ "tacos and nachos": {
+  "class_id": 289,
+  "nutrition_key": "tacos",
+  "match": "proxy",
+  "record_name": "Tacos",
+  "record_verification": "approximate_unverified"
+ },
+ "takoyaki": {
+  "class_id": 290,
+  "nutrition_key": "takoyaki",
+  "match": "exact",
+  "record_name": "Takoyaki",
+  "record_verification": "approximate_unverified"
+ },
+ "tandoori chicken": {
+  "class_id": 291,
+  "nutrition_key": "roast_chicken",
+  "match": "proxy",
+  "record_name": "Roast chicken",
+  "record_verification": "approximate_unverified"
+ },
+ "tau suan": {
+  "class_id": 292,
+  "nutrition_key": "tau_suan",
+  "match": "exact",
+  "record_name": "Tau suan (mung bean dessert)",
+  "record_verification": "approximate_unverified"
+ },
+ "tauhu goreng": {
+  "class_id": 293,
+  "nutrition_key": "tauhu_goreng",
+  "match": "exact",
+  "record_name": "Tauhu goreng",
+  "record_verification": "approximate_unverified"
+ },
+ "thunder tea rice": {
+  "class_id": 294,
+  "nutrition_key": "thunder_tea_rice",
+  "match": "exact",
+  "record_name": "Thunder tea rice",
+  "record_verification": "approximate_unverified"
+ },
+ "tiramisu": {
+  "class_id": 295,
+  "nutrition_key": "tiramisu",
+  "match": "exact",
+  "record_name": "Tiramisu",
+  "record_verification": "approximate_unverified"
+ },
+ "tom yum noodle soup": {
+  "class_id": 296,
+  "nutrition_key": "prawn_noodle_soup",
+  "match": "proxy",
+  "record_name": "Prawn noodle soup",
+  "record_verification": "approximate_unverified"
+ },
+ "tortilla plain": {
+  "class_id": 297,
+  "nutrition_key": "tortilla",
+  "match": "exact",
+  "record_name": "Tortilla (plain flour)",
+  "record_verification": "approximate_unverified"
+ },
+ "tumpeng": {
+  "class_id": 298,
+  "nutrition_key": "nasi_ambeng",
+  "match": "proxy",
+  "record_name": "Nasi ambeng",
+  "record_verification": "approximate_unverified"
+ },
+ "tuna tartare": {
+  "class_id": 299,
+  "nutrition_key": "sashimi",
+  "match": "proxy",
+  "record_name": "Sashimi",
+  "record_verification": "approximate_unverified"
+ },
+ "tutu kueh": {
+  "class_id": 300,
+  "nutrition_key": "tutu_kueh",
+  "match": "exact",
+  "record_name": "Tutu kueh",
+  "record_verification": "approximate_unverified"
+ },
+ "udon": {
+  "class_id": 301,
+  "nutrition_key": "udon",
+  "match": "exact",
+  "record_name": "Udon (noodle soup)",
+  "record_verification": "approximate_unverified"
+ },
+ "vadai": {
+  "class_id": 302,
+  "nutrition_key": "vadai",
+  "match": "exact",
+  "record_name": "Vadai",
+  "record_verification": "approximate_unverified"
+ },
+ "vegetable soup": {
+  "class_id": 303,
+  "nutrition_key": "vegetable_soup",
+  "match": "exact",
+  "record_name": "Vegetable soup",
+  "record_verification": "approximate_unverified"
+ },
+ "vegetarian bee hoon": {
+  "class_id": 304,
+  "nutrition_key": "veg_bee_hoon",
+  "match": "exact",
+  "record_name": "Vegetarian bee hoon",
+  "record_verification": "approximate_unverified"
+ },
+ "waffle": {
+  "class_id": 305,
+  "nutrition_key": "waffle",
+  "match": "exact",
+  "record_name": "Waffle",
+  "record_verification": "approximate_unverified"
+ },
+ "wanton mee, dry": {
+  "class_id": 306,
+  "nutrition_key": "wanton_mee",
+  "match": "exact",
+  "record_name": "Wanton mee (dry)",
+  "record_verification": "transcribed_unverified"
+ },
+ "watermelon": {
+  "class_id": 307,
+  "nutrition_key": "watermelon",
+  "match": "exact",
+  "record_name": "Watermelon",
+  "record_verification": "approximate_unverified"
+ },
+ "white bread": {
+  "class_id": 308,
+  "nutrition_key": "white_bread",
+  "match": "exact",
+  "record_name": "White bread",
+  "record_verification": "transcribed_unverified"
+ },
+ "whole grain bread": {
+  "class_id": 309,
+  "nutrition_key": "whole_grain_bread",
+  "match": "exact",
+  "record_name": "Wholegrain bread",
+  "record_verification": "approximate_unverified"
+ },
+ "whole oats": {
+  "class_id": 310,
+  "nutrition_key": "whole_oats",
+  "match": "exact",
+  "record_name": "Oats (dry)",
+  "record_verification": "approximate_unverified"
+ },
+ "whole wheat": {
+  "class_id": 311,
+  "nutrition_key": "whole_grain_bread",
+  "match": "proxy",
+  "record_name": "Wholegrain bread",
+  "record_verification": "approximate_unverified"
+ },
+ "wholegrain muffin": {
+  "class_id": 312,
+  "nutrition_key": "muffin_wholegrain",
+  "match": "exact",
+  "record_name": "Wholegrain muffin",
+  "record_verification": "approximate_unverified"
+ },
+ "wholegrain pasta": {
+  "class_id": 313,
+  "nutrition_key": "wholegrain_pasta",
+  "match": "exact",
+  "record_name": "Wholegrain pasta, cooked",
+  "record_verification": "approximate_unverified"
+ },
+ "wholegrain wrap": {
+  "class_id": 314,
+  "nutrition_key": "wholegrain_wrap",
+  "match": "exact",
+  "record_name": "Wholegrain wrap",
+  "record_verification": "approximate_unverified"
+ },
+ "xiao long bao": {
+  "class_id": 315,
+  "nutrition_key": "xiao_long_bao",
+  "match": "exact",
+  "record_name": "Xiao long bao",
+  "record_verification": "approximate_unverified"
+ },
+ "yam rice": {
+  "class_id": 316,
+  "nutrition_key": "yam_rice",
+  "match": "exact",
+  "record_name": "Yam rice",
+  "record_verification": "approximate_unverified"
+ },
+ "yogurt": {
+  "class_id": 317,
+  "nutrition_key": "yogurt",
+  "match": "exact",
+  "record_name": "Yogurt, plain low-fat",
+  "record_verification": "transcribed_unverified"
+ },
+ "yong tau foo": {
+  "class_id": 318,
+  "nutrition_key": "yong_tau_foo",
+  "match": "exact",
+  "record_name": "Yong tau foo (soup)",
+  "record_verification": "transcribed_unverified"
+ },
+ "yuseng": {
+  "class_id": 319,
+  "nutrition_key": "yusheng",
+  "match": "exact",
+  "record_name": "Yusheng (prosperity toss)",
+  "record_verification": "approximate_unverified"
+ }
+}

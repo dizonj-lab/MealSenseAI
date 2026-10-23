@@ -1,0 +1,1985 @@
+{
+ "name": "MealSenseAI EXP-002 EfficientNet-B0",
+ "version": "EXP-002_FineTuning",
+ "task": "food image classification (320 canonical classes)",
+ "architecture": "torchvision efficientnet_b0, classifier[1] = Linear(1280, 320)",
+ "lineage": "EXP-001_UnifiedFood (ImageNet-initialised) -> EXP-002 partial fine-tuning (last 3 feature blocks + head)",
+ "training_data": [
+  "Food-101",
+  "FoodSG"
+ ],
+ "files": {
+  "best_model.pth": {
+   "sha256": "4c9b30c057f893fc6e955282e73dc2767dede0d365a2cad500e4334d950ff2f6",
+   "role": "source of truth (PyTorch state_dict)"
+  },
+  "model.onnx": {
+   "sha256": "05978696572f17336738dc3b0a086696873088a4a4cb58687ffd1a787f714230",
+   "role": "runtime artefact exported by ml/export/export_exp002.py"
+  },
+  "class_mapping.json": {
+   "sha256": "05d355e942e3aa189a77e0de0bcfc6b2ff4bfa96bcf9c892d91a8615e22f4752",
+   "role": "canonical taxonomy (class name -> class id)"
+  }
+ },
+ "num_classes": 320,
+ "classes": [
+  {
+   "id": 0,
+   "name": "alcoholic beverage",
+   "nutrition_key": "alcoholic_beverage",
+   "match": "proxy"
+  },
+  {
+   "id": 1,
+   "name": "apple",
+   "nutrition_key": "apple",
+   "match": "exact"
+  },
+  {
+   "id": 2,
+   "name": "apple pie",
+   "nutrition_key": "apple_pie",
+   "match": "exact"
+  },
+  {
+   "id": 3,
+   "name": "apricot",
+   "nutrition_key": "apricot",
+   "match": "exact"
+  },
+  {
+   "id": 4,
+   "name": "assam pedas",
+   "nutrition_key": "assam_pedas",
+   "match": "exact"
+  },
+  {
+   "id": 5,
+   "name": "avocados",
+   "nutrition_key": "avocado",
+   "match": "exact"
+  },
+  {
+   "id": 6,
+   "name": "ayam penyet",
+   "nutrition_key": "ayam_penyet",
+   "match": "exact"
+  },
+  {
+   "id": 7,
+   "name": "baby back ribs",
+   "nutrition_key": "char_siew",
+   "match": "proxy"
+  },
+  {
+   "id": 8,
+   "name": "bagel & croissant",
+   "nutrition_key": "bagel",
+   "match": "proxy"
+  },
+  {
+   "id": 9,
+   "name": "bak chor mee",
+   "nutrition_key": "bak_chor_mee",
+   "match": "exact"
+  },
+  {
+   "id": 10,
+   "name": "bak kut teh",
+   "nutrition_key": "bak_kut_teh",
+   "match": "exact"
+  },
+  {
+   "id": 11,
+   "name": "bak kwa",
+   "nutrition_key": "bak_kwa",
+   "match": "exact"
+  },
+  {
+   "id": 12,
+   "name": "baked beans",
+   "nutrition_key": "baked_beans",
+   "match": "exact"
+  },
+  {
+   "id": 13,
+   "name": "baklava",
+   "nutrition_key": "baklava",
+   "match": "exact"
+  },
+  {
+   "id": 14,
+   "name": "bakso",
+   "nutrition_key": "bakso",
+   "match": "exact"
+  },
+  {
+   "id": 15,
+   "name": "ban mian",
+   "nutrition_key": "ban_mian",
+   "match": "exact"
+  },
+  {
+   "id": 16,
+   "name": "banana",
+   "nutrition_key": "banana",
+   "match": "exact"
+  },
+  {
+   "id": 17,
+   "name": "barley",
+   "nutrition_key": "barley",
+   "match": "exact"
+  },
+  {
+   "id": 18,
+   "name": "bee hoon",
+   "nutrition_key": "bee_hoon_fried",
+   "match": "exact"
+  },
+  {
+   "id": 19,
+   "name": "bee hoon, goreng",
+   "nutrition_key": "bee_hoon_goreng",
+   "match": "exact"
+  },
+  {
+   "id": 20,
+   "name": "bee hoon, soto",
+   "nutrition_key": "soto_bee_hoon",
+   "match": "exact"
+  },
+  {
+   "id": 21,
+   "name": "beef carpaccio",
+   "nutrition_key": "beef_steak",
+   "match": "proxy"
+  },
+  {
+   "id": 22,
+   "name": "beef noodle soup",
+   "nutrition_key": "pho",
+   "match": "proxy"
+  },
+  {
+   "id": 23,
+   "name": "beef tartare",
+   "nutrition_key": "beef_steak",
+   "match": "proxy"
+  },
+  {
+   "id": 24,
+   "name": "beet salad",
+   "nutrition_key": "green_salad",
+   "match": "proxy"
+  },
+  {
+   "id": 25,
+   "name": "begedil",
+   "nutrition_key": "begedil",
+   "match": "exact"
+  },
+  {
+   "id": 26,
+   "name": "beignets",
+   "nutrition_key": "donut",
+   "match": "proxy"
+  },
+  {
+   "id": 27,
+   "name": "bibimbap",
+   "nutrition_key": "bibimbap",
+   "match": "exact"
+  },
+  {
+   "id": 28,
+   "name": "biscuit",
+   "nutrition_key": "biscuit",
+   "match": "exact"
+  },
+  {
+   "id": 29,
+   "name": "black pepper crab",
+   "nutrition_key": "black_pepper_crab",
+   "match": "exact"
+  },
+  {
+   "id": 30,
+   "name": "blackberry",
+   "nutrition_key": "blackberry",
+   "match": "exact"
+  },
+  {
+   "id": 31,
+   "name": "blueberries",
+   "nutrition_key": "blueberries",
+   "match": "exact"
+  },
+  {
+   "id": 32,
+   "name": "bread pudding",
+   "nutrition_key": "bread_pudding",
+   "match": "exact"
+  },
+  {
+   "id": 33,
+   "name": "breakfast burrito",
+   "nutrition_key": "burrito",
+   "match": "proxy"
+  },
+  {
+   "id": 34,
+   "name": "breakfast cereal",
+   "nutrition_key": "breakfast_cereal",
+   "match": "exact"
+  },
+  {
+   "id": 35,
+   "name": "bruschetta",
+   "nutrition_key": null,
+   "match": "none"
+  },
+  {
+   "id": 36,
+   "name": "bubble milk tea",
+   "nutrition_key": "bubble_tea",
+   "match": "exact"
+  },
+  {
+   "id": 37,
+   "name": "buckwheat",
+   "nutrition_key": "buckwheat",
+   "match": "exact"
+  },
+  {
+   "id": 38,
+   "name": "burger",
+   "nutrition_key": "cheeseburger",
+   "match": "proxy"
+  },
+  {
+   "id": 39,
+   "name": "caesar salad",
+   "nutrition_key": "caesar_salad",
+   "match": "exact"
+  },
+  {
+   "id": 40,
+   "name": "cake",
+   "nutrition_key": "chocolate_cake",
+   "match": "proxy"
+  },
+  {
+   "id": 41,
+   "name": "cake rolls",
+   "nutrition_key": "chocolate_cake",
+   "match": "proxy"
+  },
+  {
+   "id": 42,
+   "name": "canned fruit salad",
+   "nutrition_key": "canned_fruit",
+   "match": "exact"
+  },
+  {
+   "id": 43,
+   "name": "cannoli",
+   "nutrition_key": "cheesecake",
+   "match": "proxy"
+  },
+  {
+   "id": 44,
+   "name": "caprese salad",
+   "nutrition_key": "green_salad",
+   "match": "proxy"
+  },
+  {
+   "id": 45,
+   "name": "carrot cake",
+   "nutrition_key": "carrot_cake_dessert",
+   "match": "exact"
+  },
+  {
+   "id": 46,
+   "name": "cereal prawns",
+   "nutrition_key": "cereal_prawns",
+   "match": "exact"
+  },
+  {
+   "id": 47,
+   "name": "ceviche",
+   "nutrition_key": "sashimi",
+   "match": "proxy"
+  },
+  {
+   "id": 48,
+   "name": "chai tow kuay",
+   "nutrition_key": "fried_carrot_cake",
+   "match": "exact"
+  },
+  {
+   "id": 49,
+   "name": "chap chye, nonya",
+   "nutrition_key": "chap_chye",
+   "match": "exact"
+  },
+  {
+   "id": 50,
+   "name": "char siew",
+   "nutrition_key": "char_siew",
+   "match": "exact"
+  },
+  {
+   "id": 51,
+   "name": "char siew pau",
+   "nutrition_key": "char_siew_pau",
+   "match": "exact"
+  },
+  {
+   "id": 52,
+   "name": "chawanmushi",
+   "nutrition_key": "chawanmushi",
+   "match": "exact"
+  },
+  {
+   "id": 53,
+   "name": "cheese fries",
+   "nutrition_key": "french_fries",
+   "match": "proxy"
+  },
+  {
+   "id": 54,
+   "name": "cheese plate",
+   "nutrition_key": null,
+   "match": "none"
+  },
+  {
+   "id": 55,
+   "name": "cheesecake",
+   "nutrition_key": "cheesecake",
+   "match": "exact"
+  },
+  {
+   "id": 56,
+   "name": "cheng tng",
+   "nutrition_key": "cheng_tng",
+   "match": "exact"
+  },
+  {
+   "id": 57,
+   "name": "cherries",
+   "nutrition_key": "cherries",
+   "match": "exact"
+  },
+  {
+   "id": 58,
+   "name": "chicken chop",
+   "nutrition_key": "chicken_chop",
+   "match": "exact"
+  },
+  {
+   "id": 59,
+   "name": "chicken curry",
+   "nutrition_key": "chicken_curry",
+   "match": "exact"
+  },
+  {
+   "id": 60,
+   "name": "chicken masala",
+   "nutrition_key": "chicken_curry",
+   "match": "proxy"
+  },
+  {
+   "id": 61,
+   "name": "chicken pie",
+   "nutrition_key": "pot_pie",
+   "match": "exact"
+  },
+  {
+   "id": 62,
+   "name": "chicken quesadilla",
+   "nutrition_key": "burrito",
+   "match": "proxy"
+  },
+  {
+   "id": 63,
+   "name": "chicken rice",
+   "nutrition_key": "chicken_rice",
+   "match": "exact"
+  },
+  {
+   "id": 64,
+   "name": "chicken soup",
+   "nutrition_key": "chicken_soup",
+   "match": "exact"
+  },
+  {
+   "id": 65,
+   "name": "chicken wing",
+   "nutrition_key": "chicken_wing",
+   "match": "exact"
+  },
+  {
+   "id": 66,
+   "name": "chilli crab",
+   "nutrition_key": "chilli_crab",
+   "match": "exact"
+  },
+  {
+   "id": 67,
+   "name": "chin chow drink",
+   "nutrition_key": "chin_chow",
+   "match": "exact"
+  },
+  {
+   "id": 68,
+   "name": "chinese fritters",
+   "nutrition_key": "you_tiao",
+   "match": "exact"
+  },
+  {
+   "id": 69,
+   "name": "chocolate",
+   "nutrition_key": "chocolate_bar",
+   "match": "exact"
+  },
+  {
+   "id": 70,
+   "name": "chocolate cake",
+   "nutrition_key": "chocolate_cake",
+   "match": "exact"
+  },
+  {
+   "id": 71,
+   "name": "chocolate mousse",
+   "nutrition_key": "chocolate_mousse",
+   "match": "exact"
+  },
+  {
+   "id": 72,
+   "name": "churros",
+   "nutrition_key": "churros",
+   "match": "exact"
+  },
+  {
+   "id": 73,
+   "name": "chwee kueh",
+   "nutrition_key": "chwee_kueh",
+   "match": "exact"
+  },
+  {
+   "id": 74,
+   "name": "clam chowder",
+   "nutrition_key": "cream_soup",
+   "match": "proxy"
+  },
+  {
+   "id": 75,
+   "name": "claypot rice",
+   "nutrition_key": "claypot_rice",
+   "match": "exact"
+  },
+  {
+   "id": 76,
+   "name": "club sandwich",
+   "nutrition_key": "sandwich",
+   "match": "proxy"
+  },
+  {
+   "id": 77,
+   "name": "cny love letter",
+   "nutrition_key": "love_letter",
+   "match": "exact"
+  },
+  {
+   "id": 78,
+   "name": "cooked brown rice",
+   "nutrition_key": "brown_rice",
+   "match": "exact"
+  },
+  {
+   "id": 79,
+   "name": "cooked white rice",
+   "nutrition_key": "white_rice",
+   "match": "exact"
+  },
+  {
+   "id": 80,
+   "name": "corn",
+   "nutrition_key": "corn",
+   "match": "exact"
+  },
+  {
+   "id": 81,
+   "name": "crab cakes",
+   "nutrition_key": "fried_prawn",
+   "match": "proxy"
+  },
+  {
+   "id": 82,
+   "name": "cream soup",
+   "nutrition_key": "cream_soup",
+   "match": "exact"
+  },
+  {
+   "id": 83,
+   "name": "creme brulee",
+   "nutrition_key": "creme_brulee",
+   "match": "exact"
+  },
+  {
+   "id": 84,
+   "name": "croque madame",
+   "nutrition_key": "sandwich",
+   "match": "proxy"
+  },
+  {
+   "id": 85,
+   "name": "cucumber",
+   "nutrition_key": "cucumber",
+   "match": "exact"
+  },
+  {
+   "id": 86,
+   "name": "cup cakes",
+   "nutrition_key": "cupcake",
+   "match": "exact"
+  },
+  {
+   "id": 87,
+   "name": "curry puff",
+   "nutrition_key": "curry_puff",
+   "match": "exact"
+  },
+  {
+   "id": 88,
+   "name": "deviled eggs",
+   "nutrition_key": "boiled_egg",
+   "match": "proxy"
+  },
+  {
+   "id": 89,
+   "name": "don, chicken teriyaki",
+   "nutrition_key": "chicken_rice",
+   "match": "proxy"
+  },
+  {
+   "id": 90,
+   "name": "don, unagi",
+   "nutrition_key": "duck_rice",
+   "match": "proxy"
+  },
+  {
+   "id": 91,
+   "name": "donuts",
+   "nutrition_key": "donut",
+   "match": "exact"
+  },
+  {
+   "id": 92,
+   "name": "drunken prawn",
+   "nutrition_key": null,
+   "match": "none"
+  },
+  {
+   "id": 93,
+   "name": "duck rice",
+   "nutrition_key": "duck_rice",
+   "match": "exact"
+  },
+  {
+   "id": 94,
+   "name": "dumpling",
+   "nutrition_key": "dumpling",
+   "match": "exact"
+  },
+  {
+   "id": 95,
+   "name": "dumpling noodle soup",
+   "nutrition_key": "ban_mian",
+   "match": "proxy"
+  },
+  {
+   "id": 96,
+   "name": "durian",
+   "nutrition_key": "durian",
+   "match": "exact"
+  },
+  {
+   "id": 97,
+   "name": "edamame",
+   "nutrition_key": "edamame",
+   "match": "exact"
+  },
+  {
+   "id": 98,
+   "name": "egg tart",
+   "nutrition_key": "egg_tart",
+   "match": "exact"
+  },
+  {
+   "id": 99,
+   "name": "eggs benedict",
+   "nutrition_key": "eggs_benedict",
+   "match": "exact"
+  },
+  {
+   "id": 100,
+   "name": "escargots",
+   "nutrition_key": null,
+   "match": "none"
+  },
+  {
+   "id": 101,
+   "name": "falafel",
+   "nutrition_key": "falafel",
+   "match": "exact"
+  },
+  {
+   "id": 102,
+   "name": "filet mignon",
+   "nutrition_key": "beef_steak",
+   "match": "proxy"
+  },
+  {
+   "id": 103,
+   "name": "fish and chips",
+   "nutrition_key": "fish_and_chips",
+   "match": "exact"
+  },
+  {
+   "id": 104,
+   "name": "fish ball noodles",
+   "nutrition_key": "fishball_noodles",
+   "match": "exact"
+  },
+  {
+   "id": 105,
+   "name": "fish head curry",
+   "nutrition_key": "fish_head_curry",
+   "match": "exact"
+  },
+  {
+   "id": 106,
+   "name": "foie gras",
+   "nutrition_key": null,
+   "match": "none"
+  },
+  {
+   "id": 107,
+   "name": "french fries",
+   "nutrition_key": "french_fries",
+   "match": "exact"
+  },
+  {
+   "id": 108,
+   "name": "french onion soup",
+   "nutrition_key": "vegetable_soup",
+   "match": "proxy"
+  },
+  {
+   "id": 109,
+   "name": "french toast",
+   "nutrition_key": "french_toast",
+   "match": "exact"
+  },
+  {
+   "id": 110,
+   "name": "fried calamari",
+   "nutrition_key": "fried_calamari",
+   "match": "exact"
+  },
+  {
+   "id": 111,
+   "name": "fried chicken",
+   "nutrition_key": "fried_chicken",
+   "match": "exact"
+  },
+  {
+   "id": 112,
+   "name": "fried fish",
+   "nutrition_key": "fried_fish",
+   "match": "exact"
+  },
+  {
+   "id": 113,
+   "name": "fried noodles",
+   "nutrition_key": "mee_goreng",
+   "match": "proxy"
+  },
+  {
+   "id": 114,
+   "name": "fried prawn",
+   "nutrition_key": "fried_prawn",
+   "match": "exact"
+  },
+  {
+   "id": 115,
+   "name": "fried rice",
+   "nutrition_key": "nasi_goreng",
+   "match": "exact"
+  },
+  {
+   "id": 116,
+   "name": "frozen yogurt",
+   "nutrition_key": "frozen_yogurt",
+   "match": "exact"
+  },
+  {
+   "id": 117,
+   "name": "fruit juice",
+   "nutrition_key": "fruit_juice",
+   "match": "exact"
+  },
+  {
+   "id": 118,
+   "name": "garlic bread",
+   "nutrition_key": "garlic_bread",
+   "match": "exact"
+  },
+  {
+   "id": 119,
+   "name": "gnocchi",
+   "nutrition_key": "gnocchi",
+   "match": "exact"
+  },
+  {
+   "id": 120,
+   "name": "goreng pisang",
+   "nutrition_key": "goreng_pisang",
+   "match": "exact"
+  },
+  {
+   "id": 121,
+   "name": "grape",
+   "nutrition_key": "grape",
+   "match": "exact"
+  },
+  {
+   "id": 122,
+   "name": "grapefruit",
+   "nutrition_key": "grapefruit",
+   "match": "exact"
+  },
+  {
+   "id": 123,
+   "name": "greek salad",
+   "nutrition_key": "green_salad",
+   "match": "proxy"
+  },
+  {
+   "id": 124,
+   "name": "green leafy vegetables",
+   "nutrition_key": "stir_fried_greens",
+   "match": "exact"
+  },
+  {
+   "id": 125,
+   "name": "grilled cheese sandwich",
+   "nutrition_key": "sandwich",
+   "match": "proxy"
+  },
+  {
+   "id": 126,
+   "name": "grilled salmon",
+   "nutrition_key": "salmon",
+   "match": "exact"
+  },
+  {
+   "id": 127,
+   "name": "guacamole",
+   "nutrition_key": "guacamole",
+   "match": "exact"
+  },
+  {
+   "id": 128,
+   "name": "guava",
+   "nutrition_key": "guava",
+   "match": "exact"
+  },
+  {
+   "id": 129,
+   "name": "gulai daun ubi",
+   "nutrition_key": "gulai_daun_ubi",
+   "match": "exact"
+  },
+  {
+   "id": 130,
+   "name": "gyoza",
+   "nutrition_key": "gyoza",
+   "match": "exact"
+  },
+  {
+   "id": 131,
+   "name": "hamburger",
+   "nutrition_key": "cheeseburger",
+   "match": "proxy"
+  },
+  {
+   "id": 132,
+   "name": "har cheong gai",
+   "nutrition_key": "har_cheong_gai",
+   "match": "exact"
+  },
+  {
+   "id": 133,
+   "name": "hokkien prawn mee",
+   "nutrition_key": "hokkien_mee",
+   "match": "exact"
+  },
+  {
+   "id": 134,
+   "name": "honeydew",
+   "nutrition_key": "honeydew",
+   "match": "exact"
+  },
+  {
+   "id": 135,
+   "name": "hor fun",
+   "nutrition_key": "hor_fun",
+   "match": "exact"
+  },
+  {
+   "id": 136,
+   "name": "hot and sour soup",
+   "nutrition_key": "vegetable_soup",
+   "match": "proxy"
+  },
+  {
+   "id": 137,
+   "name": "hot dog",
+   "nutrition_key": "hot_dog",
+   "match": "exact"
+  },
+  {
+   "id": 138,
+   "name": "hotplate tofu",
+   "nutrition_key": "hotplate_tofu",
+   "match": "exact"
+  },
+  {
+   "id": 139,
+   "name": "huevos rancheros",
+   "nutrition_key": "omelette",
+   "match": "proxy"
+  },
+  {
+   "id": 140,
+   "name": "hummus",
+   "nutrition_key": "hummus",
+   "match": "exact"
+  },
+  {
+   "id": 141,
+   "name": "ice cream",
+   "nutrition_key": "ice_cream",
+   "match": "exact"
+  },
+  {
+   "id": 142,
+   "name": "ice cream chocolate",
+   "nutrition_key": "ice_cream",
+   "match": "proxy"
+  },
+  {
+   "id": 143,
+   "name": "ice cream vanilla",
+   "nutrition_key": "ice_cream",
+   "match": "exact"
+  },
+  {
+   "id": 144,
+   "name": "ice kacang",
+   "nutrition_key": "ice_kacang",
+   "match": "exact"
+  },
+  {
+   "id": 145,
+   "name": "indian pancake",
+   "nutrition_key": "indian_pancake",
+   "match": "exact"
+  },
+  {
+   "id": 146,
+   "name": "indian prata",
+   "nutrition_key": "roti_prata",
+   "match": "exact"
+  },
+  {
+   "id": 147,
+   "name": "instant cereal drink",
+   "nutrition_key": "milo",
+   "match": "proxy"
+  },
+  {
+   "id": 148,
+   "name": "jackfruit",
+   "nutrition_key": "jackfruit",
+   "match": "exact"
+  },
+  {
+   "id": 149,
+   "name": "katsudon",
+   "nutrition_key": "katsudon",
+   "match": "exact"
+  },
+  {
+   "id": 150,
+   "name": "kaya toast",
+   "nutrition_key": "kaya_toast",
+   "match": "exact"
+  },
+  {
+   "id": 151,
+   "name": "kebab beef",
+   "nutrition_key": "beef_steak",
+   "match": "proxy"
+  },
+  {
+   "id": 152,
+   "name": "kebab chicken",
+   "nutrition_key": "roast_chicken",
+   "match": "proxy"
+  },
+  {
+   "id": 153,
+   "name": "kiwi",
+   "nutrition_key": "kiwi",
+   "match": "exact"
+  },
+  {
+   "id": 154,
+   "name": "kopi teh milo",
+   "nutrition_key": "kopi",
+   "match": "proxy"
+  },
+  {
+   "id": 155,
+   "name": "kueh lapis baked",
+   "nutrition_key": "kueh_lapis",
+   "match": "exact"
+  },
+  {
+   "id": 156,
+   "name": "kueh lapis rainbow",
+   "nutrition_key": "kueh_lapis",
+   "match": "proxy"
+  },
+  {
+   "id": 157,
+   "name": "kueh salat",
+   "nutrition_key": "kueh_salat",
+   "match": "exact"
+  },
+  {
+   "id": 158,
+   "name": "kuih bahulu",
+   "nutrition_key": "kuih_bahulu",
+   "match": "exact"
+  },
+  {
+   "id": 159,
+   "name": "kway chap",
+   "nutrition_key": "kway_chap",
+   "match": "exact"
+  },
+  {
+   "id": 160,
+   "name": "kway teow",
+   "nutrition_key": "kway_teow_plain",
+   "match": "exact"
+  },
+  {
+   "id": 161,
+   "name": "laksa",
+   "nutrition_key": "laksa",
+   "match": "exact"
+  },
+  {
+   "id": 162,
+   "name": "lamb chops",
+   "nutrition_key": "lamb_chops",
+   "match": "exact"
+  },
+  {
+   "id": 163,
+   "name": "lasagna",
+   "nutrition_key": "lasagna",
+   "match": "exact"
+  },
+  {
+   "id": 164,
+   "name": "lobster bisque",
+   "nutrition_key": "cream_soup",
+   "match": "proxy"
+  },
+  {
+   "id": 165,
+   "name": "lobster roll sandwich",
+   "nutrition_key": "sandwich",
+   "match": "proxy"
+  },
+  {
+   "id": 166,
+   "name": "longan",
+   "nutrition_key": "longan",
+   "match": "exact"
+  },
+  {
+   "id": 167,
+   "name": "lontong",
+   "nutrition_key": "lontong",
+   "match": "exact"
+  },
+  {
+   "id": 168,
+   "name": "lontong with sayur lodeh",
+   "nutrition_key": "lontong",
+   "match": "exact"
+  },
+  {
+   "id": 169,
+   "name": "lor mee",
+   "nutrition_key": "lor_mee",
+   "match": "exact"
+  },
+  {
+   "id": 170,
+   "name": "lychee",
+   "nutrition_key": "lychee",
+   "match": "exact"
+  },
+  {
+   "id": 171,
+   "name": "macaroni",
+   "nutrition_key": "pasta",
+   "match": "exact"
+  },
+  {
+   "id": 172,
+   "name": "macaroni and cheese",
+   "nutrition_key": "mac_and_cheese",
+   "match": "exact"
+  },
+  {
+   "id": 173,
+   "name": "macarons",
+   "nutrition_key": "macarons",
+   "match": "exact"
+  },
+  {
+   "id": 174,
+   "name": "mango pudding",
+   "nutrition_key": "mango_pudding",
+   "match": "exact"
+  },
+  {
+   "id": 175,
+   "name": "mangosteen",
+   "nutrition_key": "mangosteen",
+   "match": "exact"
+  },
+  {
+   "id": 176,
+   "name": "meatball",
+   "nutrition_key": "meatball",
+   "match": "exact"
+  },
+  {
+   "id": 177,
+   "name": "mee bandung",
+   "nutrition_key": "mee_bandung",
+   "match": "exact"
+  },
+  {
+   "id": 178,
+   "name": "mee goreng",
+   "nutrition_key": "mee_goreng",
+   "match": "exact"
+  },
+  {
+   "id": 179,
+   "name": "mee kuah",
+   "nutrition_key": "mee_kuah",
+   "match": "exact"
+  },
+  {
+   "id": 180,
+   "name": "mee pok",
+   "nutrition_key": "fishball_noodles",
+   "match": "exact"
+  },
+  {
+   "id": 181,
+   "name": "mee rebus",
+   "nutrition_key": "mee_rebus",
+   "match": "exact"
+  },
+  {
+   "id": 182,
+   "name": "mee siam",
+   "nutrition_key": "mee_siam",
+   "match": "exact"
+  },
+  {
+   "id": 183,
+   "name": "mee siam, fried",
+   "nutrition_key": "mee_siam",
+   "match": "proxy"
+  },
+  {
+   "id": 184,
+   "name": "mee soto",
+   "nutrition_key": "mee_soto",
+   "match": "exact"
+  },
+  {
+   "id": 185,
+   "name": "milk",
+   "nutrition_key": "milk",
+   "match": "exact"
+  },
+  {
+   "id": 186,
+   "name": "miso ramen, with fishcake",
+   "nutrition_key": "ramen",
+   "match": "exact"
+  },
+  {
+   "id": 187,
+   "name": "miso soup",
+   "nutrition_key": "consomme",
+   "match": "proxy"
+  },
+  {
+   "id": 188,
+   "name": "mixed grills",
+   "nutrition_key": "mixed_grill",
+   "match": "exact"
+  },
+  {
+   "id": 189,
+   "name": "mixed vegetables",
+   "nutrition_key": "mixed_vegetables",
+   "match": "exact"
+  },
+  {
+   "id": 190,
+   "name": "muesli",
+   "nutrition_key": "muesli",
+   "match": "exact"
+  },
+  {
+   "id": 191,
+   "name": "murtabak",
+   "nutrition_key": "murtabak",
+   "match": "exact"
+  },
+  {
+   "id": 192,
+   "name": "mushroom soup",
+   "nutrition_key": "cream_soup",
+   "match": "proxy"
+  },
+  {
+   "id": 193,
+   "name": "mussels",
+   "nutrition_key": "mussels",
+   "match": "exact"
+  },
+  {
+   "id": 194,
+   "name": "nachos",
+   "nutrition_key": "nachos",
+   "match": "exact"
+  },
+  {
+   "id": 195,
+   "name": "nasi ambeng",
+   "nutrition_key": "nasi_ambeng",
+   "match": "exact"
+  },
+  {
+   "id": 196,
+   "name": "nasi lemak",
+   "nutrition_key": "nasi_lemak",
+   "match": "exact"
+  },
+  {
+   "id": 197,
+   "name": "nasi pattaya",
+   "nutrition_key": "nasi_pattaya",
+   "match": "exact"
+  },
+  {
+   "id": 198,
+   "name": "ngoh hiang",
+   "nutrition_key": "ngoh_hiang",
+   "match": "exact"
+  },
+  {
+   "id": 199,
+   "name": "nuts",
+   "nutrition_key": "mixed_nuts",
+   "match": "exact"
+  },
+  {
+   "id": 200,
+   "name": "omelette",
+   "nutrition_key": "omelette",
+   "match": "exact"
+  },
+  {
+   "id": 201,
+   "name": "onion rings",
+   "nutrition_key": "onion_rings",
+   "match": "exact"
+  },
+  {
+   "id": 202,
+   "name": "orange",
+   "nutrition_key": "orange",
+   "match": "exact"
+  },
+  {
+   "id": 203,
+   "name": "otak",
+   "nutrition_key": "otak",
+   "match": "exact"
+  },
+  {
+   "id": 204,
+   "name": "oyster omelette",
+   "nutrition_key": "oyster_omelette",
+   "match": "exact"
+  },
+  {
+   "id": 205,
+   "name": "oysters",
+   "nutrition_key": "oysters",
+   "match": "exact"
+  },
+  {
+   "id": 206,
+   "name": "pad thai",
+   "nutrition_key": "pad_thai",
+   "match": "exact"
+  },
+  {
+   "id": 207,
+   "name": "paella",
+   "nutrition_key": "paella",
+   "match": "exact"
+  },
+  {
+   "id": 208,
+   "name": "paella seafood",
+   "nutrition_key": "paella",
+   "match": "exact"
+  },
+  {
+   "id": 209,
+   "name": "pancake",
+   "nutrition_key": "pancake",
+   "match": "exact"
+  },
+  {
+   "id": 210,
+   "name": "panna cotta",
+   "nutrition_key": "panna_cotta",
+   "match": "exact"
+  },
+  {
+   "id": 211,
+   "name": "papaya",
+   "nutrition_key": "papaya",
+   "match": "exact"
+  },
+  {
+   "id": 212,
+   "name": "parfait",
+   "nutrition_key": "parfait",
+   "match": "exact"
+  },
+  {
+   "id": 213,
+   "name": "passion fruit",
+   "nutrition_key": "passion_fruit",
+   "match": "exact"
+  },
+  {
+   "id": 214,
+   "name": "pasta fettuccine",
+   "nutrition_key": "pasta",
+   "match": "proxy"
+  },
+  {
+   "id": 215,
+   "name": "pasta red sauce",
+   "nutrition_key": "spaghetti_bolognese",
+   "match": "proxy"
+  },
+  {
+   "id": 216,
+   "name": "peanut pancake",
+   "nutrition_key": "peanut_pancake",
+   "match": "exact"
+  },
+  {
+   "id": 217,
+   "name": "pear",
+   "nutrition_key": "pear",
+   "match": "exact"
+  },
+  {
+   "id": 218,
+   "name": "peking duck",
+   "nutrition_key": "peking_duck",
+   "match": "exact"
+  },
+  {
+   "id": 219,
+   "name": "persimmon",
+   "nutrition_key": "persimmon",
+   "match": "exact"
+  },
+  {
+   "id": 220,
+   "name": "pho",
+   "nutrition_key": "pho",
+   "match": "exact"
+  },
+  {
+   "id": 221,
+   "name": "pig organ soup",
+   "nutrition_key": "pig_organ_soup",
+   "match": "exact"
+  },
+  {
+   "id": 222,
+   "name": "pilaf, pea",
+   "nutrition_key": "nasi_goreng",
+   "match": "proxy"
+  },
+  {
+   "id": 223,
+   "name": "pineapple",
+   "nutrition_key": "pineapple",
+   "match": "exact"
+  },
+  {
+   "id": 224,
+   "name": "pineapple tarts",
+   "nutrition_key": "pineapple_tarts",
+   "match": "exact"
+  },
+  {
+   "id": 225,
+   "name": "pitaya",
+   "nutrition_key": "dragon_fruit",
+   "match": "exact"
+  },
+  {
+   "id": 226,
+   "name": "pizza",
+   "nutrition_key": "pizza",
+   "match": "exact"
+  },
+  {
+   "id": 227,
+   "name": "pomegranate",
+   "nutrition_key": "pomegranate",
+   "match": "exact"
+  },
+  {
+   "id": 228,
+   "name": "pomelo",
+   "nutrition_key": "pomelo",
+   "match": "exact"
+  },
+  {
+   "id": 229,
+   "name": "popcorn",
+   "nutrition_key": "popcorn",
+   "match": "exact"
+  },
+  {
+   "id": 230,
+   "name": "popiah",
+   "nutrition_key": "popiah",
+   "match": "exact"
+  },
+  {
+   "id": 231,
+   "name": "pork chop",
+   "nutrition_key": "pork_chop",
+   "match": "exact"
+  },
+  {
+   "id": 232,
+   "name": "porridge",
+   "nutrition_key": "porridge",
+   "match": "exact"
+  },
+  {
+   "id": 233,
+   "name": "poutine",
+   "nutrition_key": "french_fries",
+   "match": "proxy"
+  },
+  {
+   "id": 234,
+   "name": "prawn noodle",
+   "nutrition_key": "prawn_noodle_soup",
+   "match": "exact"
+  },
+  {
+   "id": 235,
+   "name": "preserved fruit snacks",
+   "nutrition_key": "preserved_fruit",
+   "match": "exact"
+  },
+  {
+   "id": 236,
+   "name": "prime rib",
+   "nutrition_key": "beef_steak",
+   "match": "proxy"
+  },
+  {
+   "id": 237,
+   "name": "pulled pork sandwich",
+   "nutrition_key": "sandwich",
+   "match": "proxy"
+  },
+  {
+   "id": 238,
+   "name": "pung kueh",
+   "nutrition_key": "pung_kueh",
+   "match": "exact"
+  },
+  {
+   "id": 239,
+   "name": "rambutan",
+   "nutrition_key": "rambutan",
+   "match": "exact"
+  },
+  {
+   "id": 240,
+   "name": "ramen",
+   "nutrition_key": "ramen",
+   "match": "exact"
+  },
+  {
+   "id": 241,
+   "name": "raspberry",
+   "nutrition_key": "raspberry",
+   "match": "exact"
+  },
+  {
+   "id": 242,
+   "name": "ravioli",
+   "nutrition_key": "ravioli",
+   "match": "exact"
+  },
+  {
+   "id": 243,
+   "name": "red velvet cake",
+   "nutrition_key": "chocolate_cake",
+   "match": "proxy"
+  },
+  {
+   "id": 244,
+   "name": "rice dumpling",
+   "nutrition_key": "rice_dumpling",
+   "match": "exact"
+  },
+  {
+   "id": 245,
+   "name": "rice, chicken katsu with japanese curry",
+   "nutrition_key": "katsudon",
+   "match": "proxy"
+  },
+  {
+   "id": 246,
+   "name": "rice, korean bulgogi beef",
+   "nutrition_key": "duck_rice",
+   "match": "proxy"
+  },
+  {
+   "id": 247,
+   "name": "rice, with dakgalbi",
+   "nutrition_key": "duck_rice",
+   "match": "proxy"
+  },
+  {
+   "id": 248,
+   "name": "risotto",
+   "nutrition_key": "risotto",
+   "match": "exact"
+  },
+  {
+   "id": 249,
+   "name": "roasted chicken",
+   "nutrition_key": "roast_chicken",
+   "match": "exact"
+  },
+  {
+   "id": 250,
+   "name": "rock melon",
+   "nutrition_key": "rock_melon",
+   "match": "exact"
+  },
+  {
+   "id": 251,
+   "name": "rojak",
+   "nutrition_key": "rojak",
+   "match": "exact"
+  },
+  {
+   "id": 252,
+   "name": "roti john",
+   "nutrition_key": "roti_john",
+   "match": "exact"
+  },
+  {
+   "id": 253,
+   "name": "salad",
+   "nutrition_key": "green_salad",
+   "match": "proxy"
+  },
+  {
+   "id": 254,
+   "name": "salmon grilled",
+   "nutrition_key": "salmon",
+   "match": "exact"
+  },
+  {
+   "id": 255,
+   "name": "sambal",
+   "nutrition_key": "sambal",
+   "match": "exact"
+  },
+  {
+   "id": 256,
+   "name": "sambal kangkong",
+   "nutrition_key": "sambal_kangkong",
+   "match": "exact"
+  },
+  {
+   "id": 257,
+   "name": "sambal stingray",
+   "nutrition_key": "sambal_stingray",
+   "match": "exact"
+  },
+  {
+   "id": 258,
+   "name": "samosa",
+   "nutrition_key": "samosa",
+   "match": "exact"
+  },
+  {
+   "id": 259,
+   "name": "sandwich",
+   "nutrition_key": "sandwich",
+   "match": "proxy"
+  },
+  {
+   "id": 260,
+   "name": "sashimi",
+   "nutrition_key": "sashimi",
+   "match": "exact"
+  },
+  {
+   "id": 261,
+   "name": "satay",
+   "nutrition_key": "chicken_satay",
+   "match": "exact"
+  },
+  {
+   "id": 262,
+   "name": "satay bee hoon",
+   "nutrition_key": "satay_bee_hoon",
+   "match": "exact"
+  },
+  {
+   "id": 263,
+   "name": "sausage rolls",
+   "nutrition_key": "sausage_roll",
+   "match": "exact"
+  },
+  {
+   "id": 264,
+   "name": "scallops",
+   "nutrition_key": "scallops",
+   "match": "exact"
+  },
+  {
+   "id": 265,
+   "name": "seafood noodles soup",
+   "nutrition_key": "prawn_noodle_soup",
+   "match": "proxy"
+  },
+  {
+   "id": 266,
+   "name": "seaweed salad",
+   "nutrition_key": "green_salad",
+   "match": "proxy"
+  },
+  {
+   "id": 267,
+   "name": "seaweed snack",
+   "nutrition_key": null,
+   "match": "none"
+  },
+  {
+   "id": 268,
+   "name": "shrimp and grits",
+   "nutrition_key": null,
+   "match": "none"
+  },
+  {
+   "id": 269,
+   "name": "siew mai",
+   "nutrition_key": "siew_mai",
+   "match": "exact"
+  },
+  {
+   "id": 270,
+   "name": "singapore sling",
+   "nutrition_key": "singapore_sling",
+   "match": "exact"
+  },
+  {
+   "id": 271,
+   "name": "sirloin steak",
+   "nutrition_key": "beef_steak",
+   "match": "exact"
+  },
+  {
+   "id": 272,
+   "name": "sliced fish soup",
+   "nutrition_key": "sliced_fish_soup",
+   "match": "exact"
+  },
+  {
+   "id": 273,
+   "name": "snacks and chips",
+   "nutrition_key": "potato_chips",
+   "match": "exact"
+  },
+  {
+   "id": 274,
+   "name": "soft boiled eggs",
+   "nutrition_key": "boiled_egg",
+   "match": "exact"
+  },
+  {
+   "id": 275,
+   "name": "soto ayam",
+   "nutrition_key": "soto_ayam",
+   "match": "exact"
+  },
+  {
+   "id": 276,
+   "name": "soursop",
+   "nutrition_key": "soursop",
+   "match": "exact"
+  },
+  {
+   "id": 277,
+   "name": "spaghetti bolognese",
+   "nutrition_key": "spaghetti_bolognese",
+   "match": "exact"
+  },
+  {
+   "id": 278,
+   "name": "spaghetti carbonara",
+   "nutrition_key": "carbonara",
+   "match": "exact"
+  },
+  {
+   "id": 279,
+   "name": "spring rolls",
+   "nutrition_key": "spring_roll_fried",
+   "match": "exact"
+  },
+  {
+   "id": 280,
+   "name": "starfruit",
+   "nutrition_key": "starfruit",
+   "match": "exact"
+  },
+  {
+   "id": 281,
+   "name": "steak",
+   "nutrition_key": "beef_steak",
+   "match": "exact"
+  },
+  {
+   "id": 282,
+   "name": "steamed buns",
+   "nutrition_key": "steamed_bun",
+   "match": "exact"
+  },
+  {
+   "id": 283,
+   "name": "steamed grouper",
+   "nutrition_key": "steamed_fish",
+   "match": "exact"
+  },
+  {
+   "id": 284,
+   "name": "strawberry",
+   "nutrition_key": "strawberry",
+   "match": "exact"
+  },
+  {
+   "id": 285,
+   "name": "strawberry shortcake",
+   "nutrition_key": "chocolate_cake",
+   "match": "proxy"
+  },
+  {
+   "id": 286,
+   "name": "sushi",
+   "nutrition_key": "sushi",
+   "match": "exact"
+  },
+  {
+   "id": 287,
+   "name": "sweets",
+   "nutrition_key": "candy",
+   "match": "exact"
+  },
+  {
+   "id": 288,
+   "name": "tacos",
+   "nutrition_key": "tacos",
+   "match": "exact"
+  },
+  {
+   "id": 289,
+   "name": "tacos and nachos",
+   "nutrition_key": "tacos",
+   "match": "proxy"
+  },
+  {
+   "id": 290,
+   "name": "takoyaki",
+   "nutrition_key": "takoyaki",
+   "match": "exact"
+  },
+  {
+   "id": 291,
+   "name": "tandoori chicken",
+   "nutrition_key": "roast_chicken",
+   "match": "proxy"
+  },
+  {
+   "id": 292,
+   "name": "tau suan",
+   "nutrition_key": "tau_suan",
+   "match": "exact"
+  },
+  {
+   "id": 293,
+   "name": "tauhu goreng",
+   "nutrition_key": "tauhu_goreng",
+   "match": "exact"
+  },
+  {
+   "id": 294,
+   "name": "thunder tea rice",
+   "nutrition_key": "thunder_tea_rice",
+   "match": "exact"
+  },
+  {
+   "id": 295,
+   "name": "tiramisu",
+   "nutrition_key": "tiramisu",
+   "match": "exact"
+  },
+  {
+   "id": 296,
+   "name": "tom yum noodle soup",
+   "nutrition_key": "prawn_noodle_soup",
+   "match": "proxy"
+  },
+  {
+   "id": 297,
+   "name": "tortilla plain",
+   "nutrition_key": "tortilla",
+   "match": "exact"
+  },
+  {
+   "id": 298,
+   "name": "tumpeng",
+   "nutrition_key": "nasi_ambeng",
+   "match": "proxy"
+  },
+  {
+   "id": 299,
+   "name": "tuna tartare",
+   "nutrition_key": "sashimi",
+   "match": "proxy"
+  },
+  {
+   "id": 300,
+   "name": "tutu kueh",
+   "nutrition_key": "tutu_kueh",
+   "match": "exact"
+  },
+  {
+   "id": 301,
+   "name": "udon",
+   "nutrition_key": "udon",
+   "match": "exact"
+  },
+  {
+   "id": 302,
+   "name": "vadai",
+   "nutrition_key": "vadai",
+   "match": "exact"
+  },
+  {
+   "id": 303,
+   "name": "vegetable soup",
+   "nutrition_key": "vegetable_soup",
+   "match": "exact"
+  },
+  {
+   "id": 304,
+   "name": "vegetarian bee hoon",
+   "nutrition_key": "veg_bee_hoon",
+   "match": "exact"
+  },
+  {
+   "id": 305,
+   "name": "waffle",
+   "nutrition_key": "waffle",
+   "match": "exact"
+  },
+  {
+   "id": 306,
+   "name": "wanton mee, dry",
+   "nutrition_key": "wanton_mee",
+   "match": "exact"
+  },
+  {
+   "id": 307,
+   "name": "watermelon",
+   "nutrition_key": "watermelon",
+   "match": "exact"
+  },
+  {
+   "id": 308,
+   "name": "white bread",
+   "nutrition_key": "white_bread",
+   "match": "exact"
+  },
+  {
+   "id": 309,
+   "name": "whole grain bread",
+   "nutrition_key": "whole_grain_bread",
+   "match": "exact"
+  },
+  {
+   "id": 310,
+   "name": "whole oats",
+   "nutrition_key": "whole_oats",
+   "match": "exact"
+  },
+  {
+   "id": 311,
+   "name": "whole wheat",
+   "nutrition_key": "whole_grain_bread",
+   "match": "proxy"
+  },
+  {
+   "id": 312,
+   "name": "wholegrain muffin",
+   "nutrition_key": "muffin_wholegrain",
+   "match": "exact"
+  },
+  {
+   "id": 313,
+   "name": "wholegrain pasta",
+   "nutrition_key": "wholegrain_pasta",
+   "match": "exact"
+  },
+  {
+   "id": 314,
+   "name": "wholegrain wrap",
+   "nutrition_key": "wholegrain_wrap",
+   "match": "exact"
+  },
+  {
+   "id": 315,
+   "name": "xiao long bao",
+   "nutrition_key": "xiao_long_bao",
+   "match": "exact"
+  },
+  {
+   "id": 316,
+   "name": "yam rice",
+   "nutrition_key": "yam_rice",
+   "match": "exact"
+  },
+  {
+   "id": 317,
+   "name": "yogurt",
+   "nutrition_key": "yogurt",
+   "match": "exact"
+  },
+  {
+   "id": 318,
+   "name": "yong tau foo",
+   "nutrition_key": "yong_tau_foo",
+   "match": "exact"
+  },
+  {
+   "id": 319,
+   "name": "yuseng",
+   "nutrition_key": "yusheng",
+   "match": "exact"
+  }
+ ],
+ "input": {
+  "resize": 256,
+  "size": 224,
+  "layout": "NCHW",
+  "mean": [
+   0.485,
+   0.456,
+   0.406
+  ],
+  "std": [
+   0.229,
+   0.224,
+   0.225
+  ],
+  "implementation": "backend/app/services/preprocess.py (bit-identical to preprocessing.py; see evidence)"
+ },
+ "metrics": {
+  "reported_by_developer": {
+   "top1_accuracy": 0.7063,
+   "top3_accuracy": 0.8566,
+   "macro_f1": 0.6668,
+   "source": "EXP-002 evaluation on the developer workstation; evidence/ files not shipped in the archive"
+  },
+  "checkpoint_metadata": {
+   "epoch": 5,
+   "validation_macro_f1": 0.6628635553920498,
+   "source": "stored inside best_model.pth"
+  },
+  "measured_in_this_package": "see evidence/onnx_parity.json (runtime equivalence, not accuracy)"
+ },
+ "score_calibrated": false,
+ "auto_accept_min_score": 0.5,
+ "evidence": [
+  "evidence/onnx_parity.json",
+  "evidence/nutrition_coverage.json",
+  "evidence/train_finetune.py"
+ ]
+}

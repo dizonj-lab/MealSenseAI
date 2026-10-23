@@ -13,7 +13,8 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
-from app.core.db import Base, SessionLocal, engine  # noqa: E402
+from app.core.db import SessionLocal  # noqa: E402
+from app.core.migrate import upgrade_db  # noqa: E402
 from app.models import Experiment  # noqa: E402
 from app.services import vision  # noqa: E402
 
@@ -77,7 +78,7 @@ def main():
         "latency_avg_ms": sum(s) / len(s), "latency_p95_ms": s[int(0.95 * (len(s) - 1))],
         "throughput_img_s": 1000 / (sum(s) / len(s)), "per_class": per,
     }
-    Base.metadata.create_all(engine)
+    upgrade_db()
     with SessionLocal() as db:
         names = " + ".join(m["name"] for m in vision.models().values())
         db.add(Experiment(name=a.name, model_name=names, dataset=f"{a.root}" + (f" [{a.manifest}]" if a.manifest else ""),

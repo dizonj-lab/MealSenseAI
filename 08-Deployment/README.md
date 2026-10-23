@@ -3,7 +3,7 @@
 Local single-machine deployment with Docker Compose: see `05-Infrastructure/README.md`.
 
 Checklist before a demo:
-1. `./infrastructure/test.sh` passes.
+1. `./scripts/acceptance.sh` and `./scripts/test.sh` pass.
 2. `.env` has a real `JWT_SECRET` and `POSTGRES_PASSWORD`.
 3. `docker compose up -d --build`, then `docker compose ps` shows every service healthy.
 4. `curl http://localhost:8080/api/v1/health` returns `"vision": true` (and `"slm": true` if Ollama is used).

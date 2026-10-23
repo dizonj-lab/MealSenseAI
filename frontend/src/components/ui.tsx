@@ -58,3 +58,11 @@ export function Toggle({ options, value, onChange, multi = false }: { options: [
     </div>
   )
 }
+
+/** Provenance tags: what kind of value the user is looking at. */
+export const Tag = ({ kind }: { kind: 'prediction' | 'estimate' | 'measured' | 'guidance' }) => {
+  const t = { prediction: ['Model prediction', 'bg-violet-50 text-violet-700'], estimate: ['Estimate', 'bg-amber-50 text-amber-700'],
+    measured: ['Your input', 'bg-emerald-50 text-emerald-700'], guidance: ['Unvalidated guidance', 'bg-slate-100 text-slate-600'] }[kind]
+  return <span className={`chip text-[10px] uppercase tracking-wide ${t[1]}`}>{t[0]}</span>
+}
+

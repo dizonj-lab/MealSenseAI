@@ -10,7 +10,7 @@ class Settings(BaseSettings):
 
     app_name: str = "MealSenseAI"
     database_url: str = "postgresql+psycopg://mealsense:mealsense@localhost:5432/mealsenseai"
-    redis_url: str = "redis://localhost:6379/0"
+    redis_url: str = ""  # optional; empty = in-process cache
     jwt_secret: str = "change-me-in-env"
     jwt_expire_minutes: int = 60 * 24 * 7
     ollama_url: str = "http://localhost:11434"

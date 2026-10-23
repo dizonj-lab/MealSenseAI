@@ -1,5 +1,5 @@
 {
- "version": "mvp-0.1",
+ "version": "mvp-0.2",
  "foods": [
   {
    "key": "white_rice",
@@ -2349,6 +2349,5608 @@
    ],
    "source": "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)",
    "verification": "transcribed_unverified"
+  },
+  {
+   "key": "assam_pedas",
+   "name": "Assam pedas (sour spicy fish)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 4,
+    "protein_g": 12,
+    "fat_g": 5,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish"
+   ],
+   "aliases": [
+    "assam pedas"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "ayam_penyet",
+   "name": "Ayam penyet with rice",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 200,
+    "carbs_g": 18,
+    "protein_g": 11,
+    "fat_g": 9,
+    "sugar_g": 1.5,
+    "fiber_g": 1,
+    "sodium_mg": 380
+   },
+   "default_serving_g": 400,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "ayam penyet"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "bak_kut_teh",
+   "name": "Bak kut teh (pork rib soup)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 1.5,
+    "protein_g": 6,
+    "fat_g": 4.5,
+    "sugar_g": 0.5,
+    "fiber_g": 0,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 500,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "bak kut teh"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "bak_kwa",
+   "name": "Bak kwa (barbecued dried pork)",
+   "category": "snack",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 350,
+    "carbs_g": 38,
+    "protein_g": 30,
+    "fat_g": 9,
+    "sugar_g": 30,
+    "fiber_g": 0,
+    "sodium_mg": 1100
+   },
+   "default_serving_g": 50,
+   "serving_desc": "1 slice",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "bak kwa"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "bakso",
+   "name": "Bakso (meatball noodle soup)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 5,
+    "protein_g": 4,
+    "fat_g": 2.5,
+    "sugar_g": 0.5,
+    "fiber_g": 0.3,
+    "sodium_mg": 380
+   },
+   "default_serving_g": 500,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "bakso"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "ban_mian",
+   "name": "Ban mian (soup)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 75,
+    "carbs_g": 10,
+    "protein_g": 4.5,
+    "fat_g": 2,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 330
+   },
+   "default_serving_g": 600,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "ban mian"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "bee_hoon_fried",
+   "name": "Fried bee hoon (plain)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 25,
+    "protein_g": 3.5,
+    "fat_g": 5,
+    "sugar_g": 1,
+    "fiber_g": 0.8,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "bee hoon",
+    "fried bee hoon"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "bee_hoon_goreng",
+   "name": "Bee hoon goreng",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 170,
+    "carbs_g": 24,
+    "protein_g": 5,
+    "fat_g": 6,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 350,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "soy"
+   ],
+   "aliases": [
+    "bee hoon goreng"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "soto_bee_hoon",
+   "name": "Bee hoon soto",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 9,
+    "protein_g": 4,
+    "fat_g": 2,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 380
+   },
+   "default_serving_g": 600,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "bee hoon soto"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "begedil",
+   "name": "Begedil (potato patty)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 190,
+    "carbs_g": 20,
+    "protein_g": 3,
+    "fat_g": 11,
+    "sugar_g": 1,
+    "fiber_g": 1.5,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "egg"
+   ],
+   "aliases": [
+    "begedil"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "black_pepper_crab",
+   "name": "Black pepper crab",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 140,
+    "carbs_g": 4,
+    "protein_g": 14,
+    "fat_g": 7.5,
+    "sugar_g": 1,
+    "fiber_g": 0.5,
+    "sodium_mg": 650
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish"
+   ],
+   "aliases": [
+    "black pepper crab"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "cereal_prawns",
+   "name": "Cereal prawns",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 280,
+    "carbs_g": 18,
+    "protein_g": 14,
+    "fat_g": 17,
+    "sugar_g": 6,
+    "fiber_g": 1,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "shellfish",
+    "dairy"
+   ],
+   "aliases": [
+    "cereal prawns"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "char_siew",
+   "name": "Char siew (barbecued pork)",
+   "category": "protein",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 250,
+    "carbs_g": 15,
+    "protein_g": 25,
+    "fat_g": 10,
+    "sugar_g": 12,
+    "fiber_g": 0,
+    "sodium_mg": 750
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 portion",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "char siew"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "char_siew_pau",
+   "name": "Char siew pau (steamed bun)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 250,
+    "carbs_g": 38,
+    "protein_g": 8,
+    "fat_g": 7,
+    "sugar_g": 10,
+    "fiber_g": 1.2,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 80,
+   "serving_desc": "1 bun",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "soy"
+   ],
+   "aliases": [
+    "char siew pau"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chawanmushi",
+   "name": "Chawanmushi (steamed egg)",
+   "category": "protein",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 2,
+    "protein_g": 5.5,
+    "fat_g": 3.5,
+    "sugar_g": 1,
+    "fiber_g": 0,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "egg",
+    "fish"
+   ],
+   "aliases": [
+    "chawanmushi"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "cheng_tng",
+   "name": "Cheng tng (dessert soup)",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 16,
+    "protein_g": 0.8,
+    "fat_g": 0.3,
+    "sugar_g": 12,
+    "fiber_g": 1,
+    "sodium_mg": 15
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "cheng tng"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chap_chye",
+   "name": "Chap chye (braised mixed vegetables)",
+   "category": "vegetable",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 7,
+    "protein_g": 3,
+    "fat_g": 3.5,
+    "sugar_g": 2,
+    "fiber_g": 2,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "chap chye",
+    "chap chye, nonya"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chicken_curry",
+   "name": "Chicken curry",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 5,
+    "protein_g": 12,
+    "fat_g": 9,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "chicken curry"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chilli_crab",
+   "name": "Chilli crab",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 130,
+    "carbs_g": 7,
+    "protein_g": 12,
+    "fat_g": 6,
+    "sugar_g": 4,
+    "fiber_g": 0.5,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 350,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish",
+    "egg"
+   ],
+   "aliases": [
+    "chilli crab"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chin_chow",
+   "name": "Chin chow (grass jelly drink)",
+   "category": "beverage",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 35,
+    "carbs_g": 9,
+    "protein_g": 0,
+    "fat_g": 0,
+    "sugar_g": 8.5,
+    "fiber_g": 0.2,
+    "sodium_mg": 10
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "chin chow drink",
+    "chin chow"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "you_tiao",
+   "name": "Chinese fritters (you tiao)",
+   "category": "snack",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 390,
+    "carbs_g": 45,
+    "protein_g": 8,
+    "fat_g": 20,
+    "sugar_g": 2,
+    "fiber_g": 1.5,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 stick",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "chinese fritters",
+    "you tiao"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chwee_kueh",
+   "name": "Chwee kueh",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 28,
+    "protein_g": 2.5,
+    "fat_g": 4.5,
+    "sugar_g": 1,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 150,
+   "serving_desc": "4 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "chwee kueh"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "claypot_rice",
+   "name": "Claypot rice",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 22,
+    "protein_g": 7,
+    "fat_g": 5,
+    "sugar_g": 1.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 400,
+   "serving_desc": "1 pot",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "claypot rice"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "love_letter",
+   "name": "CNY love letter (egg roll)",
+   "category": "snack",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 470,
+    "carbs_g": 65,
+    "protein_g": 5,
+    "fat_g": 21,
+    "sugar_g": 30,
+    "fiber_g": 1,
+    "sodium_mg": 120
+   },
+   "default_serving_g": 30,
+   "serving_desc": "5 rolls",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "gluten"
+   ],
+   "aliases": [
+    "cny love letter"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "curry_puff",
+   "name": "Curry puff",
+   "category": "snack",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 300,
+    "carbs_g": 30,
+    "protein_g": 6,
+    "fat_g": 17,
+    "sugar_g": 3,
+    "fiber_g": 1.5,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 80,
+   "serving_desc": "1 puff",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "curry puff"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "duck_rice",
+   "name": "Braised duck rice",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 20,
+    "protein_g": 8,
+    "fat_g": 5.5,
+    "sugar_g": 2,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 350,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "duck rice"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "dumpling",
+   "name": "Dumplings (boiled)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 200,
+    "carbs_g": 24,
+    "protein_g": 8,
+    "fat_g": 8,
+    "sugar_g": 1,
+    "fiber_g": 1,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 150,
+   "serving_desc": "6 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "dumpling",
+    "dumplings"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "egg_tart",
+   "name": "Egg tart",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 330,
+    "carbs_g": 35,
+    "protein_g": 6,
+    "fat_g": 18,
+    "sugar_g": 18,
+    "fiber_g": 0.6,
+    "sodium_mg": 200
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 tart",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "egg tart"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "fishball_noodles",
+   "name": "Fishball noodles / mee pok (dry)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 140,
+    "carbs_g": 20,
+    "protein_g": 6,
+    "fat_g": 4,
+    "sugar_g": 1.5,
+    "fiber_g": 0.8,
+    "sodium_mg": 520
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "fish",
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "fish ball noodles",
+    "mee pok"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "fish_head_curry",
+   "name": "Fish head curry",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 4,
+    "protein_g": 10,
+    "fat_g": 6,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 500,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish"
+   ],
+   "aliases": [
+    "fish head curry"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "goreng_pisang",
+   "name": "Goreng pisang (banana fritter)",
+   "category": "snack",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 280,
+    "carbs_g": 38,
+    "protein_g": 2,
+    "fat_g": 13,
+    "sugar_g": 12,
+    "fiber_g": 2,
+    "sodium_mg": 150
+   },
+   "default_serving_g": 80,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "goreng pisang"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "gulai_daun_ubi",
+   "name": "Gulai daun ubi (tapioca leaf curry)",
+   "category": "vegetable",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 90,
+    "carbs_g": 5,
+    "protein_g": 2,
+    "fat_g": 7,
+    "sugar_g": 1,
+    "fiber_g": 2.5,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "gulai daun ubi"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "har_cheong_gai",
+   "name": "Har cheong gai (prawn paste chicken)",
+   "category": "protein",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 290,
+    "carbs_g": 12,
+    "protein_g": 20,
+    "fat_g": 18,
+    "sugar_g": 1,
+    "fiber_g": 0,
+    "sodium_mg": 650
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish"
+   ],
+   "aliases": [
+    "har cheong gai"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "hor_fun",
+   "name": "Hor fun (wat tan)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 120,
+    "carbs_g": 17,
+    "protein_g": 5,
+    "fat_g": 4,
+    "sugar_g": 1,
+    "fiber_g": 0.5,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 450,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "soy"
+   ],
+   "aliases": [
+    "hor fun"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "ice_kacang",
+   "name": "Ice kacang",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 25,
+    "protein_g": 1.5,
+    "fat_g": 1,
+    "sugar_g": 20,
+    "fiber_g": 1,
+    "sodium_mg": 30
+   },
+   "default_serving_g": 400,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "ice kacang"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "kway_chap",
+   "name": "Kway chap",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 14,
+    "protein_g": 7,
+    "fat_g": 3,
+    "sugar_g": 1.5,
+    "fiber_g": 0.3,
+    "sodium_mg": 550
+   },
+   "default_serving_g": 500,
+   "serving_desc": "1 set",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "kway chap"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "kway_teow_plain",
+   "name": "Kway teow (flat rice noodles, cooked)",
+   "category": "grain",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 120,
+    "carbs_g": 26,
+    "protein_g": 1.8,
+    "fat_g": 0.5,
+    "sugar_g": 0,
+    "fiber_g": 0.5,
+    "sodium_mg": 20
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "kway teow"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "kueh_lapis",
+   "name": "Kueh lapis",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 300,
+    "carbs_g": 50,
+    "protein_g": 3,
+    "fat_g": 10,
+    "sugar_g": 25,
+    "fiber_g": 0.5,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 50,
+   "serving_desc": "1 slice",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "kueh lapis baked",
+    "kueh lapis rainbow",
+    "kueh lapis"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "kueh_salat",
+   "name": "Kueh salat",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 40,
+    "protein_g": 3,
+    "fat_g": 7,
+    "sugar_g": 18,
+    "fiber_g": 0.5,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 70,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg"
+   ],
+   "aliases": [
+    "kueh salat"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "kuih_bahulu",
+   "name": "Kuih bahulu",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 380,
+    "carbs_g": 65,
+    "protein_g": 8,
+    "fat_g": 9,
+    "sugar_g": 35,
+    "fiber_g": 0.5,
+    "sodium_mg": 50
+   },
+   "default_serving_g": 30,
+   "serving_desc": "4 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "gluten"
+   ],
+   "aliases": [
+    "kuih bahulu"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "lontong",
+   "name": "Lontong (sayur lodeh)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 12,
+    "protein_g": 4,
+    "fat_g": 5,
+    "sugar_g": 2,
+    "fiber_g": 1.5,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 450,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg"
+   ],
+   "aliases": [
+    "lontong",
+    "lontong with sayur lodeh"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "lor_mee",
+   "name": "Lor mee",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 100,
+    "carbs_g": 14,
+    "protein_g": 4.5,
+    "fat_g": 3,
+    "sugar_g": 1.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 550
+   },
+   "default_serving_g": 550,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "fish"
+   ],
+   "aliases": [
+    "lor mee"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mee_bandung",
+   "name": "Mee bandung",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 95,
+    "carbs_g": 12,
+    "protein_g": 5,
+    "fat_g": 3,
+    "sugar_g": 2,
+    "fiber_g": 0.8,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 550,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "shellfish",
+    "egg"
+   ],
+   "aliases": [
+    "mee bandung"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mee_kuah",
+   "name": "Mee kuah",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 95,
+    "carbs_g": 12,
+    "protein_g": 4.5,
+    "fat_g": 3,
+    "sugar_g": 2,
+    "fiber_g": 0.8,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 550,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "mee kuah"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mee_rebus",
+   "name": "Mee rebus",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 16,
+    "protein_g": 4,
+    "fat_g": 3.5,
+    "sugar_g": 3,
+    "fiber_g": 1,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 550,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "mee rebus"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mee_siam",
+   "name": "Mee siam",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 120,
+    "carbs_g": 18,
+    "protein_g": 4,
+    "fat_g": 3.5,
+    "sugar_g": 4,
+    "fiber_g": 1,
+    "sodium_mg": 520
+   },
+   "default_serving_g": 450,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "shellfish"
+   ],
+   "aliases": [
+    "mee siam",
+    "mee siam, fried"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mee_soto",
+   "name": "Mee soto",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 80,
+    "carbs_g": 10,
+    "protein_g": 5,
+    "fat_g": 2.5,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 550,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "mee soto"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "murtabak",
+   "name": "Murtabak",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 250,
+    "carbs_g": 24,
+    "protein_g": 11,
+    "fat_g": 12,
+    "sugar_g": 1.5,
+    "fiber_g": 1.5,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "murtabak"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "nasi_ambeng",
+   "name": "Nasi ambeng",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 180,
+    "carbs_g": 22,
+    "protein_g": 7,
+    "fat_g": 7,
+    "sugar_g": 2,
+    "fiber_g": 1.5,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 450,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "nasi ambeng",
+    "tumpeng"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "nasi_pattaya",
+   "name": "Nasi pattaya",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 180,
+    "carbs_g": 22,
+    "protein_g": 7,
+    "fat_g": 7,
+    "sugar_g": 2,
+    "fiber_g": 0.8,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 400,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg"
+   ],
+   "aliases": [
+    "nasi pattaya"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "ngoh_hiang",
+   "name": "Ngoh hiang",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 240,
+    "carbs_g": 15,
+    "protein_g": 13,
+    "fat_g": 14,
+    "sugar_g": 2,
+    "fiber_g": 0.8,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy",
+    "shellfish"
+   ],
+   "aliases": [
+    "ngoh hiang"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "otak",
+   "name": "Otak-otak",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 180,
+    "carbs_g": 5,
+    "protein_g": 14,
+    "fat_g": 11,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish"
+   ],
+   "aliases": [
+    "otak",
+    "otak-otak"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "oyster_omelette",
+   "name": "Oyster omelette (orh luak)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 220,
+    "carbs_g": 14,
+    "protein_g": 8,
+    "fat_g": 15,
+    "sugar_g": 1,
+    "fiber_g": 0.3,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "shellfish",
+    "egg"
+   ],
+   "aliases": [
+    "oyster omelette"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "peanut_pancake",
+   "name": "Peanut pancake (min jiang kueh)",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 290,
+    "carbs_g": 45,
+    "protein_g": 7,
+    "fat_g": 9,
+    "sugar_g": 18,
+    "fiber_g": 2,
+    "sodium_mg": 200
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "peanut",
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "peanut pancake"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pig_organ_soup",
+   "name": "Pig organ soup",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 50,
+    "carbs_g": 1,
+    "protein_g": 7,
+    "fat_g": 2,
+    "sugar_g": 0.3,
+    "fiber_g": 0,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 500,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "pig organ soup"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "porridge",
+   "name": "Porridge (rice congee)",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 46,
+    "carbs_g": 10,
+    "protein_g": 1,
+    "fat_g": 0.1,
+    "sugar_g": 0,
+    "fiber_g": 0.1,
+    "sodium_mg": 150
+   },
+   "default_serving_g": 400,
+   "serving_desc": "1 bowl",
+   "glycemic_index": 78,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "porridge",
+    "congee"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "prawn_noodle_soup",
+   "name": "Prawn noodle soup",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 9,
+    "protein_g": 5,
+    "fat_g": 2,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 600,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "shellfish",
+    "gluten"
+   ],
+   "aliases": [
+    "prawn noodle"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pung_kueh",
+   "name": "Pung kueh / ang ku kueh",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 180,
+    "carbs_g": 33,
+    "protein_g": 3,
+    "fat_g": 4,
+    "sugar_g": 10,
+    "fiber_g": 1,
+    "sodium_mg": 80
+   },
+   "default_serving_g": 80,
+   "serving_desc": "2 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "pung kueh"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "rice_dumpling",
+   "name": "Rice dumpling (bak chang)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 220,
+    "carbs_g": 30,
+    "protein_g": 8,
+    "fat_g": 8,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 dumpling",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "rice dumpling",
+    "bak chang"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "rojak",
+   "name": "Rojak",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 170,
+    "carbs_g": 20,
+    "protein_g": 4,
+    "fat_g": 8,
+    "sugar_g": 12,
+    "fiber_g": 3,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "peanut",
+    "shellfish"
+   ],
+   "aliases": [
+    "rojak"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "roti_john",
+   "name": "Roti john",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 260,
+    "carbs_g": 24,
+    "protein_g": 12,
+    "fat_g": 13,
+    "sugar_g": 4,
+    "fiber_g": 1.5,
+    "sodium_mg": 520
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "roti john"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "sambal_kangkong",
+   "name": "Sambal kangkong",
+   "category": "vegetable",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 90,
+    "carbs_g": 6,
+    "protein_g": 3,
+    "fat_g": 6,
+    "sugar_g": 2,
+    "fiber_g": 2,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish"
+   ],
+   "aliases": [
+    "sambal kangkong"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "sambal_stingray",
+   "name": "Sambal stingray (BBQ)",
+   "category": "protein",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 170,
+    "carbs_g": 4,
+    "protein_g": 20,
+    "fat_g": 8,
+    "sugar_g": 2,
+    "fiber_g": 0.5,
+    "sodium_mg": 550
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish",
+    "shellfish"
+   ],
+   "aliases": [
+    "sambal stingray"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "sambal",
+   "name": "Sambal chilli paste",
+   "category": "condiment",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 12,
+    "protein_g": 2,
+    "fat_g": 11,
+    "sugar_g": 8,
+    "fiber_g": 3,
+    "sodium_mg": 1500
+   },
+   "default_serving_g": 15,
+   "serving_desc": "1 tbsp",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish"
+   ],
+   "aliases": [
+    "sambal"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "satay_bee_hoon",
+   "name": "Satay bee hoon",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 16,
+    "protein_g": 6,
+    "fat_g": 7,
+    "sugar_g": 4,
+    "fiber_g": 1,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 450,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "peanut",
+    "shellfish"
+   ],
+   "aliases": [
+    "satay bee hoon"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "siew_mai",
+   "name": "Siew mai",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 220,
+    "carbs_g": 14,
+    "protein_g": 10,
+    "fat_g": 14,
+    "sugar_g": 1.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 550
+   },
+   "default_serving_g": 100,
+   "serving_desc": "4 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "shellfish"
+   ],
+   "aliases": [
+    "siew mai",
+    "shumai"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "sliced_fish_soup",
+   "name": "Sliced fish soup (no noodles)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 40,
+    "carbs_g": 1.5,
+    "protein_g": 6,
+    "fat_g": 1,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 330
+   },
+   "default_serving_g": 500,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish"
+   ],
+   "aliases": [
+    "sliced fish soup"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "soto_ayam",
+   "name": "Soto ayam",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 5,
+    "protein_g": 5,
+    "fat_g": 2.5,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 500,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "soto ayam"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "steamed_bun",
+   "name": "Steamed bun (plain mantou)",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 220,
+    "carbs_g": 45,
+    "protein_g": 7,
+    "fat_g": 1.5,
+    "sugar_g": 5,
+    "fiber_g": 1.5,
+    "sodium_mg": 200
+   },
+   "default_serving_g": 80,
+   "serving_desc": "1 bun",
+   "glycemic_index": 88,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "steamed buns",
+    "mantou"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "tau_suan",
+   "name": "Tau suan (mung bean dessert)",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 120,
+    "carbs_g": 24,
+    "protein_g": 5,
+    "fat_g": 0.5,
+    "sugar_g": 12,
+    "fiber_g": 2,
+    "sodium_mg": 30
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "tau suan"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "thunder_tea_rice",
+   "name": "Thunder tea rice",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 120,
+    "carbs_g": 18,
+    "protein_g": 4.5,
+    "fat_g": 3.5,
+    "sugar_g": 1,
+    "fiber_g": 2.5,
+    "sodium_mg": 280
+   },
+   "default_serving_g": 450,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "peanut"
+   ],
+   "aliases": [
+    "thunder tea rice"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "tutu_kueh",
+   "name": "Tutu kueh",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 45,
+    "protein_g": 3,
+    "fat_g": 4,
+    "sugar_g": 15,
+    "fiber_g": 1.5,
+    "sodium_mg": 40
+   },
+   "default_serving_g": 60,
+   "serving_desc": "4 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "peanut"
+   ],
+   "aliases": [
+    "tutu kueh"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "vadai",
+   "name": "Vadai",
+   "category": "snack",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 300,
+    "carbs_g": 30,
+    "protein_g": 10,
+    "fat_g": 16,
+    "sugar_g": 1,
+    "fiber_g": 4,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "vadai"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "veg_bee_hoon",
+   "name": "Vegetarian bee hoon",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 24,
+    "protein_g": 3.5,
+    "fat_g": 4.5,
+    "sugar_g": 1.5,
+    "fiber_g": 1.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy",
+    "gluten"
+   ],
+   "aliases": [
+    "vegetarian bee hoon"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "yam_rice",
+   "name": "Yam rice",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 170,
+    "carbs_g": 28,
+    "protein_g": 4,
+    "fat_g": 5,
+    "sugar_g": 1,
+    "fiber_g": 1.5,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "soy",
+    "shellfish"
+   ],
+   "aliases": [
+    "yam rice"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "yusheng",
+   "name": "Yusheng (prosperity toss)",
+   "category": "sg_dish",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 180,
+    "carbs_g": 25,
+    "protein_g": 6,
+    "fat_g": 6,
+    "sugar_g": 10,
+    "fiber_g": 2,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "fish",
+    "peanut"
+   ],
+   "aliases": [
+    "yuseng",
+    "yusheng"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "xiao_long_bao",
+   "name": "Xiao long bao",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 22,
+    "protein_g": 10,
+    "fat_g": 11,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 150,
+   "serving_desc": "6 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "xiao long bao"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "indian_pancake",
+   "name": "Thosai / dosa (plain)",
+   "category": "grain",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 170,
+    "carbs_g": 30,
+    "protein_g": 4,
+    "fat_g": 3.5,
+    "sugar_g": 0.5,
+    "fiber_g": 1.5,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 piece",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "indian pancake",
+    "thosai",
+    "dosa"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "hotplate_tofu",
+   "name": "Hotplate tofu",
+   "category": "protein",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 140,
+    "carbs_g": 8,
+    "protein_g": 9,
+    "fat_g": 8,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 480
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy",
+    "egg"
+   ],
+   "aliases": [
+    "hotplate tofu"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "tauhu_goreng",
+   "name": "Tauhu goreng",
+   "category": "protein",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 220,
+    "carbs_g": 12,
+    "protein_g": 10,
+    "fat_g": 15,
+    "sugar_g": 6,
+    "fiber_g": 1.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy",
+    "peanut"
+   ],
+   "aliases": [
+    "tauhu goreng"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "stir_fried_greens",
+   "name": "Stir-fried leafy greens",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 4,
+    "protein_g": 2.5,
+    "fat_g": 4,
+    "sugar_g": 1,
+    "fiber_g": 2.5,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "green leafy vegetables",
+    "stir fried vegetables"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mixed_vegetables",
+   "name": "Mixed vegetables (stir-fried)",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 7,
+    "protein_g": 2.5,
+    "fat_g": 4,
+    "sugar_g": 2.5,
+    "fiber_g": 2.5,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "mixed vegetables"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "fried_chicken",
+   "name": "Fried chicken",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 250,
+    "carbs_g": 10,
+    "protein_g": 20,
+    "fat_g": 15,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 150,
+   "serving_desc": "2 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "fried chicken"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chicken_wing",
+   "name": "Chicken wings (fried / roasted)",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 260,
+    "carbs_g": 7,
+    "protein_g": 20,
+    "fat_g": 17,
+    "sugar_g": 1,
+    "fiber_g": 0.2,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 100,
+   "serving_desc": "4 wings",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "chicken wing",
+    "chicken wings"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chicken_chop",
+   "name": "Chicken chop",
+   "category": "protein",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 8,
+    "protein_g": 20,
+    "fat_g": 13,
+    "sugar_g": 3,
+    "fiber_g": 0.5,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 chop",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "chicken chop"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "roast_chicken",
+   "name": "Roast chicken",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 200,
+    "carbs_g": 0,
+    "protein_g": 27,
+    "fat_g": 10,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 portion",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "roasted chicken",
+    "roast chicken",
+    "tandoori chicken"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "fish_and_chips",
+   "name": "Fish and chips",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 22,
+    "protein_g": 10,
+    "fat_g": 12,
+    "sugar_g": 0.5,
+    "fiber_g": 1.8,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 350,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "fish",
+    "gluten"
+   ],
+   "aliases": [
+    "fish and chips"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "fried_fish",
+   "name": "Fried fish",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 9,
+    "protein_g": 18,
+    "fat_g": 13,
+    "sugar_g": 0.3,
+    "fiber_g": 0.4,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 fillet",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish",
+    "gluten"
+   ],
+   "aliases": [
+    "fried fish"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "steamed_fish",
+   "name": "Steamed fish (e.g. grouper)",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 0,
+    "protein_g": 20,
+    "fat_g": 3,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 portion",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish",
+    "soy"
+   ],
+   "aliases": [
+    "steamed grouper",
+    "steamed fish"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "spaghetti_bolognese",
+   "name": "Spaghetti bolognese",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 130,
+    "carbs_g": 16,
+    "protein_g": 7,
+    "fat_g": 4.5,
+    "sugar_g": 3,
+    "fiber_g": 1.5,
+    "sodium_mg": 250
+   },
+   "default_serving_g": 350,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "spaghetti bolognese"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "ramen",
+   "name": "Ramen (with broth)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 90,
+    "carbs_g": 11,
+    "protein_g": 4,
+    "fat_g": 3.5,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 550
+   },
+   "default_serving_g": 600,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "soy"
+   ],
+   "aliases": [
+    "ramen",
+    "miso ramen, with fishcake"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pho",
+   "name": "Pho (beef noodle soup)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 7,
+    "protein_g": 5,
+    "fat_g": 1.2,
+    "sugar_g": 0.5,
+    "fiber_g": 0.3,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 700,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "pho",
+    "beef noodle soup"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pad_thai",
+   "name": "Pad thai",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 22,
+    "protein_g": 7,
+    "fat_g": 5,
+    "sugar_g": 5,
+    "fiber_g": 1,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 350,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "peanut",
+    "egg",
+    "shellfish"
+   ],
+   "aliases": [
+    "pad thai"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "gyoza",
+   "name": "Gyoza (pan-fried dumplings)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 220,
+    "carbs_g": 22,
+    "protein_g": 9,
+    "fat_g": 11,
+    "sugar_g": 1.5,
+    "fiber_g": 1,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 120,
+   "serving_desc": "6 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "soy"
+   ],
+   "aliases": [
+    "gyoza"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "sashimi",
+   "name": "Sashimi",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 130,
+    "carbs_g": 0,
+    "protein_g": 22,
+    "fat_g": 4,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "fish"
+   ],
+   "aliases": [
+    "sashimi"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "tacos",
+   "name": "Tacos",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 210,
+    "carbs_g": 20,
+    "protein_g": 10,
+    "fat_g": 10,
+    "sugar_g": 2,
+    "fiber_g": 3,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 150,
+   "serving_desc": "2 tacos",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "tacos",
+    "tacos and nachos"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "waffle",
+   "name": "Waffle",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 290,
+    "carbs_g": 33,
+    "protein_g": 8,
+    "fat_g": 14,
+    "sugar_g": 8,
+    "fiber_g": 1.5,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 75,
+   "serving_desc": "1 waffle",
+   "glycemic_index": 76,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "waffle",
+    "waffles"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pancake",
+   "name": "Pancakes",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 225,
+    "carbs_g": 28,
+    "protein_g": 6,
+    "fat_g": 10,
+    "sugar_g": 6,
+    "fiber_g": 1,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 120,
+   "serving_desc": "2 pancakes",
+   "glycemic_index": 66,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "pancake",
+    "pancakes"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "french_toast",
+   "name": "French toast",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 25,
+    "protein_g": 8,
+    "fat_g": 11,
+    "sugar_g": 8,
+    "fiber_g": 1,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 130,
+   "serving_desc": "2 slices",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "french toast"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "omelette",
+   "name": "Omelette",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 155,
+    "carbs_g": 1,
+    "protein_g": 11,
+    "fat_g": 12,
+    "sugar_g": 1,
+    "fiber_g": 0,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 120,
+   "serving_desc": "2 eggs",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "omelette",
+    "omelet"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "cheesecake",
+   "name": "Cheesecake",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 320,
+    "carbs_g": 26,
+    "protein_g": 6,
+    "fat_g": 22,
+    "sugar_g": 22,
+    "fiber_g": 0.4,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 110,
+   "serving_desc": "1 slice",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy",
+    "egg",
+    "gluten"
+   ],
+   "aliases": [
+    "cheesecake"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "tiramisu",
+   "name": "Tiramisu",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 280,
+    "carbs_g": 30,
+    "protein_g": 5,
+    "fat_g": 16,
+    "sugar_g": 22,
+    "fiber_g": 0.5,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 slice",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy",
+    "egg",
+    "gluten"
+   ],
+   "aliases": [
+    "tiramisu"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mac_and_cheese",
+   "name": "Macaroni and cheese",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 165,
+    "carbs_g": 18,
+    "protein_g": 7,
+    "fat_g": 7,
+    "sugar_g": 2,
+    "fiber_g": 1,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 cup",
+   "glycemic_index": 64,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "macaroni and cheese"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "caesar_salad",
+   "name": "Caesar salad (with dressing)",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 7,
+    "protein_g": 6,
+    "fat_g": 12,
+    "sugar_g": 1.5,
+    "fiber_g": 1.5,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "dairy",
+    "egg",
+    "fish",
+    "gluten"
+   ],
+   "aliases": [
+    "caesar salad"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "lasagna",
+   "name": "Lasagna",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 135,
+    "carbs_g": 12,
+    "protein_g": 8,
+    "fat_g": 6,
+    "sugar_g": 3,
+    "fiber_g": 1,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 portion",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy",
+    "egg"
+   ],
+   "aliases": [
+    "lasagna"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "risotto",
+   "name": "Risotto",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 20,
+    "protein_g": 4,
+    "fat_g": 5,
+    "sugar_g": 1,
+    "fiber_g": 0.5,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "risotto"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "samosa",
+   "name": "Samosa",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 260,
+    "carbs_g": 30,
+    "protein_g": 5,
+    "fat_g": 14,
+    "sugar_g": 2,
+    "fiber_g": 2.5,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 100,
+   "serving_desc": "2 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "samosa"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "spring_roll_fried",
+   "name": "Spring rolls (fried)",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 26,
+    "protein_g": 5,
+    "fat_g": 12,
+    "sugar_g": 2,
+    "fiber_g": 1.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 100,
+   "serving_desc": "3 rolls",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "spring rolls"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "lamb_chops",
+   "name": "Lamb chops",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 280,
+    "carbs_g": 0,
+    "protein_g": 25,
+    "fat_g": 20,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 80
+   },
+   "default_serving_g": 150,
+   "serving_desc": "2 chops",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "lamb chops"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pork_chop",
+   "name": "Pork chop",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 0,
+    "protein_g": 27,
+    "fat_g": 13,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 70
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 chop",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "pork chop"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "meatball",
+   "name": "Meatballs",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 220,
+    "carbs_g": 8,
+    "protein_g": 15,
+    "fat_g": 14,
+    "sugar_g": 1.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 120,
+   "serving_desc": "4 meatballs",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "meatball",
+    "meatballs"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "peking_duck",
+   "name": "Peking duck",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 340,
+    "carbs_g": 10,
+    "protein_g": 19,
+    "fat_g": 25,
+    "sugar_g": 8,
+    "fiber_g": 0,
+    "sodium_mg": 550
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "gluten",
+    "soy"
+   ],
+   "aliases": [
+    "peking duck"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mixed_grill",
+   "name": "Mixed grill",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 2,
+    "protein_g": 25,
+    "fat_g": 14,
+    "sugar_g": 1,
+    "fiber_g": 0.3,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "mixed grills"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "scallops",
+   "name": "Scallops",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 5,
+    "protein_g": 20,
+    "fat_g": 1,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish"
+   ],
+   "aliases": [
+    "scallops"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mussels",
+   "name": "Mussels",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 170,
+    "carbs_g": 7,
+    "protein_g": 24,
+    "fat_g": 4.5,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 370
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish"
+   ],
+   "aliases": [
+    "mussels"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "oysters",
+   "name": "Oysters",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 80,
+    "carbs_g": 5,
+    "protein_g": 9,
+    "fat_g": 2.5,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 210
+   },
+   "default_serving_g": 100,
+   "serving_desc": "6 oysters",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish"
+   ],
+   "aliases": [
+    "oysters"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "fried_calamari",
+   "name": "Fried calamari",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 175,
+    "carbs_g": 8,
+    "protein_g": 18,
+    "fat_g": 7.5,
+    "sugar_g": 0.5,
+    "fiber_g": 0.3,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish",
+    "gluten"
+   ],
+   "aliases": [
+    "fried calamari"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "fried_prawn",
+   "name": "Fried prawns",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 240,
+    "carbs_g": 15,
+    "protein_g": 15,
+    "fat_g": 13,
+    "sugar_g": 0.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "shellfish",
+    "gluten"
+   ],
+   "aliases": [
+    "fried prawn"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "cream_soup",
+   "name": "Cream soup (e.g. mushroom, chowder)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 80,
+    "carbs_g": 7,
+    "protein_g": 2.5,
+    "fat_g": 5,
+    "sugar_g": 1.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "dairy",
+    "gluten"
+   ],
+   "aliases": [
+    "cream soup",
+    "mushroom soup",
+    "clam chowder"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "vegetable_soup",
+   "name": "Vegetable soup",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 35,
+    "carbs_g": 6,
+    "protein_g": 1.5,
+    "fat_g": 0.8,
+    "sugar_g": 2,
+    "fiber_g": 1.5,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "vegetable soup"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chicken_soup",
+   "name": "Chicken soup",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 40,
+    "carbs_g": 3,
+    "protein_g": 4,
+    "fat_g": 1.5,
+    "sugar_g": 0.5,
+    "fiber_g": 0.3,
+    "sodium_mg": 380
+   },
+   "default_serving_g": 300,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "chicken soup"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "garlic_bread",
+   "name": "Garlic bread",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 350,
+    "carbs_g": 42,
+    "protein_g": 8,
+    "fat_g": 17,
+    "sugar_g": 3,
+    "fiber_g": 2,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 60,
+   "serving_desc": "2 slices",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "garlic bread"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "whole_grain_bread",
+   "name": "Wholegrain bread",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 250,
+    "carbs_g": 43,
+    "protein_g": 13,
+    "fat_g": 3.5,
+    "sugar_g": 6,
+    "fiber_g": 7,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 30,
+   "serving_desc": "1 slice",
+   "glycemic_index": 51,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "whole grain bread",
+    "whole wheat"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "wholegrain_pasta",
+   "name": "Wholegrain pasta, cooked",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 124,
+    "carbs_g": 27,
+    "protein_g": 5.3,
+    "fat_g": 1.4,
+    "sugar_g": 0.8,
+    "fiber_g": 4.5,
+    "sodium_mg": 3
+   },
+   "default_serving_g": 140,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "wholegrain pasta"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "wholegrain_wrap",
+   "name": "Wholegrain wrap",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 290,
+    "carbs_g": 48,
+    "protein_g": 9,
+    "fat_g": 7,
+    "sugar_g": 2,
+    "fiber_g": 6,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 wrap",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "wholegrain wrap"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "tortilla",
+   "name": "Tortilla (plain flour)",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 300,
+    "carbs_g": 50,
+    "protein_g": 8,
+    "fat_g": 7,
+    "sugar_g": 2,
+    "fiber_g": 3,
+    "sodium_mg": 700
+   },
+   "default_serving_g": 50,
+   "serving_desc": "1 tortilla",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "tortilla plain"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "muffin_wholegrain",
+   "name": "Wholegrain muffin",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 300,
+    "carbs_g": 45,
+    "protein_g": 6,
+    "fat_g": 11,
+    "sugar_g": 18,
+    "fiber_g": 4,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 90,
+   "serving_desc": "1 muffin",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "wholegrain muffin"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "cupcake",
+   "name": "Cupcake",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 370,
+    "carbs_g": 55,
+    "protein_g": 4,
+    "fat_g": 15,
+    "sugar_g": 35,
+    "fiber_g": 1,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1 cupcake",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "cup cakes",
+    "cupcake"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "carrot_cake_dessert",
+   "name": "Carrot cake (dessert, with frosting)",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 415,
+    "carbs_g": 50,
+    "protein_g": 4,
+    "fat_g": 22,
+    "sugar_g": 35,
+    "fiber_g": 1.5,
+    "sodium_mg": 330
+   },
+   "default_serving_g": 110,
+   "serving_desc": "1 slice",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "carrot cake"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "churros",
+   "name": "Churros",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 400,
+    "carbs_g": 46,
+    "protein_g": 5,
+    "fat_g": 22,
+    "sugar_g": 15,
+    "fiber_g": 1.5,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 80,
+   "serving_desc": "3 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg"
+   ],
+   "aliases": [
+    "churros"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mango_pudding",
+   "name": "Mango pudding",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 120,
+    "carbs_g": 20,
+    "protein_g": 2,
+    "fat_g": 3.5,
+    "sugar_g": 18,
+    "fiber_g": 0.5,
+    "sodium_mg": 40
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "mango pudding"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "panna_cotta",
+   "name": "Panna cotta",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 20,
+    "protein_g": 3,
+    "fat_g": 15,
+    "sugar_g": 18,
+    "fiber_g": 0,
+    "sodium_mg": 40
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "panna cotta"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "creme_brulee",
+   "name": "Cr\u00e8me br\u00fbl\u00e9e",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 260,
+    "carbs_g": 22,
+    "protein_g": 4,
+    "fat_g": 17,
+    "sugar_g": 20,
+    "fiber_g": 0,
+    "sodium_mg": 50
+   },
+   "default_serving_g": 110,
+   "serving_desc": "1 ramekin",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy",
+    "egg"
+   ],
+   "aliases": [
+    "creme brulee"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chocolate_mousse",
+   "name": "Chocolate mousse",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 250,
+    "carbs_g": 22,
+    "protein_g": 5,
+    "fat_g": 16,
+    "sugar_g": 20,
+    "fiber_g": 1.5,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy",
+    "egg"
+   ],
+   "aliases": [
+    "chocolate mousse"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "frozen_yogurt",
+   "name": "Frozen yogurt",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 130,
+    "carbs_g": 22,
+    "protein_g": 3,
+    "fat_g": 3.5,
+    "sugar_g": 20,
+    "fiber_g": 0,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "frozen yogurt"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "parfait",
+   "name": "Yogurt parfait",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 22,
+    "protein_g": 5,
+    "fat_g": 5,
+    "sugar_g": 16,
+    "fiber_g": 1.5,
+    "sodium_mg": 60
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "parfait"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "biscuit",
+   "name": "Biscuits / cookies",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 480,
+    "carbs_g": 68,
+    "protein_g": 6,
+    "fat_g": 20,
+    "sugar_g": 25,
+    "fiber_g": 2,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 30,
+   "serving_desc": "3 biscuits",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "biscuit",
+    "biscuits",
+    "cookies"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "chocolate_bar",
+   "name": "Chocolate (milk)",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 540,
+    "carbs_g": 60,
+    "protein_g": 5,
+    "fat_g": 31,
+    "sugar_g": 52,
+    "fiber_g": 3,
+    "sodium_mg": 80
+   },
+   "default_serving_g": 40,
+   "serving_desc": "1 bar",
+   "glycemic_index": 43,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "chocolate"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "popcorn",
+   "name": "Popcorn (air-popped)",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 387,
+    "carbs_g": 78,
+    "protein_g": 13,
+    "fat_g": 4.5,
+    "sugar_g": 0.9,
+    "fiber_g": 15,
+    "sodium_mg": 8
+   },
+   "default_serving_g": 30,
+   "serving_desc": "3 cups",
+   "glycemic_index": 65,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "popcorn"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "candy",
+   "name": "Sweets / candy",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 390,
+    "carbs_g": 98,
+    "protein_g": 0,
+    "fat_g": 0,
+    "sugar_g": 70,
+    "fiber_g": 0,
+    "sodium_mg": 40
+   },
+   "default_serving_g": 30,
+   "serving_desc": "1 handful",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "sweets",
+    "candy"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "preserved_fruit",
+   "name": "Preserved fruit snacks",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 300,
+    "carbs_g": 75,
+    "protein_g": 1,
+    "fat_g": 0.5,
+    "sugar_g": 60,
+    "fiber_g": 2,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 30,
+   "serving_desc": "1 handful",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "preserved fruit snacks"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "potato_chips",
+   "name": "Potato chips / snacks",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 536,
+    "carbs_g": 53,
+    "protein_g": 7,
+    "fat_g": 34,
+    "sugar_g": 0.5,
+    "fiber_g": 4.5,
+    "sodium_mg": 520
+   },
+   "default_serving_g": 30,
+   "serving_desc": "1 small bag",
+   "glycemic_index": 56,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "snacks and chips",
+    "potato chips"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mixed_nuts",
+   "name": "Mixed nuts",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 600,
+    "carbs_g": 21,
+    "protein_g": 20,
+    "fat_g": 54,
+    "sugar_g": 4,
+    "fiber_g": 7,
+    "sodium_mg": 10
+   },
+   "default_serving_g": 30,
+   "serving_desc": "1 handful",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "peanut"
+   ],
+   "aliases": [
+    "nuts",
+    "mixed nuts"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "edamame",
+   "name": "Edamame",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 121,
+    "carbs_g": 9,
+    "protein_g": 12,
+    "fat_g": 5,
+    "sugar_g": 2,
+    "fiber_g": 5,
+    "sodium_mg": 6
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 cup pods",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "soy"
+   ],
+   "aliases": [
+    "edamame"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "baked_beans",
+   "name": "Baked beans",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 94,
+    "carbs_g": 21,
+    "protein_g": 4.8,
+    "fat_g": 0.4,
+    "sugar_g": 8,
+    "fiber_g": 4,
+    "sodium_mg": 420
+   },
+   "default_serving_g": 130,
+   "serving_desc": "1/2 can",
+   "glycemic_index": 40,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "baked beans"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "barley",
+   "name": "Barley, cooked",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 123,
+    "carbs_g": 28,
+    "protein_g": 2.3,
+    "fat_g": 0.4,
+    "sugar_g": 0.3,
+    "fiber_g": 3.8,
+    "sodium_mg": 3
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 cup",
+   "glycemic_index": 28,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "barley"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "buckwheat",
+   "name": "Buckwheat, cooked",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 92,
+    "carbs_g": 20,
+    "protein_g": 3.4,
+    "fat_g": 0.6,
+    "sugar_g": 0.9,
+    "fiber_g": 2.7,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 170,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "buckwheat"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "breakfast_cereal",
+   "name": "Breakfast cereal",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 380,
+    "carbs_g": 84,
+    "protein_g": 7,
+    "fat_g": 2,
+    "sugar_g": 20,
+    "fiber_g": 3,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 30,
+   "serving_desc": "1 bowl (dry)",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "breakfast cereal",
+    "instant cereal drink"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "muesli",
+   "name": "Muesli",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 370,
+    "carbs_g": 66,
+    "protein_g": 10,
+    "fat_g": 6,
+    "sugar_g": 22,
+    "fiber_g": 7,
+    "sodium_mg": 30
+   },
+   "default_serving_g": 50,
+   "serving_desc": "1/2 cup",
+   "glycemic_index": 57,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "muesli"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "whole_oats",
+   "name": "Oats (dry)",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 380,
+    "carbs_g": 66,
+    "protein_g": 13,
+    "fat_g": 7,
+    "sugar_g": 1,
+    "fiber_g": 10,
+    "sodium_mg": 5
+   },
+   "default_serving_g": 40,
+   "serving_desc": "1/2 cup",
+   "glycemic_index": 55,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "whole oats"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "fruit_juice",
+   "name": "Fruit juice (mixed)",
+   "category": "beverage",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 50,
+    "carbs_g": 12,
+    "protein_g": 0.5,
+    "fat_g": 0.1,
+    "sugar_g": 10,
+    "fiber_g": 0.2,
+    "sodium_mg": 5
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 glass",
+   "glycemic_index": 50,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "fruit juice"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "milo",
+   "name": "Milo / malted chocolate drink",
+   "category": "beverage",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 9.5,
+    "protein_g": 2,
+    "fat_g": 1.5,
+    "sugar_g": 8,
+    "fiber_g": 0.4,
+    "sodium_mg": 40
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy",
+    "gluten"
+   ],
+   "aliases": [
+    "milo"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "alcoholic_beverage",
+   "name": "Alcoholic beverage (beer)",
+   "category": "beverage",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 43,
+    "carbs_g": 3.6,
+    "protein_g": 0.5,
+    "fat_g": 0,
+    "sugar_g": 0,
+    "fiber_g": 0,
+    "sodium_mg": 4
+   },
+   "default_serving_g": 330,
+   "serving_desc": "1 can",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "alcoholic beverage",
+    "beer"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "singapore_sling",
+   "name": "Singapore sling (cocktail)",
+   "category": "beverage",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 110,
+    "carbs_g": 14,
+    "protein_g": 0,
+    "fat_g": 0,
+    "sugar_g": 12,
+    "fiber_g": 0,
+    "sodium_mg": 5
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 glass",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "singapore sling"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "apple_pie",
+   "name": "Apple pie",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 265,
+    "carbs_g": 37,
+    "protein_g": 2.4,
+    "fat_g": 12.5,
+    "sugar_g": 16,
+    "fiber_g": 1.6,
+    "sodium_mg": 250
+   },
+   "default_serving_g": 125,
+   "serving_desc": "1 slice",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "apple pie"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "baklava",
+   "name": "Baklava",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 430,
+    "carbs_g": 47,
+    "protein_g": 6,
+    "fat_g": 25,
+    "sugar_g": 25,
+    "fiber_g": 2.5,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 60,
+   "serving_desc": "2 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "peanut",
+    "dairy"
+   ],
+   "aliases": [
+    "baklava"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "bibimbap",
+   "name": "Bibimbap",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 130,
+    "carbs_g": 18,
+    "protein_g": 6,
+    "fat_g": 4,
+    "sugar_g": 2,
+    "fiber_g": 1.5,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 450,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "soy"
+   ],
+   "aliases": [
+    "bibimbap"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "nachos",
+   "name": "Nachos with cheese",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 340,
+    "carbs_g": 35,
+    "protein_g": 8,
+    "fat_g": 19,
+    "sugar_g": 2,
+    "fiber_g": 3,
+    "sodium_mg": 600
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "dairy"
+   ],
+   "aliases": [
+    "nachos"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "onion_rings",
+   "name": "Onion rings",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 330,
+    "carbs_g": 38,
+    "protein_g": 4,
+    "fat_g": 18,
+    "sugar_g": 4,
+    "fiber_g": 2,
+    "sodium_mg": 500
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "onion rings"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "udon",
+   "name": "Udon (noodle soup)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 13,
+    "protein_g": 2.5,
+    "fat_g": 0.8,
+    "sugar_g": 1,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 600,
+   "serving_desc": "1 bowl",
+   "glycemic_index": 55,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "soy",
+    "fish"
+   ],
+   "aliases": [
+    "udon"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "katsudon",
+   "name": "Katsudon (pork cutlet rice bowl)",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 180,
+    "carbs_g": 22,
+    "protein_g": 9,
+    "fat_g": 6,
+    "sugar_g": 3,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 450,
+   "serving_desc": "1 bowl",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "soy"
+   ],
+   "aliases": [
+    "katsudon"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "eggs_benedict",
+   "name": "Eggs benedict",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 230,
+    "carbs_g": 12,
+    "protein_g": 11,
+    "fat_g": 15,
+    "sugar_g": 1.5,
+    "fiber_g": 0.5,
+    "sodium_mg": 550
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "gluten",
+    "dairy"
+   ],
+   "aliases": [
+    "eggs benedict"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "hummus",
+   "name": "Hummus",
+   "category": "vegetable",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 177,
+    "carbs_g": 14,
+    "protein_g": 8,
+    "fat_g": 10,
+    "sugar_g": 0.3,
+    "fiber_g": 6,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 60,
+   "serving_desc": "1/4 cup",
+   "glycemic_index": 6,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [
+    "sesame"
+   ],
+   "aliases": [
+    "hummus"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "falafel",
+   "name": "Falafel",
+   "category": "protein",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 333,
+    "carbs_g": 32,
+    "protein_g": 13,
+    "fat_g": 18,
+    "sugar_g": 1,
+    "fiber_g": 5,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 100,
+   "serving_desc": "4 pieces",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [
+    "sesame"
+   ],
+   "aliases": [
+    "falafel"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "paella",
+   "name": "Paella",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 150,
+    "carbs_g": 20,
+    "protein_g": 8,
+    "fat_g": 4,
+    "sugar_g": 1,
+    "fiber_g": 1,
+    "sodium_mg": 400
+   },
+   "default_serving_g": 350,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "shellfish"
+   ],
+   "aliases": [
+    "paella",
+    "paella seafood"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "ravioli",
+   "name": "Ravioli",
+   "category": "mixed",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 175,
+    "carbs_g": 22,
+    "protein_g": 7,
+    "fat_g": 6,
+    "sugar_g": 2,
+    "fiber_g": 1.5,
+    "sodium_mg": 350
+   },
+   "default_serving_g": 250,
+   "serving_desc": "1 plate",
+   "glycemic_index": 39,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "ravioli"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "gnocchi",
+   "name": "Gnocchi",
+   "category": "grain",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 130,
+    "carbs_g": 28,
+    "protein_g": 3,
+    "fat_g": 0.5,
+    "sugar_g": 1,
+    "fiber_g": 1.5,
+    "sodium_mg": 300
+   },
+   "default_serving_g": 200,
+   "serving_desc": "1 plate",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "gnocchi"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "takoyaki",
+   "name": "Takoyaki",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 180,
+    "carbs_g": 20,
+    "protein_g": 6,
+    "fat_g": 8,
+    "sugar_g": 3,
+    "fiber_g": 0.5,
+    "sodium_mg": 450
+   },
+   "default_serving_g": 120,
+   "serving_desc": "6 balls",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "shellfish"
+   ],
+   "aliases": [
+    "takoyaki"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "bread_pudding",
+   "name": "Bread pudding",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 180,
+    "carbs_g": 27,
+    "protein_g": 5,
+    "fat_g": 6,
+    "sugar_g": 15,
+    "fiber_g": 0.7,
+    "sodium_mg": 200
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 serving",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "bread pudding"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "macarons",
+   "name": "Macarons",
+   "category": "dessert",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 400,
+    "carbs_g": 55,
+    "protein_g": 7,
+    "fat_g": 17,
+    "sugar_g": 50,
+    "fiber_g": 1.5,
+    "sodium_mg": 50
+   },
+   "default_serving_g": 40,
+   "serving_desc": "3 macarons",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "macarons"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pineapple_tarts",
+   "name": "Pineapple tarts",
+   "category": "dessert",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 450,
+    "carbs_g": 60,
+    "protein_g": 5,
+    "fat_g": 21,
+    "sugar_g": 25,
+    "fiber_g": 1.5,
+    "sodium_mg": 200
+   },
+   "default_serving_g": 40,
+   "serving_desc": "4 tarts",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten",
+    "egg",
+    "dairy"
+   ],
+   "aliases": [
+    "pineapple tarts"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "sausage_roll",
+   "name": "Sausage roll",
+   "category": "snack",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 330,
+    "carbs_g": 26,
+    "protein_g": 9,
+    "fat_g": 21,
+    "sugar_g": 1.5,
+    "fiber_g": 1,
+    "sodium_mg": 650
+   },
+   "default_serving_g": 90,
+   "serving_desc": "1 roll",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": true,
+   "allergens": [
+    "gluten"
+   ],
+   "aliases": [
+    "sausage rolls",
+    "sausage roll"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "watermelon",
+   "name": "Watermelon",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 30,
+    "carbs_g": 7.6,
+    "protein_g": 0.6,
+    "fat_g": 0.2,
+    "sugar_g": 6.2,
+    "fiber_g": 0.4,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 280,
+   "serving_desc": "1 wedge",
+   "glycemic_index": 76,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "watermelon"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "papaya",
+   "name": "Papaya",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 43,
+    "carbs_g": 11,
+    "protein_g": 0.5,
+    "fat_g": 0.3,
+    "sugar_g": 7.8,
+    "fiber_g": 1.7,
+    "sodium_mg": 8
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 cup",
+   "glycemic_index": 60,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "papaya"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "guava",
+   "name": "Guava",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 68,
+    "carbs_g": 14,
+    "protein_g": 2.6,
+    "fat_g": 1,
+    "sugar_g": 9,
+    "fiber_g": 5.4,
+    "sodium_mg": 2
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 fruit",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "guava"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "grape",
+   "name": "Grapes",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 69,
+    "carbs_g": 18,
+    "protein_g": 0.7,
+    "fat_g": 0.2,
+    "sugar_g": 15.5,
+    "fiber_g": 0.9,
+    "sodium_mg": 2
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 cup",
+   "glycemic_index": 53,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "grape",
+    "grapes"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "kiwi",
+   "name": "Kiwi",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 61,
+    "carbs_g": 15,
+    "protein_g": 1.1,
+    "fat_g": 0.5,
+    "sugar_g": 9,
+    "fiber_g": 3,
+    "sodium_mg": 3
+   },
+   "default_serving_g": 75,
+   "serving_desc": "1 fruit",
+   "glycemic_index": 50,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "kiwi"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pear",
+   "name": "Pear",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 57,
+    "carbs_g": 15,
+    "protein_g": 0.4,
+    "fat_g": 0.1,
+    "sugar_g": 10,
+    "fiber_g": 3.1,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 180,
+   "serving_desc": "1 fruit",
+   "glycemic_index": 38,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "pear"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "mangosteen",
+   "name": "Mangosteen",
+   "category": "fruit",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 73,
+    "carbs_g": 18,
+    "protein_g": 0.4,
+    "fat_g": 0.6,
+    "sugar_g": 16,
+    "fiber_g": 1.8,
+    "sodium_mg": 7
+   },
+   "default_serving_g": 100,
+   "serving_desc": "4 fruits",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "mangosteen"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "rambutan",
+   "name": "Rambutan",
+   "category": "fruit",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 82,
+    "carbs_g": 21,
+    "protein_g": 0.7,
+    "fat_g": 0.2,
+    "sugar_g": null,
+    "fiber_g": 0.9,
+    "sodium_mg": 11
+   },
+   "default_serving_g": 100,
+   "serving_desc": "6 fruits",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "rambutan"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "longan",
+   "name": "Longan",
+   "category": "fruit",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 15,
+    "protein_g": 1.3,
+    "fat_g": 0.1,
+    "sugar_g": null,
+    "fiber_g": 1.1,
+    "sodium_mg": 0
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "longan"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "lychee",
+   "name": "Lychee",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 66,
+    "carbs_g": 16.5,
+    "protein_g": 0.8,
+    "fat_g": 0.4,
+    "sugar_g": 15,
+    "fiber_g": 1.3,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 100,
+   "serving_desc": "10 fruits",
+   "glycemic_index": 57,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "lychee"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "honeydew",
+   "name": "Honeydew",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 36,
+    "carbs_g": 9,
+    "protein_g": 0.5,
+    "fat_g": 0.1,
+    "sugar_g": 8,
+    "fiber_g": 0.8,
+    "sodium_mg": 18
+   },
+   "default_serving_g": 170,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "honeydew"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "rock_melon",
+   "name": "Rock melon (cantaloupe)",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 34,
+    "carbs_g": 8,
+    "protein_g": 0.8,
+    "fat_g": 0.2,
+    "sugar_g": 8,
+    "fiber_g": 0.9,
+    "sodium_mg": 16
+   },
+   "default_serving_g": 170,
+   "serving_desc": "1 cup",
+   "glycemic_index": 65,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "rock melon",
+    "cantaloupe"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "dragon_fruit",
+   "name": "Dragon fruit (pitaya)",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 60,
+    "carbs_g": 13,
+    "protein_g": 1.2,
+    "fat_g": 0,
+    "sugar_g": 8,
+    "fiber_g": 3,
+    "sodium_mg": 0
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1/2 fruit",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "pitaya",
+    "dragon fruit"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "pomelo",
+   "name": "Pomelo",
+   "category": "fruit",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 38,
+    "carbs_g": 9.6,
+    "protein_g": 0.8,
+    "fat_g": 0,
+    "sugar_g": null,
+    "fiber_g": 1,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "pomelo"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "grapefruit",
+   "name": "Grapefruit",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 42,
+    "carbs_g": 11,
+    "protein_g": 0.8,
+    "fat_g": 0.1,
+    "sugar_g": 7,
+    "fiber_g": 1.6,
+    "sodium_mg": 0
+   },
+   "default_serving_g": 150,
+   "serving_desc": "1/2 fruit",
+   "glycemic_index": 25,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "grapefruit"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "starfruit",
+   "name": "Starfruit",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 31,
+    "carbs_g": 7,
+    "protein_g": 1,
+    "fat_g": 0.3,
+    "sugar_g": 4,
+    "fiber_g": 2.8,
+    "sodium_mg": 2
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 fruit",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "starfruit"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "persimmon",
+   "name": "Persimmon",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 19,
+    "protein_g": 0.6,
+    "fat_g": 0.2,
+    "sugar_g": 12.5,
+    "fiber_g": 3.6,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 170,
+   "serving_desc": "1 fruit",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "persimmon"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "soursop",
+   "name": "Soursop",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 66,
+    "carbs_g": 17,
+    "protein_g": 1,
+    "fat_g": 0.3,
+    "sugar_g": 13.5,
+    "fiber_g": 3.3,
+    "sodium_mg": 14
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1/2 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "soursop"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "cherries",
+   "name": "Cherries",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 63,
+    "carbs_g": 16,
+    "protein_g": 1.1,
+    "fat_g": 0.2,
+    "sugar_g": 12.8,
+    "fiber_g": 2.1,
+    "sodium_mg": 0
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1 cup",
+   "glycemic_index": 22,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "cherries"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "blueberries",
+   "name": "Blueberries",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 57,
+    "carbs_g": 14.5,
+    "protein_g": 0.7,
+    "fat_g": 0.3,
+    "sugar_g": 10,
+    "fiber_g": 2.4,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 100,
+   "serving_desc": "2/3 cup",
+   "glycemic_index": 53,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "blueberries"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "raspberry",
+   "name": "Raspberries",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 52,
+    "carbs_g": 12,
+    "protein_g": 1.2,
+    "fat_g": 0.7,
+    "sugar_g": 4.4,
+    "fiber_g": 6.5,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 100,
+   "serving_desc": "3/4 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "raspberry",
+    "raspberries"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "blackberry",
+   "name": "Blackberries",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 43,
+    "carbs_g": 9.6,
+    "protein_g": 1.4,
+    "fat_g": 0.5,
+    "sugar_g": 4.9,
+    "fiber_g": 5.3,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 100,
+   "serving_desc": "3/4 cup",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "blackberry",
+    "blackberries"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "apricot",
+   "name": "Apricot",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 48,
+    "carbs_g": 11,
+    "protein_g": 1.4,
+    "fat_g": 0.4,
+    "sugar_g": 9,
+    "fiber_g": 2,
+    "sodium_mg": 1
+   },
+   "default_serving_g": 70,
+   "serving_desc": "2 fruits",
+   "glycemic_index": 34,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "apricot"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "avocado",
+   "name": "Avocado",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 160,
+    "carbs_g": 8.5,
+    "protein_g": 2,
+    "fat_g": 14.7,
+    "sugar_g": 0.7,
+    "fiber_g": 6.7,
+    "sodium_mg": 7
+   },
+   "default_serving_g": 100,
+   "serving_desc": "1/2 fruit",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "avocados",
+    "avocado"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "passion_fruit",
+   "name": "Passion fruit",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 97,
+    "carbs_g": 23,
+    "protein_g": 2.2,
+    "fat_g": 0.7,
+    "sugar_g": 11,
+    "fiber_g": 10.4,
+    "sodium_mg": 28
+   },
+   "default_serving_g": 50,
+   "serving_desc": "2 fruits",
+   "glycemic_index": null,
+   "gi_source": null,
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "passion fruit"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "durian",
+   "name": "Durian",
+   "category": "fruit",
+   "region": "sg",
+   "per_100g": {
+    "calories_kcal": 147,
+    "carbs_g": 27,
+    "protein_g": 1.5,
+    "fat_g": 5.3,
+    "sugar_g": null,
+    "fiber_g": 3.8,
+    "sodium_mg": 2
+   },
+   "default_serving_g": 100,
+   "serving_desc": "2 seeds",
+   "glycemic_index": 49,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": false,
+   "allergens": [],
+   "aliases": [
+    "durian"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
+  },
+  {
+   "key": "canned_fruit",
+   "name": "Canned fruit salad (in syrup)",
+   "category": "fruit",
+   "region": "generic",
+   "per_100g": {
+    "calories_kcal": 70,
+    "carbs_g": 18,
+    "protein_g": 0.4,
+    "fat_g": 0.1,
+    "sugar_g": 16,
+    "fiber_g": 1,
+    "sodium_mg": 6
+   },
+   "default_serving_g": 120,
+   "serving_desc": "1/2 cup",
+   "glycemic_index": 55,
+   "gi_source": "International Tables of Glycemic Index (Atkinson et al., 2021), typical value",
+   "refined_carb": true,
+   "allergens": [],
+   "aliases": [
+    "canned fruit salad"
+   ],
+   "source": "MealSenseAI approximation for EXP-002 taxonomy coverage (typical recipe values, per 100 g); not a verified record",
+   "verification": "approximate_unverified"
   }
  ]
 }
