@@ -19,9 +19,15 @@ if [ ! -f .env ]; then
 fi
 C=(docker compose "${FILES[@]}")
 [ ${#BUILD[@]} -gt 0 ] || docker image inspect mealsenseai/backend:local >/dev/null 2>&1 || BUILD=(--build)
+PORT="$(sed -n 's/^HTTP_PORT=//p' .env)"; PORT="${PORT:-8080}"
+"${C[@]}" down --remove-orphans >/dev/null 2>&1 || true   # also removes containers of older versions (data volumes are kept)
+HOLDER="$(docker ps --filter "publish=$PORT" --format '{{.Names}}' | head -1)"
+if [ -n "$HOLDER" ] || (command -v lsof >/dev/null && lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1); then
+  echo "Port $PORT is already in use${HOLDER:+ by container '$HOLDER'}."
+  echo "Stop it (docker stop ${HOLDER:-<name>}) or choose another port: echo HTTP_PORT=8090 >> .env"; exit 1
+fi
 "${C[@]}" up -d "${BUILD[@]}" --wait
 "${C[@]}" ps --format "table {{.Service}}\t{{.Status}}"
-PORT="$(sed -n 's/^HTTP_PORT=//p' .env)"; PORT="${PORT:-8080}"
 curl -fsS "http://127.0.0.1:$PORT/api/v1/health" && echo
 [ "$DEMO" = 1 ] && "${C[@]}" exec -T backend python -m app.seed
 echo "MealSenseAI is running: http://localhost:$PORT   (stop with ./scripts/stop.sh)"
