@@ -11,10 +11,9 @@ __pycache__/
 frontend/*.tsbuildinfo
 datasets/food-101/
 datasets/foodsg/
-ml/models/*.tflite
 datasets/raw/
 datasets/processed/
 ml/models/*.pt
-ml/models/*.onnx
 ml/runs/
 ml/models/backbones/
+test-results/

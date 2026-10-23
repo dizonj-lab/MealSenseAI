@@ -8,30 +8,23 @@ An intelligent meal recording system that uses computer vision and pattern recog
 
 Photo-based meal logging: **capture (top/side view) → food recognition → portion estimate → user correction → sourced nutrition → glucose & energy insights → history**. Self-hosted, CPU-only, no paid services.
 
-## Quick start (local Ubuntu)
-
+## Quick start (Docker, recommended)
 ```bash
-python3.12 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-sudo apt install -y libegl1 libgles2 libgl1 postgresql redis-server   # MediaPipe needs EGL libs
-./ml/models/fetch_models.sh
-cp .env.example .env            # set JWT_SECRET
+cp .env.example .env
+docker compose up -d --build             # nginx + app + PostgreSQL + Redis  ->  http://localhost:8080
+docker compose exec app python -m app.seed   # optional demo user: demo@mealsense.ai / demo12345
+./infrastructure/test.sh                 # isolated test environment: pytest + Playwright UI flow
+```
+Details: `05-Infrastructure/README.md` (services, SLM options, operations) and `07-Testing/README.md`.
+
+## Quick start (without Docker)
+```bash
+python3.12 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+sudo apt install -y libegl1 libgles2 libgl1 libglib2.0-0t64 postgresql redis-server
+cp .env.example .env
 sudo -u postgres psql -c "CREATE USER mealsense WITH PASSWORD 'mealsense';" -c "CREATE DATABASE mealsenseai OWNER mealsense;"
 (cd frontend && npm ci && npm run build)
 cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-Open http://localhost:8000 (use your LAN IP from a phone). API docs: `/docs`. Frontend dev server: `cd frontend && npm run dev` (port 5173, proxies `/api`).
-
-**Docker:** `cp .env.example .env && docker compose up --build` (Postgres, Redis, app; uses Ollama on the host via `host.docker.internal`).
-
-**Ollama (optional):** `ollama pull qwen2.5:3b` (any text model works; set `OLLAMA_MODEL` to pin one). Without it, the app uses rule-based fallbacks and says so in the UI.
-
-## Tests
-```bash
-sudo -u postgres psql -c "CREATE DATABASE mealsenseai_test OWNER mealsense;"
-cd backend && pytest -q                                          # API + pipeline tests
-python tests/e2e/ui_flow.py http://localhost:8000 /tmp/shots     # mobile UI flow (Playwright)
-python ../ml/evaluation/evaluate.py /path/to/food-101/images     # accuracy/P/R/F1 on labeled data
 ```
 
 ## Inference pipeline (see `02-Solution Architecture/`)

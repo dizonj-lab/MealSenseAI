@@ -1,0 +1,18 @@
+.git
+.venv
+.venv-train
+**/node_modules
+frontend/dist
+data
+data_server.log
+.env
+**/__pycache__
+**/.pytest_cache
+datasets/raw
+datasets/processed
+ml/runs
+ml/models/backbones
+ml/models/*.pt
+test-results
+FINAL FOOD DATASET
+0*
