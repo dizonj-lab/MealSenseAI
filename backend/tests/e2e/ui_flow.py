@@ -82,7 +82,41 @@ with sync_playwright() as p:
     page.get_by_role("button", name="Cucumber").first.click()
     page.get_by_role("button", name="Use Cucumber").click()
     expect(page.get_by_role("heading", name="Cucumber")).to_be_visible()
+    # multi-food: numbered boxes on the photo; unidentified items must be named before saving
+    boxes = page.locator("figure button[aria-label^='Item ']")
+    print("boxes on photo:", boxes.count())
+    while page.locator("h3", has_text="Unidentified food").count():
+        unk = page.locator(".card", has=page.locator("h3", has_text="Unidentified food")).first
+        title = unk.locator("h3").inner_text()
+        unk.get_by_role("button", name="Name it").click()
+        page.get_by_placeholder("Search e.g.").fill("bacon")
+        dlg = page.get_by_role("dialog")
+        dlg.get_by_role("button", name="Bacon").first.click()
+        dlg.get_by_role("button", name="Use Bacon").click()
+        expect(page.locator("h3", has_text=title)).to_have_count(0, timeout=15000)
+        print("named", title, "-> Bacon")
+    if page.locator("h3", has_text="Bacon").count() >= 2:  # merge duplicated items
+        for c in page.locator(".card", has=page.locator("h3", has_text="Bacon")).all()[:2]:
+            c.get_by_label("merge").check()
+        page.get_by_role("button", name="Merge 2 items into one").click()
+        expect(page.locator("h3", has_text="Bacon")).to_have_count(1, timeout=15000)
+    if boxes.count() >= 2:
+        expect(page.get_by_text("Meal composition")).to_be_visible()
+        expect(page.get_by_text("Carbohydrate contribution by food (g)")).to_be_visible()
     shot(page, "07_after_corrections")
+    # portion simulator: halve the kaya toast, compare, log a measured reading, apply
+    sim = page.locator(".card", has=page.get_by_text("Portion simulator", exact=True))
+    sim.get_by_label("Kaya toast with butter portion").fill("70")
+    expect(sim.get_by_role("button", name="Apply 1 portion change(s)")).to_be_visible()
+    expect(sim.locator("tr", has_text="Portion (g)").locator("td", has_text="-70")).to_be_visible(timeout=10000)
+    sim.get_by_label("Glucose reading").fill("140")
+    sim.get_by_label("Unit").select_option("mg/dL")
+    sim.get_by_role("button", name="Log reading").click()
+    expect(sim.get_by_text("7.8 mmol/L")).to_be_visible(timeout=10000)
+    sim.scroll_into_view_if_needed()
+    shot(page, "07b_portion_simulator")
+    sim.get_by_role("button", name="Apply 1 portion change(s)").click()
+    expect(card.get_by_text("70 g").first).to_be_visible(timeout=10000)
     page.get_by_role("button", name="Confirm & save meal").click()
     expect(page.get_by_text("Meal saved to your history")).to_be_visible()
     shot(page, "08_saved_meal")

@@ -7,7 +7,7 @@ from functools import lru_cache
 from app.core import cache
 from app.core.config import settings
 
-NUTRIENTS = ["calories_kcal", "carbs_g", "protein_g", "fat_g", "sugar_g", "fiber_g", "sodium_mg"]
+NUTRIENTS = ["calories_kcal", "carbs_g", "protein_g", "fat_g", "sat_fat_g", "sugar_g", "fiber_g", "sodium_mg"]
 
 
 @lru_cache
@@ -77,13 +77,13 @@ def summary(f: dict) -> dict:
 
 def compute(key: str, grams: float) -> dict:
     """Scale per-100 g composition to the portion. Missing values stay None (never invented)."""
-    ck = f"nutr:{key}:{round(grams, 1)}"
+    ck = f"nutr2:{key}:{round(grams, 1)}"
     hit = cache.get(ck)
     if hit is not None:
         return hit
     f = get(key)
     per = f["per_100g"]
-    out = {n: (None if per[n] is None else round(per[n] * grams / 100, 1)) for n in NUTRIENTS}
+    out = {n: (None if per.get(n) is None else round(per[n] * grams / 100, 1)) for n in NUTRIENTS}
     cache.set(ck, out, ttl=86400)
     return out
 

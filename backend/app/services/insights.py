@@ -157,12 +157,69 @@ def allergy_warnings(foods: list[dict], profile) -> list[str]:
     return out
 
 
+WHO_SODIUM_MG = 2000      # WHO 2012 sodium guideline: < 2 g/day for adults
+WHO_SAT_FAT_PCT = 10      # WHO 2023 saturated fatty acid guideline: < 10% of energy
+
+
+def personalised(foods: list[dict], t: dict, g: dict, profile) -> list[dict]:
+    """Condition- and goal-specific observations from the computed composition. Educational; no dosing or
+    medication guidance (type 1 users are explicitly pointed to their own care plan)."""
+    status = profile.diabetes_status if profile else None
+    goals = set(profile.goals or []) if profile else set()
+    out = []
+    carb_foods = sorted(((f["label"], max((f["nutrients"].get("carbs_g") or 0) - (f["nutrients"].get("fiber_g") or 0), 0))
+                         for f in foods), key=lambda x: -x[1])
+    avail = sum(c for _, c in carb_foods)
+    top = [(n, c) for n, c in carb_foods if c >= 5][:3]
+    contrib = ", ".join(f"{n} {c:.0f} g ({c / avail * 100:.0f}%)" for n, c in top) if avail else ""
+    sugary = [f["label"] for f in foods if (f["nutrients"].get("sugar_g") or 0) >= 10]
+    if status == "type1":
+        out.append({"audience": "Type 1 diabetes", "title": f"About {avail:.0f} g available carbohydrate (photo-based estimate)",
+                    "detail": (f"Main sources: {contrib}. " if contrib else "") + "Portions are estimated from a photo and can be "
+                              "off by a third or more — weigh or check servings where it matters. This app does not calculate "
+                              "or advise insulin doses; follow your own diabetes care plan.", "basis": "composition"})
+    elif status in ("type2", "prediabetes", "gestational") or "diabetes_friendly" in goals:
+        label = {"type2": "Type 2 diabetes", "prediabetes": "Prediabetes", "gestational": "Gestational diabetes"}.get(status, "Diabetes-friendly goal")
+        detail = f"Carbohydrate mainly from {contrib}. " if contrib else "Little digestible carbohydrate in this meal. "
+        if top and avail >= 30:
+            detail += f"Reducing the {top[0][0]} portion changes the glycaemic load the most; try it in the portion simulator. "
+        if sugary:
+            detail += f"Sugar-rich items: {', '.join(sugary)}. "
+        detail += "Eating vegetables and protein first and a short walk afterwards are commonly suggested strategies. "
+        detail += "Do not change medication based on this app."
+        out.append({"audience": label, "title": f"Glycaemic load {g['glycemic_load'] if g['glycemic_load'] is not None else 'not estimated'}",
+                    "detail": detail, "basis": "composition + GI table"})
+    if "heart_health" in goals:
+        na, sf, kcal = t.get("sodium_mg"), t.get("sat_fat_g"), t.get("calories_kcal") or 0
+        parts = []
+        if na is not None:
+            parts.append(f"sodium {na:.0f} mg = {na / WHO_SODIUM_MG * 100:.0f}% of the WHO daily limit (2,000 mg)")
+        if sf is not None and kcal:
+            pct = sf * 9 / kcal * 100
+            parts.append(f"saturated fat {sf:.1f} g ≈ {pct:.0f}% of this meal's energy (WHO: under {WHO_SAT_FAT_PCT}%)")
+        if "sat_fat_g" in t.get("incomplete_nutrients", []):
+            parts.append("saturated fat is missing for some foods, so the true value is higher than shown")
+        out.append({"audience": "Heart health", "title": "Salt and saturated fat",
+                    "detail": ("; ".join(parts) or "No sodium or saturated-fat data for these foods") + ".",
+                    "basis": "WHO guidelines (2012 sodium, 2023 saturated fat)"})
+    if goals & {"weight_management", "calorie_awareness"} and t.get("grams"):
+        density = (t.get("calories_kcal") or 0) / t["grams"]
+        out.append({"audience": "Weight management", "title": f"Energy density {density:.1f} kcal/g",
+                    "detail": "Below ~1.5 kcal/g is considered low energy density; above ~4 is high. Swapping part of a "
+                              "dense item for vegetables lowers calories while keeping volume.", "basis": "composition"})
+    if not out:
+        out.append({"audience": "General wellness", "title": "Balance check",
+                    "detail": f"Carbohydrate mainly from {contrib}." if contrib else "Low-carbohydrate meal.",
+                    "basis": "composition"})
+    return out
+
+
 def core(foods: list[dict], profile) -> tuple[dict, dict]:
     """Stages 7 and 9: aggregation, glucose/energy assessment and rule-based recommendations."""
     t = totals(foods)
     g = glucose(foods, t)
     return t, {"glucose": g, "energy": energy(t, profile), "recommendations": recommendations(foods, t, g, profile),
-               "allergy_warnings": allergy_warnings(foods, profile)}
+               "allergy_warnings": allergy_warnings(foods, profile), "personalised": personalised(foods, t, g, profile)}
 
 
 def contextualise(foods: list[dict], t: dict, ins: dict, profile) -> dict:

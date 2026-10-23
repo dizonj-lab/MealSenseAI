@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { AlertTriangle, Check, Droplet, Flame, Info, Lightbulb, Pencil, Plus, Scale, Sparkles, Trash2 } from 'lucide-react'
+import { AlertTriangle, Check, Droplet, Flame, Info, Lightbulb, Merge, Pencil, Plus, RotateCcw, Scale, Sparkles, Trash2 } from 'lucide-react'
 import { api, fmt } from '../lib/api'
 import { useAuthImage } from '../lib/hooks'
 import type { Food, Meal } from '../lib/types'
 import FoodPicker from './FoodPicker'
 import Forecast from './Forecast'
+import MealComposition from './MealComposition'
+import PortionSimulator from './PortionSimulator'
 import { Card, ErrorNote, LevelBadge, Progress, Spinner, Tag } from './ui'
 
 const ORIGIN: Record<string, string> = { model: 'AI recognised', description: 'From description', manual: 'Added by you', slm: 'SLM suggestion' }
@@ -15,19 +17,28 @@ const MAPQ: Record<string, [string, string]> = {
 }
 const UNC: Record<string, string> = { low: 'text-emerald-700', medium: 'text-amber-700', high: 'text-rose-700', unknown: 'text-slate-500' }
 
-function MealImage({ mealId, view, hasOverlay }: { mealId: number; view: string; hasOverlay: boolean }) {
-  const [showMasks, setShowMasks] = useState(hasOverlay)
-  const url = useAuthImage(`/api/v1/meals/${mealId}/images/${view}${showMasks ? '_overlay' : ''}`)
+export const ITEM_COLORS = ['#0d9488', '#6366f1', '#f59e0b', '#e11d48', '#0284c7', '#16a34a', '#9333ea', '#ea580c', '#0891b2', '#65a30d', '#db2777', '#4f46e5']
+
+function MealImage({ mealId, view, items, selected, onSelect }: { mealId: number; view: string; items: { f: Food; n: number }[]; selected: number | null; onSelect: (id: number) => void }) {
+  const [boxes, setBoxes] = useState(true)
+  const url = useAuthImage(`/api/v1/meals/${mealId}/images/${view}`)
+  const mine = items.filter(({ f }) => f.original_prediction?.bbox && f.original_prediction?.view === view)
   return (
     <figure className="relative rounded-xl overflow-hidden bg-slate-100">
       {url ? <img src={url} className="w-full h-auto block" alt={`${view} view`} /> : <div className="aspect-[4/3] grid place-items-center"><Spinner /></div>}
+      {url && boxes && mine.map(({ f, n }) => { const b = f.original_prediction.bbox; const col = ITEM_COLORS[(n - 1) % ITEM_COLORS.length]; const sel = selected === f.id; return (
+        <button key={f.id} onClick={() => onSelect(f.id)} aria-label={`Item ${n}: ${f.label}`}
+          className="absolute rounded-md transition" style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%`,
+            border: `${sel ? 3 : 2}px ${f.nutrition_key ? 'solid' : 'dashed'} ${col}`, background: sel ? `${col}22` : 'transparent' }}>
+          <span className="absolute -top-px -left-px rounded-br-md px-1.5 text-[11px] font-bold text-white" style={{ background: col }}>{n}</span>
+        </button>) })}
       <figcaption className="absolute bottom-2 left-2 chip bg-black/50 text-white capitalize">{view === 'top' ? 'Top view' : 'Side view'}</figcaption>
-      {hasOverlay && <button onClick={() => setShowMasks(m => !m)} className="absolute bottom-2 right-2 chip bg-white/90 text-slate-700 shadow">{showMasks ? 'Hide' : 'Show'} detections</button>}
+      {mine.length > 0 && <button onClick={() => setBoxes(v => !v)} className="absolute bottom-2 right-2 chip bg-white/90 text-slate-700 shadow">{boxes ? 'Hide' : 'Show'} boxes</button>}
     </figure>
   )
 }
 
-function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChange: (m: Meal) => void; readOnly: boolean }) {
+function FoodCard({ f, n, meal, onChange, readOnly, selected, onSelect, mergeChecked, onMergeToggle }: { f: Food; n: number; meal: Meal; onChange: (m: Meal) => void; readOnly: boolean; selected: boolean; onSelect: () => void; mergeChecked: boolean; onMergeToggle: () => void }) {
   const [picker, setPicker] = useState(false)
   const [editG, setEditG] = useState(false)
   const [g, setG] = useState(String(f.grams))
@@ -37,13 +48,19 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
   const put = (json: object) => call(api(`/meals/${meal.id}/foods/${f.id}`, { method: 'PUT', json }))
   const pred = f.original_prediction
   const [mq, mqc] = MAPQ[f.mapping_quality] ?? MAPQ.none
-  const n = f.nutrients
+  const nu = f.nutrients
+  const unknown = !f.nutrition_key && pred?.kind && pred.kind !== 'food'
+  const col = ITEM_COLORS[(n - 1) % ITEM_COLORS.length]
   return (
-    <div className={`card p-4 ${f.confirmed ? 'ring-1 ring-emerald-200' : ''}`}>
+    <div id={`food-${f.id}`} onClick={onSelect} className={`card p-4 transition ${selected ? 'ring-2' : f.confirmed ? 'ring-1 ring-emerald-200' : unknown ? 'ring-1 ring-amber-300' : ''}`} style={selected ? { boxShadow: `0 0 0 2px ${col}` } : undefined}>
       <div className="flex items-start gap-3">
+        <span className="mt-0.5 size-7 shrink-0 rounded-lg grid place-items-center text-sm font-bold text-white" style={{ background: col }} title={`Item ID ${f.id}`}>{n}</span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <h3 className="font-semibold text-slate-900">{f.label}</h3>
+            {unknown && <span className="chip bg-amber-50 text-amber-800">Not recognised — please name it</span>}
+            {!unknown && !f.confirmed && pred?.needs_review && <span className="chip bg-amber-50 text-amber-700">Needs your check</span>}
+            {pred?.score !== undefined && pred?.kind === 'food' && <span className="chip bg-violet-50 text-violet-700" title="Raw softmax score, not a calibrated probability">model {(pred.score * 100).toFixed(0)}% (raw)</span>}
             {f.confirmed && <span className="chip bg-emerald-50 text-emerald-700"><Check className="size-3" />Confirmed</span>}
             {f.nutrition_source?.match === 'proxy' && <span className="chip bg-amber-50 text-amber-700">≈ {f.nutrition_source.name}</span>}
             {f.user_corrected && <span className="chip bg-sky-50 text-sky-700">Corrected</span>}
@@ -54,15 +71,17 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
           </div>
         </div>
         {busy && <Spinner className="size-4" />}
+        {!readOnly && <label className="flex items-center gap-1 text-[11px] text-slate-500" onClick={e => e.stopPropagation()}>
+          <input type="checkbox" className="accent-teal-600" checked={mergeChecked} onChange={onMergeToggle} />merge</label>}
       </div>
 
       {pred?.candidates?.length > 0 && <div className="mt-3 rounded-xl bg-violet-50/40 ring-1 ring-violet-100 px-3 py-2.5">
         <div className="flex items-center gap-2 text-xs text-slate-600 mb-2"><Tag kind="prediction" />
-          <span>{pred.model_name} · {pred.instance === 'whole photo' ? 'whole photo' : `${pred.instance} region`} · {pred.needs_review ? 'low confidence — please check' : `${pred.score_band} signal`}</span></div>
+          <span>{unknown ? 'Best guesses for this region (all weak):' : `${pred.model_name} · ${pred.instance === 'whole photo' ? 'whole photo' : 'region ' + (pred.region_id ?? '')}`}</span></div>
         <div className="grid gap-1.5">{pred.candidates.map((c: any, i: number) => {
           const sel = (f.taxonomy_class ?? f.label) === c.label
           return (
-            <button key={c.class_id} disabled={readOnly || busy || sel} onClick={() => put({ candidate_class_id: c.class_id })}
+            <button key={c.class_id} disabled={readOnly || busy || sel} onClick={e => { e.stopPropagation(); put({ candidate_class_id: c.class_id }) }}
               className={`relative overflow-hidden rounded-lg px-3 py-2 text-left text-sm ring-1 transition ${sel ? 'ring-violet-400 bg-white font-semibold' : 'ring-slate-200 bg-white/70 hover:ring-violet-300'}`}>
               <span className="absolute inset-y-0 left-0 bg-violet-100" style={{ width: `${Math.max(c.score * 100, 1)}%` }} />
               <span className="relative flex justify-between gap-2"><span>{i + 1}. {c.label}{c.match === 'none' && <span className="text-[11px] text-rose-600"> · no nutrition record</span>}</span>
@@ -72,22 +91,23 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
       </div>}
       {pred?.description_text && <div className="mt-3 text-xs rounded-lg bg-slate-50 px-3 py-2 text-slate-600">From your description: “{pred.description_text}” ({pred.parser})</div>}
 
-      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-        {[['Portion', `${fmt(f.grams)} g`], ['Calories', `${fmt(n.calories_kcal)}`], ['Carbs', `${fmt(n.carbs_g, 1)} g`], ['Protein', `${fmt(n.protein_g, 1)} g`]].map(([l, v]) => (
-          <div key={l} className="rounded-xl bg-slate-50 py-2"><div className="text-[11px] text-slate-500">{l}</div><div className="font-semibold text-slate-800">{v}</div></div>))}
+      {!unknown && <><div className="mt-3 grid grid-cols-3 sm:grid-cols-7 gap-1.5 text-center">
+        {[['Portion', `${fmt(f.grams)} g`], ['kcal', fmt(nu.calories_kcal)], ['Carbs', `${fmt(nu.carbs_g, 1)} g`], ['Sugar', `${fmt(nu.sugar_g, 1)} g`],
+          ['Protein', `${fmt(nu.protein_g, 1)} g`], ['Fat', `${fmt(nu.fat_g, 1)} g`], ['Sodium', `${fmt(nu.sodium_mg)} mg`]].map(([l, v]) => (
+          <div key={l} className="rounded-xl bg-slate-50 py-1.5"><div className="text-[10px] text-slate-500">{l}</div><div className="text-sm font-semibold text-slate-800">{v}</div></div>))}
       </div>
       <div className="mt-2 text-xs text-slate-500 flex flex-wrap items-center gap-x-3 gap-y-1">
         <Tag kind={f.portion.method === 'user_entered' ? 'measured' : 'estimate'} />
-        <span>Fat {fmt(n.fat_g, 1)} g</span><span>Sugar {fmt(n.sugar_g, 1)} g</span><span>Fibre {fmt(n.fiber_g, 1)} g</span><span>Sodium {fmt(n.sodium_mg)} mg</span>
-      </div>
-      <div className="mt-2 text-xs">
+        <span>Fibre {fmt(nu.fiber_g, 1)} g</span><span>Sat. fat {nu.sat_fat_g == null ? 'n/a' : `${fmt(nu.sat_fat_g, 1)} g`}</span>
+      </div></>}
+      {!unknown && <div className="mt-2 text-xs">
         <span className={`font-semibold ${UNC[f.portion.uncertainty] ?? ''}`}><Scale className="inline size-3.5 -mt-0.5" /> Portion uncertainty: {f.portion.uncertainty}{f.portion.relative_error && ` (${f.portion.relative_error})`}</span>
         {f.portion.range_g && <span className="text-slate-500"> · likely {f.portion.range_g[0]}–{f.portion.range_g[1]} g</span>}
         <details className="text-slate-500 mt-1"><summary className="cursor-pointer">How was this estimated?</summary>
           <ul className="list-disc pl-4 mt-1 space-y-0.5">{f.portion.notes.map((x, i) => <li key={i}>{x}</li>)}</ul>
           {f.nutrition_source && <p className="mt-1">Nutrition estimate from “{f.nutrition_source.name}”{f.nutrition_source.match === 'proxy' && ' (closest available food — correct it if you know better)'}. Source: {f.nutrition_source.source} ({f.nutrition_source.verification.replace(/_/g, ' ')}).</p>}
         </details>
-      </div>
+      </div>}
 
       {editG && <div className="mt-3 flex gap-2">
         <input className="input" type="number" inputMode="decimal" value={g} onChange={e => setG(e.target.value)} autoFocus />
@@ -95,13 +115,13 @@ function FoodCard({ f, meal, onChange, readOnly }: { f: Food; meal: Meal; onChan
         <button className="btn-ghost" onClick={() => setEditG(false)}>Cancel</button></div>}
       <ErrorNote msg={err} />
 
-      {!readOnly && <div className="mt-3 grid grid-cols-4 gap-1.5">
+      {!readOnly && <div className="mt-3 grid grid-cols-4 gap-1.5" onClick={e => e.stopPropagation()}>
         <button className="btn-ghost px-2 text-xs" disabled={f.confirmed || !f.nutrition_key} onClick={() => put({ confirmed: true })}><Check className="size-4" />Confirm</button>
-        <button className="btn-ghost px-2 text-xs" onClick={() => setPicker(true)}><Pencil className="size-4" />Food</button>
+        <button className="btn-ghost px-2 text-xs" onClick={() => setPicker(true)}><Pencil className="size-4" />{unknown ? 'Name it' : 'Rename'}</button>
         <button className="btn-ghost px-2 text-xs" disabled={!f.nutrition_key} onClick={() => { setG(String(f.grams)); setEditG(true) }}><Scale className="size-4" />Portion</button>
         <button className="btn-ghost px-2 text-xs text-rose-600" onClick={() => call(api(`/meals/${meal.id}/foods/${f.id}`, { method: 'DELETE' }))}><Trash2 className="size-4" />Remove</button>
       </div>}
-      {picker && <FoodPicker title={`Correct “${f.label}”`} initial={f.nutrition_key ? '' : f.label} onClose={() => setPicker(false)}
+      {picker && <FoodPicker title={unknown ? `What is item ${n}?` : `Rename “${f.label}”`} initial={unknown ? '' : f.nutrition_key ? '' : f.label} onClose={() => setPicker(false)}
         onPick={(ref, grams) => { setPicker(false); put({ nutrition_key: ref.key, ...(grams ? { grams } : {}) }) }} />}
     </div>
   )
@@ -152,6 +172,12 @@ export function InsightCards({ meal }: { meal: Meal }) {
           <p className="mt-3 text-[11px] text-slate-400">General educational guidance; not a treatment plan.</p>
         </Card>
       </div>
+      {!!ins.personalised?.length && <Card title="Personalised for you" icon={<Sparkles className="size-5 text-violet-600" />} action={<Tag kind="guidance" />}>
+        <div className="grid sm:grid-cols-2 gap-3">{ins.personalised!.map(p => <div key={p.audience} className="rounded-xl bg-violet-50/50 ring-1 ring-violet-100 p-3">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-violet-700">{p.audience}</div>
+          <div className="text-sm font-semibold text-slate-800">{p.title}</div><p className="text-sm text-slate-600">{p.detail}</p>
+          <p className="text-[11px] text-slate-400 mt-1">Basis: {p.basis}</p></div>)}</div>
+      </Card>}
       <div className="card p-4 text-sm flex gap-3">
         <Sparkles className="size-5 text-brand-600 shrink-0" />
         {ins.explanation.text ? <div><p className="text-slate-700">{ins.explanation.text}</p><p className="text-[11px] text-slate-400 mt-1">Generated by local SLM ({ins.explanation.source.replace('slm:', '')}) from the numbers above.</p></div>
@@ -166,7 +192,15 @@ export default function MealReview({ meal, onChange, onSaved, readOnly = false }
   const [mealType, setMealType] = useState(meal.meal_type ?? guessMealType())
   const [err, setErr] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [selected, setSelected] = useState<number | null>(null)
+  const [mergeIds, setMergeIds] = useState<number[]>([])
   const active = meal.foods.filter(f => !f.removed)
+  const items = active.map((f, i) => ({ f, n: i + 1 }))
+  const suggestions = meal.foods.filter(f => f.removed && f.original_prediction?.kind === 'suggestion' && !f.user_corrected)
+  const select = (id: number) => { setSelected(id); document.getElementById(`food-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }) }
+  const act = async (p: Promise<Meal>) => { setErr(null); try { onChange(await p) } catch (e: any) { setErr(e.message) } }
+  const merge = () => act(api<Meal>(`/meals/${meal.id}/foods/merge`, { method: 'POST', json: { food_ids: mergeIds } })).then(() => setMergeIds([]))
+  const nUnknown = active.filter(f => !f.nutrition_key).length
   const cls = meal.stages.find(st => st.key === 'classify')
   const uncertain = cls?.status === 'uncertain' && !active.some(f => f.origin === 'model') ? (cls.per_view?.[0]?.top_labels ?? []) : []
   const t = meal.totals
@@ -179,7 +213,7 @@ export default function MealReview({ meal, onChange, onSaved, readOnly = false }
       <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-4 items-start">
         <div className="space-y-3 lg:sticky lg:top-20">
           {meal.images.length > 0 ? <div className={`grid gap-3 ${meal.images.length > 1 ? 'grid-cols-2 lg:grid-cols-1' : ''}`}>
-            {meal.images.map(im => <MealImage key={im.view} mealId={meal.id} view={im.view} hasOverlay={!!im.overlay_path} />)}</div>
+            {meal.images.map(im => <MealImage key={im.view} mealId={meal.id} view={im.view} items={items} selected={selected} onSelect={select} />)}</div>
             : <div className="card p-4 text-sm text-slate-500">No photo — analysed from description.</div>}
           <div className="card p-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Meal total · {t.item_count} item(s) · ~{fmt(t.grams)} g</div>
@@ -200,10 +234,24 @@ export default function MealReview({ meal, onChange, onSaved, readOnly = false }
             <p className="mt-1.5 text-[11px] text-slate-500">Low model confidence. Otherwise use “Add missing food”.</p>
           </div>}
           {active.length === 0 && <div className="card p-4 text-sm text-slate-600">No foods yet. Use <b>Add missing food</b> to enter what you ate.</div>}
-          {active.map(f => <FoodCard key={f.id} f={f} meal={meal} onChange={onChange} readOnly={readOnly} />)}
+          {active.length > 1 && <div className="text-sm text-slate-600 flex flex-wrap items-center gap-2">
+            <b>{active.length} items</b>{nUnknown > 0 && <span className="chip bg-amber-50 text-amber-800">{nUnknown} need a name before saving</span>}
+            {!readOnly && mergeIds.length >= 2 && <button className="btn-ghost ml-auto px-3 py-1.5 text-xs" onClick={merge}><Merge className="size-4" />Merge {mergeIds.length} items into one</button>}
+          </div>}
+          {items.map(({ f, n }) => <FoodCard key={f.id} f={f} n={n} meal={meal} onChange={onChange} readOnly={readOnly} selected={selected === f.id} onSelect={() => setSelected(f.id)}
+            mergeChecked={mergeIds.includes(f.id)} onMergeToggle={() => setMergeIds(m => m.includes(f.id) ? m.filter(x => x !== f.id) : [...m, f.id])} />)}
+          {!readOnly && suggestions.length > 0 && <div className="card p-4">
+            <div className="text-sm font-semibold text-slate-800">Possible additional items ({suggestions.length})</div>
+            <p className="text-[11px] text-slate-500 mb-2">Small or weak regions the detector found. Not counted unless you add them.</p>
+            <div className="flex flex-wrap gap-1.5">{suggestions.map(f => (
+              <button key={f.id} className="chip ring-1 ring-slate-200 bg-white px-3 py-1.5 text-sm hover:ring-teal-300" onClick={() => act(api(`/meals/${meal.id}/foods/${f.id}`, { method: 'PUT', json: { restore: true } }))}>
+                <RotateCcw className="size-3.5" />Add region {f.original_prediction.region_id}{f.original_prediction.candidates?.[0] && <span className="text-slate-400"> (maybe {f.original_prediction.candidates[0].label})</span>}</button>))}</div>
+          </div>}
           {!readOnly && <button className="btn-ghost w-full border-dashed py-3" onClick={() => setAdding(true)}><Plus className="size-4" />Add missing food</button>}
         </div>
       </div>
+      <MealComposition meal={meal} items={items} colors={ITEM_COLORS} />
+      <PortionSimulator meal={meal} onChange={onChange} readOnly={readOnly} />
       <InsightCards meal={meal} />
       {(meal.totals?.calories_kcal ?? 0) > 0 && <Forecast mealId={meal.id} version={meal.insights?.generated_at ?? ''} />}
       {!readOnly && <div className="card p-4 flex flex-col sm:flex-row gap-3 sm:items-center">

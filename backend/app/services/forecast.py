@@ -17,7 +17,7 @@ Two deterministic models, both explicit about their assumptions:
 """
 import math
 
-from app.services import nutrition
+from app.services import insights, nutrition
 
 REFERENCES = {
     "ainsworth2011": {"cite": "Ainsworth BE, et al. 2011 Compendium of Physical Activities: a second update of codes and MET values. Med Sci Sports Exerc. 2011;43(8):1575-1581.", "doi": "10.1249/MSS.0b013e31821ece12"},
@@ -288,4 +288,82 @@ def forecast(foods: list[dict], totals: dict, ins: dict, profile, scenarios: lis
         "references": REFERENCES,
         "activities": {k: {"label": v["label"], "moderate_met": v["moderate"], "high_met": v["high"]}
                        for k, v in ACTIVITIES.items() if k != "sitting"},
+    }
+
+
+SIM_VERSION = "meal-sim 1.0 (gamma absorption + first-order clearance; Atkinson 2021 GI/GL)"
+WHATIF_NUTRIENTS = ("calories_kcal", "carbs_g", "sugar_g", "protein_g", "fat_g", "sat_fat_g", "fiber_g", "sodium_mg")
+
+
+def _gl(nutrients: dict, key: str | None) -> float | None:
+    ref = nutrition.get(key)
+    if not ref or ref.get("glycemic_index") is None:
+        return None
+    avail = max((nutrients.get("carbs_g") or 0) - (nutrients.get("fiber_g") or 0), 0)
+    return round(ref["glycemic_index"] * avail / 100, 1)
+
+
+def _diff(a, b):
+    if a is None or b is None:
+        return {"abs": None, "pct": None}
+    return {"abs": round(b - a, 1), "pct": round((b - a) / a * 100, 1) if a else None}
+
+
+def portion_whatif(items: list[dict], profile, horizon: int = 240) -> dict:
+    """Original vs modified portions (nothing is saved). items: {id, label, nutrition_key, grams, new_grams, range_g}.
+    The glucose curves are a relative index (original peak = 100), not mmol/L. The band around the modified curve
+    re-runs the simulation at the low and high ends of each food's portion-uncertainty range; it reflects portion
+    uncertainty only, not individual physiological variation."""
+    weight = (profile.weight_kg if profile and profile.weight_kg else None) or DEFAULT_WEIGHT_KG
+    k, k_label = _clearance_k(getattr(profile, "diabetes_status", None) if profile else None)
+
+    def build(grams_of):
+        foods = [{"label": it["label"], "nutrition_key": it["nutrition_key"], "grams": grams_of(it),
+                  "nutrients": nutrition.compute(it["nutrition_key"], grams_of(it))} for it in items]
+        return foods, insights.totals(foods)
+
+    def scaled(it, end):
+        r = it.get("range_g")
+        if not r or not it["grams"]:
+            return it["new_grams"]
+        return it["new_grams"] * r[end] / it["grams"]
+
+    runs = {name: build(fn) for name, fn in (("original", lambda it: it["grams"]), ("modified", lambda it: it["new_grams"]),
+                                             ("low", lambda it: scaled(it, 0)), ("high", lambda it: scaled(it, 1)))}
+    sims = {name: _simulate(_meal_inputs(f, t), k, weight, None, horizon) for name, (f, t) in runs.items()}
+    peak = max(sims["original"]["series"]) or 1.0
+    idx = {name: [round(v / peak * 100, 1) for v in s["series"]] for name, s in sims.items()}
+
+    def summary(name):
+        f, t = runs[name]
+        gls = [_gl(x["nutrients"], x["nutrition_key"]) for x in f]
+        carb_items = [x for x in f if (x["nutrients"].get("carbs_g") or 0) >= 5]
+        return {**{n: t[n] for n in WHATIF_NUTRIENTS}, "grams": t["grams"],
+                "glycemic_load": round(sum(g for g in gls if g is not None), 1) if any(g is not None for g in gls) else None,
+                "gl_coverage": f"{sum(1 for x, g in zip(f, gls) if g is not None and x in carb_items)}/{len(carb_items)} carbohydrate foods have a GI value",
+                "peak_index": max(idx[name]), "peak_time_min": idx[name].index(max(idx[name])) * 5,
+                "auc_index": round(sum(idx[name]) * 5 / 60, 1)}
+
+    orig, mod = summary("original"), summary("modified")
+    foods = []
+    for it, fo, fm in zip(items, runs["original"][0], runs["modified"][0]):
+        o = {**fo["nutrients"], "grams": fo["grams"], "glycemic_load": _gl(fo["nutrients"], it["nutrition_key"])}
+        m = {**fm["nutrients"], "grams": fm["grams"], "glycemic_load": _gl(fm["nutrients"], it["nutrition_key"])}
+        foods.append({"id": it["id"], "label": it["label"], "original": o, "modified": m,
+                      "diff": {n: _diff(o.get(n), m.get(n)) for n in (*WHATIF_NUTRIENTS, "grams", "glycemic_load")}})
+    return {
+        "simulation_version": SIM_VERSION, "kind": "simulated",
+        "time_min": list(range(0, horizon + 1, 5)),
+        "curves": {"original": idx["original"], "modified": idx["modified"],
+                   "modified_low": [min(a, b) for a, b in zip(idx["low"], idx["high"])],
+                   "modified_high": [max(a, b) for a, b in zip(idx["low"], idx["high"])]},
+        "band": "portion-uncertainty range of each food (low–high grams); not physiological variation",
+        "foods": foods, "totals": {"original": orig, "modified": mod,
+                                   "diff": {n: _diff(orig.get(n), mod.get(n)) for n in (*WHATIF_NUTRIENTS, "grams", "glycemic_load", "peak_index", "auc_index")}},
+        "assumptions": [f"Clearance: {k_label}, half-life {round(math.log(2) / k)} min", f"Body mass {weight} kg",
+                        f"Foods without a GI value use an assumed GI of {DEFAULT_GI}",
+                        "Curves are a relative index (original peak = 100), not blood-glucose concentrations",
+                        "Nutrients scale linearly with grams from the same reference record"],
+        "disclaimer": "Illustrative simulation from population-average physiology — not a prediction of your blood glucose "
+                      "and not medical advice. Do not use it to adjust medication or insulin.",
     }

@@ -13,7 +13,7 @@ export default function FoodPicker({ title, onPick, onClose, initial = '' }: { t
     return () => clearTimeout(t)
   }, [q])
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
       <div className="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-h-[85vh] flex flex-col pb-safe">
         <div className="flex items-center justify-between p-4 pb-2"><h3 className="font-semibold">{title}</h3><button onClick={onClose} className="p-1"><X className="size-5" /></button></div>

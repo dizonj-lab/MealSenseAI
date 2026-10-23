@@ -1,4 +1,4 @@
-export type Nutrients = { calories_kcal: number | null; carbs_g: number | null; protein_g: number | null; fat_g: number | null; sugar_g: number | null; fiber_g: number | null; sodium_mg: number | null }
+export type Nutrients = { calories_kcal: number | null; carbs_g: number | null; protein_g: number | null; fat_g: number | null; sat_fat_g?: number | null; sugar_g: number | null; fiber_g: number | null; sodium_mg: number | null }
 export type Profile = {
   health_consent: boolean; age: number | null; sex: string | null; height_cm: number | null; weight_kg: number | null
   activity_level: string | null; diet_preferences: string[]; diabetes_status: string | null; allergies: string[]; restrictions: string[]
@@ -19,6 +19,7 @@ export type Insights = {
   energy: { calories_kcal: number; carbs_g: number | null; protein_g: number | null; fat_g: number | null; fiber_g: number | null; sugar_g: number | null; sodium_mg: number | null; macro_energy_pct: Record<string, number>; goal_progress: { label: string; value: number; goal: number; unit: string; pct: number }[]; notes: string[] }
   recommendations: { tag: string; title: string; detail: string }[]
   allergy_warnings: string[]
+  personalised?: { audience: string; title: string; detail: string; basis: string }[]
   explanation: { text: string | null; source: string }
   generated_at?: string
 }

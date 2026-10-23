@@ -38,6 +38,32 @@ Extra check: a held-out Food-101 photo (`1063878.jpg`, sushi; possibly seen in t
 | Legacy photo volume owned by root | Fixed automatically by `init-perms`; the non-root backend can read and write |
 | Nutrition coverage of 320 classes | 247 exact, 66 proxy, 7 none (`evidence/model/nutrition_coverage.json`) |
 
+## Multi-food recognition and health-intelligence update (23 Oct 2026)
+Executed locally (CPU, Python venv + PostgreSQL 16, built frontend via `vite preview`). Docker images were **not**
+rebuilt for this update (no new dependencies were added).
+
+| Test | Result |
+|---|---|
+| pytest | **18 passed** (adds multi-food items/rename/merge/restore, blank photo, portion simulator, glucose readings, personalised insights) |
+| Playwright phone flow, `coffee.png` | **PASS**, no JS errors: 1 box; top-3 override; portion simulator (−70 g row), reading 140 mg/dL shown as 7.8 mmol/L; apply; save |
+| Playwright phone flow, `multi_food_plate.jpg` | **PASS**, no JS errors: 3 numbered boxes; 2 unidentified items named via search; 2 merged; composition charts; simulator; save blocked until all items named, then saved |
+
+**Detection benchmark** (`ml/evaluation/multifood_eval.py`, seed 11, evaluated after tuning on seed 7): 100 **synthetic**
+plates built from Food-101 *test* images (pizza/sushi/steak, 2–3 per plate, 263 items). Synthetic composites have clean
+edges and no overlap; these are **not** real-meal results.
+
+| Metric (IoU ≥ 0.5, class-agnostic) | Value |
+|---|---|
+| TP / FP / FN | 180 / 61 / 83 |
+| Precision / Recall / AP50 | 0.747 / 0.684 / 0.592 |
+| Matched items: top-1 / top-3 | 0.561 / 0.750 |
+| Per-class F1 (pizza / sushi / steak) | 0.926 / 0.586 / 0.192 — steak crops are mostly "unidentified" or *sirloin steak*/*filet mignon* |
+| Latency per photo (CPU) | mean 260 ms, p50 262 ms, p95 320 ms |
+| Single-dish photos (75) | 43 show exactly one item (38 correct); mean 1.37 extra items per photo |
+
+Not measured: real multi-food photos (no labelled set available; the breakfast acceptance photo was not supplied),
+segmentation-mask quality, the uncertainty band's coverage, and any glucose accuracy (the simulation is illustrative).
+
 ## Not tested / outstanding
 1. **GPU path:** the `gpu` image (CUDA 12.8, cuDNN 9, onnxruntime-gpu) was **not built or run**: no GPU and
    insufficient disk in the test environment. CUDA auto-selection is implemented with a CPU fallback, but is unverified.

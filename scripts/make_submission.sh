@@ -18,7 +18,8 @@ sed -i '/HOME-SERVER.md/d; s#`0x-\*/` project report sections.#`evidence/` test 
 mkdir -p "$PKG/evidence"
 cp -r ml/models/exp002/evidence "$PKG/evidence/model"
 [ -d test-results ] && { mkdir -p "$PKG/evidence/tests"; cp test-results/*.json test-results/*.log "$PKG/evidence/tests/" 2>/dev/null || true;
-  [ -d test-results/screenshots ] && cp -r test-results/screenshots "$PKG/evidence/tests/"; }
+  [ -d test-results/screenshots ] && cp -r test-results/screenshots "$PKG/evidence/tests/"
+  [ -d test-results/ui-multifood ] && cp -r test-results/ui-multifood "$PKG/evidence/tests/"; }
 # safety checks: nothing secret or heavy slipped in
 ! find "$PKG" \( -name .env -o -name '*.pem' -o -name 'id_*' -o -name node_modules -o -name .venv -o -name __pycache__ -o -name '*.pt' \) | grep -q . \
   || { echo "forbidden files in package"; exit 1; }

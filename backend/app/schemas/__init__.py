@@ -4,7 +4,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 DiabetesStatus = Literal["none", "prediabetes", "type1", "type2", "gestational", "prefer_not_to_disclose"]
-Goal = Literal["carb_awareness", "calorie_awareness", "weight_management", "balanced_nutrition", "diabetes_friendly"]
+Goal = Literal["carb_awareness", "calorie_awareness", "weight_management", "balanced_nutrition", "diabetes_friendly", "heart_health"]
 
 
 class RegisterIn(BaseModel):
@@ -64,7 +64,12 @@ class AnalyzeIn(BaseModel):
     meal_id: int
 
 
+class MergeIn(BaseModel):
+    food_ids: list[int] = Field(min_length=2, max_length=20, description="Foods to merge; the first identified one is kept")
+
+
 class FoodUpdateIn(BaseModel):
+    restore: bool = Field(default=False, description="Add back a hidden 'possible extra item' (or a removed food)")
     candidate_class_id: int | None = Field(default=None, ge=0, description="Choose an EXP-002 taxonomy class (e.g. a top-3 candidate)")
     nutrition_key: str | None = None
     label: str | None = Field(default=None, max_length=200)
@@ -153,6 +158,11 @@ class Scenario(BaseModel):
     intensity: Literal["moderate", "high"] = "moderate"
     start_min: int = Field(default=15, ge=0, le=240, description="Minutes after the meal")
     duration_min: int = Field(default=20, ge=5, le=180)
+
+
+class SimulateIn(BaseModel):
+    portions: dict[int, float] = Field(description="food id -> modified grams")
+    horizon_min: int = Field(default=240, ge=120, le=480)
 
 
 class ForecastIn(BaseModel):

@@ -11,6 +11,13 @@ from pathlib import Path
 
 USDA = "USDA FoodData Central (SR Legacy / FNDDS), per 100 g"
 HPB = "Singapore HPB Energy & Nutrient Composition of Food (per-serving values converted to per 100 g)"
+# Saturated fat (g/100 g) only where a typical reference value is known; other records report it as unavailable.
+SAT_FAT = {"butter": 51, "bacon": 14, "pork_sausage": 9.5, "pizza": 4.5, "cheeseburger": 5, "fried_egg": 4.3,
+           "boiled_egg": 3.3, "omelette": 3.3, "ice_cream": 6.8, "milk": 1.9, "beef_steak": 3.8, "salmon": 2.5,
+           "chicken_breast": 1.0, "french_fries": 2.3, "donut": 10, "chocolate_cake": 5, "pancake": 2.3, "waffle": 2.7,
+           "cheesecake": 13, "yogurt": 1.0, "white_bread": 0.7, "white_rice": 0.1, "brown_rice": 0.3, "oatmeal": 0.3,
+           "hot_dog": 5.5, "sandwich": 3.5, "french_toast": 2.8, "hash_browns": 2, "maple_syrup": 0, "banana": 0.1,
+           "apple": 0, "orange": 0, "strawberry": 0, "coffee_black": 0, "cola": 0, "water": 0}
 GI_SRC = "International Tables of Glycemic Index (Atkinson et al., 2021), typical value"
 
 # key, name, category, kcal, carb, prot, fat, sugar, fiber, sodium_mg, serving_g, serving_desc, gi, refined_carb, allergens, aliases, region
@@ -278,6 +285,11 @@ EXTRA_ROWS = [
  ("macarons","Macarons","dessert",400,55,7,17,50,1.5,50,40,"3 macarons",None,True,["egg","dairy"],["macarons"],"generic"),
  ("pineapple_tarts","Pineapple tarts","dessert",450,60,5,21,25,1.5,200,40,"4 tarts",None,True,["gluten","egg","dairy"],["pineapple tarts"],"sg"),
  ("sausage_roll","Sausage roll","snack",330,26,9,21,1.5,1,650,90,"1 roll",None,True,["gluten"],["sausage rolls","sausage roll"],"generic"),
+ ("bacon","Bacon, pan-fried","protein",541,1.4,37,42,0,0,1717,16,"2 strips",None,False,[],["bacon","bacon strips"],"generic"),
+ ("pork_sausage","Pork breakfast sausage, cooked","protein",325,1.5,19,27,1,0,800,50,"2 links",None,False,[],["sausage","sausages","breakfast sausage"],"generic"),
+ ("butter","Butter (salted)","condiment",717,0.1,0.9,81,0.1,0,643,10,"2 tsp",None,False,["dairy"],["butter"],"generic"),
+ ("maple_syrup","Maple / pancake syrup","condiment",260,67,0,0.1,60,0,12,40,"2 tbsp",54,True,[],["syrup","maple syrup","pancake syrup"],"generic"),
+ ("hash_browns","Hash browns","vegetable",265,35,3,13,0.3,3,340,100,"1 serving",None,True,[],["hash browns","hash brown"],"generic"),
  # fruit (USDA-style typical values)
  ("watermelon","Watermelon","fruit",30,7.6,0.6,0.2,6.2,0.4,1,280,"1 wedge",76,False,[],["watermelon"],"generic"),
  ("papaya","Papaya","fruit",43,11,0.5,0.3,7.8,1.7,8,150,"1 cup",60,False,[],["papaya"],"generic"),
@@ -316,7 +328,7 @@ def main():
         foods.append({
             "key": key, "name": name, "category": cat, "region": region,
             "per_100g": {"calories_kcal": kcal, "carbs_g": carb, "protein_g": prot, "fat_g": fat,
-                          "sugar_g": sugar, "fiber_g": fiber, "sodium_mg": na},
+                          "sat_fat_g": SAT_FAT.get(key), "sugar_g": sugar, "fiber_g": fiber, "sodium_mg": na},
             "default_serving_g": sg, "serving_desc": sdesc,
             "glycemic_index": gi, "gi_source": GI_SRC if gi is not None else None,
             "refined_carb": refined, "allergens": allergens, "aliases": aliases,

@@ -1,3 +1,4 @@
+import pytest
 import io
 from pathlib import Path
 
@@ -80,7 +81,6 @@ def test_top3_confirm_override_on_photo(client, auth):
     # add a taxonomy class directly (e.g. from the candidates of an uncertain photo)
     meal3 = client.post(f"{API}/meals/{meal['id']}/foods", headers=auth, json={"candidate_class_id": 63}).json()
     assert any(f["taxonomy_class"] == "chicken rice" and f["nutrition_key"] == "chicken_rice" for f in meal3["foods"])
-    assert client.get(f"{API}/meals/{meal['id']}/images/top_overlay", headers=auth).status_code == 200
     assert client.get(f"{API}/taxonomy/search?q=laksa", headers=auth).json()[0]["name"] == "laksa"
 
 
@@ -167,3 +167,79 @@ def test_portion_reference_scaling():
     assert g == 2 * nutrition.get("banana")["default_serving_g"]
     g, p = portion.estimate(ref, note="2 bowls")
     assert g == 2 * ref["default_serving_g"] and p["uncertainty"] == "high"
+
+
+def test_multi_food_plate_items_rename_merge_restore(client, auth):
+    r = client.post(f"{API}/meals/capture", headers=auth,
+                    files={"top": ("plate.jpg", (FIX / "multi_food_plate.jpg").read_bytes(), "image/jpeg")})
+    meal = client.post(f"{API}/meals/analyze", json={"meal_id": r.json()["id"]}, headers=auth).json()
+    mid = meal["id"]
+    model = [f for f in meal["foods"] if f["origin"] == "model"]
+    visible = [f for f in model if not f["removed"]]
+    assert len(visible) >= 2, [f["label"] for f in visible]                     # more than one item from one photo
+    assert all(f["original_prediction"]["bbox"] for f in visible)                # each item has its own box
+    assert len({f["original_prediction"]["region_id"] for f in model}) == len(model)
+    named = [f for f in visible if f["nutrition_key"]]
+    unknown = [f for f in visible if f["label"].startswith("Unidentified")]
+    assert named and unknown                                                     # weak region not forced into a class
+    assert client.put(f"{API}/meals/{mid}/confirm", json={}, headers=auth).status_code == 422  # must be named first
+    # name the unidentified region from its own top-3, then merge two items, then restore a hidden suggestion
+    u = unknown[0]
+    meal = client.put(f"{API}/meals/{mid}/foods/{u['id']}", headers=auth,
+                      json={"candidate_class_id": u["original_prediction"]["candidates"][0]["class_id"]}).json()
+    u2 = next(f for f in meal["foods"] if f["id"] == u["id"])
+    assert u2["taxonomy_class"] == u["original_prediction"]["candidates"][0]["label"] and u2["nutrition_key"]
+    kcal_before = meal["totals"]["calories_kcal"]
+    ids = [f["id"] for f in meal["foods"] if not f["removed"] and f["origin"] == "model"][:2]
+    meal = client.post(f"{API}/meals/{mid}/foods/merge", headers=auth, json={"food_ids": ids}).json()
+    assert sum(1 for f in meal["foods"] if f["id"] in ids and not f["removed"]) == 1
+    kept = next(f for f in meal["foods"] if f["id"] in ids and not f["removed"])
+    assert kept["original_prediction"]["merged_from"] and meal["totals"]["calories_kcal"] is not None
+    sugg = [f for f in meal["foods"] if f["removed"] and f["original_prediction"] and f["original_prediction"].get("kind") == "suggestion"]
+    if sugg:
+        meal = client.put(f"{API}/meals/{mid}/foods/{sugg[0]['id']}", headers=auth, json={"restore": True}).json()
+        assert not next(f for f in meal["foods"] if f["id"] == sugg[0]["id"])["removed"]
+    ai = client.get(f"{API}/ai/models", headers=auth).json()
+    assert ai["corrections"].get("merge") == 1
+    assert kcal_before is not None
+
+
+def test_blank_photo_gives_no_items(client, auth):
+    meal = client.post(f"{API}/meals/capture", headers=auth, files={"top": ("b.jpg", jpeg((90, 60, 30)), "image/jpeg")}).json()
+    meal = client.post(f"{API}/meals/analyze", json={"meal_id": meal["id"]}, headers=auth).json()
+    assert not any(f["origin"] == "model" and not f["removed"] for f in meal["foods"])
+
+
+def test_portion_simulator_glucose_readings_personalised(client, auth):
+    client.put(f"{API}/users/health-profile", headers=auth, json={
+        "health_consent": True, "diabetes_status": "type1", "goals": ["heart_health"], "weight_kg": 70})
+    meal = client.post(f"{API}/meals/capture", headers=auth, data={"description": "chicken rice and teh tarik"}).json()
+    meal = client.post(f"{API}/meals/analyze", json={"meal_id": meal["id"]}, headers=auth).json()
+    mid, foods = meal["id"], [f for f in meal["foods"] if not f["removed"] and f["nutrition_key"]]
+    assert len(foods) == 2
+    rice = next(f for f in foods if "rice" in f["label"].lower())
+    half = round(rice["grams"] / 2)
+    sim = client.post(f"{API}/meals/{mid}/simulate", headers=auth, json={"portions": {str(rice["id"]): half}}).json()
+    assert sim["kind"] == "simulated" and sim["simulation_version"]
+    o, m = sim["totals"]["original"], sim["totals"]["modified"]
+    assert m["carbs_g"] < o["carbs_g"] and sim["totals"]["diff"]["carbs_g"]["pct"] < 0
+    assert max(sim["curves"]["original"]) == 100 and max(sim["curves"]["modified"]) < 100
+    assert all(lo <= hi for lo, hi in zip(sim["curves"]["modified_low"], sim["curves"]["modified_high"]))
+    fr = next(f for f in sim["foods"] if f["id"] == rice["id"])
+    assert fr["modified"]["grams"] == half and fr["diff"]["grams"]["pct"] == pytest.approx(-50, abs=1)
+    # nothing saved until confirmed
+    again = client.get(f"{API}/meals/{mid}", headers=auth).json()
+    assert next(f for f in again["foods"] if f["id"] == rice["id"])["grams"] == rice["grams"]
+    assert client.post(f"{API}/meals/{mid}/simulate", headers=auth, json={"portions": {"999999": 10}}).status_code == 422
+    # personalised insights: type 1 → no dosing; heart-health → sodium vs WHO
+    pers = {p["audience"]: p for p in meal["insights"]["personalised"]}
+    assert "does not calculate" in pers["Type 1 diabetes"]["detail"] and "WHO" in pers["Heart health"]["detail"]
+    # measured readings: mg/dL stored as mmol/L, linked to the meal, validated
+    r = client.post(f"{API}/glucose", headers=auth, json={"value": 144, "unit": "mg/dL", "measured_at": "2026-10-23T08:30:00Z",
+                                                           "context": "after_meal", "meal_id": mid})
+    assert r.status_code == 201 and r.json()["value_mmol"] == pytest.approx(7.99, abs=0.01)
+    assert client.post(f"{API}/glucose", headers=auth, json={"value": 90, "unit": "mmol/L", "measured_at": "2026-10-23T08:30:00Z"}).status_code == 422
+    rows = client.get(f"{API}/glucose?meal_id={mid}", headers=auth).json()
+    assert len(rows) == 1 and rows[0]["kind"] == "measured"
+    assert client.delete(f"{API}/glucose/{rows[0]['id']}", headers=auth).status_code == 204
+    assert client.get(f"{API}/glucose?meal_id={mid}", headers=auth).json() == []

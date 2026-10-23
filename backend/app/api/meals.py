@@ -13,7 +13,7 @@ from app.core.config import settings
 from app.core.db import get_db
 from app.core.security import current_user
 from app.models import Correction, Meal, MealFood, User
-from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut
+from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut, MergeIn, SimulateIn
 from app.services import analysis, forecast, imaging, nutrition, portion, vision
 
 router = APIRouter(prefix="/meals", tags=["meals"])
@@ -131,6 +131,21 @@ def meal_forecast(body: ForecastIn, meal: Meal = Depends(owned_meal), user: User
                              [s.model_dump() for s in body.scenarios], body.horizon_min)
 
 
+@router.post("/{meal_id}/simulate", summary="Portion what-if: original vs modified portions (nothing is saved)")
+def simulate(body: SimulateIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user)):
+    foods = [f for f in meal.foods if not f.removed and f.nutrition_key]
+    if not foods:
+        raise HTTPException(422, "Add at least one food with a nutrition match first")
+    ids = {f.id for f in foods}
+    if bad := [i for i in body.portions if i not in ids]:
+        raise HTTPException(422, f"Unknown or unmapped food id(s): {bad}")
+    if any(not 0 <= g <= 3000 for g in body.portions.values()):
+        raise HTTPException(422, "Portions must be between 0 and 3000 g")
+    items = [{"id": f.id, "label": f.label, "nutrition_key": f.nutrition_key, "grams": f.grams,
+              "new_grams": body.portions.get(f.id, f.grams), "range_g": (f.portion or {}).get("range_g")} for f in foods]
+    return forecast.portion_whatif(items, user.profile, body.horizon_min)
+
+
 @router.put("/{meal_id}/confirm", response_model=MealOut)
 def confirm(body: ConfirmIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user),
             db: Session = Depends(get_db)):
@@ -160,11 +175,14 @@ def confirm(body: ConfirmIn, meal: Meal = Depends(owned_meal), user: User = Depe
 @router.put("/{meal_id}/foods/{food_id}", response_model=MealOut, summary="Edit food label and/or portion")
 def update_food(food_id: int, body: FoodUpdateIn, meal: Meal = Depends(owned_meal),
                 user: User = Depends(current_user), db: Session = Depends(get_db)):
-    f = next((x for x in meal.foods if x.id == food_id and not x.removed), None)
+    f = next((x for x in meal.foods if x.id == food_id and (not x.removed or body.restore)), None)
     if not f:
         raise HTTPException(404, "Food not found")
     before = _snapshot(f)
     kinds = []
+    if body.restore and f.removed:
+        f.removed = False
+        kinds.append("add")
     if body.candidate_class_id is not None:
         cls = vision.taxonomy_class(body.candidate_class_id)
         if not cls:
@@ -204,6 +222,39 @@ def update_food(food_id: int, body: FoodUpdateIn, meal: Meal = Depends(owned_mea
         for k in kinds:
             db.add(Correction(user_id=user.id, meal_id=meal.id, food_id=f.id, kind=k, before=before,
                               after=_snapshot(f), model_name=_model_name(f)))
+    analysis.recompute(meal, user.profile)
+    db.commit()
+    db.refresh(meal)
+    return meal
+
+
+@router.post("/{meal_id}/foods/merge", response_model=MealOut, summary="Merge several detections into one food")
+def merge_foods(body: MergeIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user),
+                db: Session = Depends(get_db)):
+    foods = [next((f for f in meal.foods if f.id == i and not f.removed), None) for i in body.food_ids]
+    if any(f is None for f in foods):
+        raise HTTPException(404, "Food not found")
+    keep = next((f for f in foods if f.nutrition_key), foods[0])
+    before = [_snapshot(f) for f in foods]
+    grams = sum(f.grams for f in foods if f.nutrition_key == keep.nutrition_key or not f.nutrition_key) or keep.grams
+    pred = dict(keep.original_prediction or {})
+    boxes = [b for b in ((f.original_prediction or {}).get("bbox") for f in foods) if b]
+    if boxes:
+        x1, y1 = min(b["x"] for b in boxes), min(b["y"] for b in boxes)
+        pred["bbox"] = {"x": x1, "y": y1, "w": max(b["x"] + b["w"] for b in boxes) - x1,
+                        "h": max(b["y"] + b["h"] for b in boxes) - y1}
+    pred["merged_from"] = [f.id for f in foods if f is not keep]
+    keep.original_prediction = pred
+    if keep.nutrition_key and grams != keep.grams:
+        keep.grams, keep.portion = grams, {**keep.portion, "notes": (keep.portion.get("notes") or [])
+                                           + [f"Merged {len(foods)} detections; portions added."]}
+        analysis.apply_mapping(keep, keep.nutrition_key, keep.mapping_quality)
+    keep.user_corrected = True
+    for f in foods:
+        if f is not keep:
+            f.removed = True
+    db.add(Correction(user_id=user.id, meal_id=meal.id, food_id=keep.id, kind="merge",
+                      before={"foods": before}, after=_snapshot(keep), model_name=_model_name(keep)))
     analysis.recompute(meal, user.profile)
     db.commit()
     db.refresh(meal)

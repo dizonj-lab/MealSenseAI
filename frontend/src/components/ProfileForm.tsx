@@ -13,7 +13,7 @@ export const STEPS = ['Personal', 'Health', 'Diabetes context', 'Goals'] as cons
 const DIET: [string, string][] = [['vegetarian', 'Vegetarian'], ['vegan', 'Vegan'], ['halal', 'Halal'], ['pescatarian', 'Pescatarian'], ['low_carb', 'Lower carb'], ['no_beef', 'No beef'], ['no_pork', 'No pork']]
 const ALLERGY: [string, string][] = [['peanut', 'Peanut'], ['shellfish', 'Shellfish'], ['fish', 'Fish'], ['egg', 'Egg'], ['dairy', 'Dairy'], ['gluten', 'Gluten'], ['soy', 'Soy']]
 const DIABETES: [string, string][] = [['none', 'None'], ['prediabetes', 'Prediabetes'], ['type1', 'Type 1'], ['type2', 'Type 2'], ['gestational', 'Gestational'], ['prefer_not_to_disclose', 'Prefer not to say']]
-const GOALS: [string, string][] = [['carb_awareness', 'Carbohydrate awareness'], ['calorie_awareness', 'Calorie awareness'], ['weight_management', 'Weight management'], ['balanced_nutrition', 'Balanced nutrition'], ['diabetes_friendly', 'Diabetes-friendly choices']]
+const GOALS: [string, string][] = [['carb_awareness', 'Carbohydrate awareness'], ['calorie_awareness', 'Calorie awareness'], ['weight_management', 'Weight management'], ['balanced_nutrition', 'Balanced nutrition'], ['diabetes_friendly', 'Diabetes-friendly choices'], ['heart_health', 'Heart health (salt & saturated fat)']]
 
 const num = (v: string) => (v === '' ? null : Number(v))
 function Num({ label, value, onChange, unit, step = 1 }: { label: string; value: number | null; onChange: (v: number | null) => void; unit?: string; step?: number }) {

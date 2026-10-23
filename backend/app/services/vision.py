@@ -29,7 +29,11 @@ COCO_FOOD = {"banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot
 COCO_DISH_CONTAINERS = {"bowl", "cup", "wine glass"}
 COCO_REFERENCE = {"dining table", "bowl", "fork", "knife", "spoon"}
 DET_MIN = 0.30
+UNKNOWN_MIN = 0.45       # a region whose top-1 is below this is shown as "unidentified" instead of forcing a class
+MIN_ITEM_AREA = 0.03     # smaller segmentation regions are only offered as possible items (noise / garnish)
 PROPOSE_MIN = 0.20       # below this the photo's top-1 is not added automatically; the user picks from the top-3
+MAX_UNKNOWN = 3          # unidentified regions listed for naming; further weak regions become suggestions
+WHOLE_DISH = 0.70        # whole-photo top-1 at/above this = single-dish photo (47% of single dishes, 2.5% of mixed plates)
 CROP_MIN = 0.60          # a crop proposes an extra item only when confident and different from the photo's top-3
 PALETTE = [(20, 184, 166), (14, 165, 233), (245, 158, 11), (16, 185, 129), (139, 92, 246), (244, 63, 94)]
 
@@ -253,74 +257,163 @@ def _overlay(img: Image.Image, instances: list[dict], path: Path) -> None:
 
 
 # ---------------------------------------------------------------- pipeline entry
+def _crop_full(full: Image.Image, box: dict, pad: float = 0.12) -> Image.Image:
+    return _crop(full, box, pad)
+
+
+def _iou(a: dict, b: dict) -> tuple[float, float]:
+    ax2, ay2, bx2, by2 = a["x"] + a["w"], a["y"] + a["h"], b["x"] + b["w"], b["y"] + b["h"]
+    iw, ih = max(0, min(ax2, bx2) - max(a["x"], b["x"])), max(0, min(ay2, by2) - max(a["y"], b["y"]))
+    inter = iw * ih
+    return inter / (a["w"] * a["h"] + b["w"] * b["h"] - inter + 1e-9), inter / (min(a["w"] * a["h"], b["w"] * b["h"]) + 1e-9)
+
+
+def _union(a: dict, b: dict) -> dict:
+    x1, y1 = min(a["x"], b["x"]), min(a["y"], b["y"])
+    return {"x": x1, "y": y1, "w": max(a["x"] + a["w"], b["x"] + b["w"]) - x1, "h": max(a["y"] + a["h"], b["y"] + b["h"]) - y1}
+
+
 def analyze(path: str, view: str, original_path: str | None = None) -> dict:
-    """Classify the photo (evaluation preprocessing on the original upload) and propose extra items from crops."""
+    """Multi-food analysis: region proposals (colour segmentation + YOLO-seg) -> EXP-002 per crop -> items.
+
+    Item kinds: "food" (top-1 >= UNKNOWN_MIN), "unknown" (weak region, user names it), "suggestion" (weak region
+    inside a named food, offered but not counted), or a single "whole photo" item when no regions are found.
+    """
+    from app.services.proposals import propose
     with _lock:
         _load()
         if not _state["cls"]:
             return {"view": view, "ok": False, "error": status()["error"], "items": [], "instances": [], "top_labels": []}
-        # display copy (orientation-corrected, <=1024 px) for detection, crops and overlay: fast on any photo size
-        img = Image.open(path).convert("RGB")
-        # whole-photo classification on the original upload, exactly as in EXP-002 evaluation
+        img = Image.open(path).convert("RGB")                     # display copy for segmentation
         full = (ImageOps.exif_transpose(Image.open(original_path)).convert("RGB")
-                if original_path and Path(original_path).exists() else img)
+                if original_path and Path(original_path).exists() else img)   # original for classification crops
         t0 = time.perf_counter()
         dets = [d for d in (_segment(img) if _state["seg"] else []) if d["score"] >= DET_MIN]
+        prop = propose(img)
         t1 = time.perf_counter()
-        top3 = classify(full)
-        items = [{"model_label": top3[0]["label"], "class_id": top3[0]["class_id"], "nutrition_key": top3[0]["nutrition_key"],
-                  "match": top3[0]["match"], "score": top3[0]["score"], "candidates": top3, "bbox": None, "area_frac": 1.0,
-                  "instance": "whole photo", "has_mask": False, "view": view, "model": "classifier"}]
-        seen = {c["class_id"] for c in top3}
-        instances = []
+        whole = classify(full)
+        regions = [{"bbox": r["bbox"], "area_frac": r["area_frac"], "source": "segmentation", "detector_label": None,
+                    "detector_score": None, "has_mask": True} for r in prop["regions"]]
+        inside = lambda r, box: (box["x"] <= r["bbox"]["x"] + r["bbox"]["w"] / 2 <= box["x"] + box["w"]
+                                 and box["y"] <= r["bbox"]["y"] + r["bbox"]["h"] / 2 <= box["y"] + box["h"])
+        for d in dets:   # a cup/bowl/glass is one dish: classify it whole and drop the fragments inside it
+            if d["label"] in COCO_DISH_CONTAINERS and d["score"] >= 0.40:
+                regions = [r for r in regions if not inside(r, d["bbox"])]
+                regions.append({"bbox": d["bbox"], "area_frac": d["area_frac"], "source": f"yolo11n-seg {d['label']}",
+                                "detector_label": d["label"], "detector_score": round(d["score"], 3), "has_mask": True})
+            elif d["label"] in {"fork", "knife", "spoon"}:   # cutlery is not food
+                regions = [r for r in regions if _iou(r["bbox"], d["bbox"])[1] < 0.5]
+        containers = []
         for d in dets:
-            kind = "food" if d["label"] in COCO_FOOD else "container" if d["label"] in COCO_DISH_CONTAINERS else \
-                "reference" if d["label"] in COCO_REFERENCE else None
-            if not kind:
-                continue
-            inst = {**d, "kind": kind}
-            instances.append(inst)
-            if kind == "reference":
-                continue
-            c3 = classify(_crop(img, d["bbox"]))
-            inst["top"] = c3
-            if c3[0]["score"] >= CROP_MIN and c3[0]["class_id"] not in seen:
-                seen.add(c3[0]["class_id"])
-                inst["label_shown"] = c3[0]["label"]
-                items.append({"model_label": c3[0]["label"], "class_id": c3[0]["class_id"], "nutrition_key": c3[0]["nutrition_key"],
-                              "match": c3[0]["match"], "score": c3[0]["score"], "candidates": c3, "bbox": d["bbox"],
-                              "area_frac": d["area_frac"], "instance": d["label"], "has_mask": True, "view": view,
-                              "model": "classifier"})
-            elif c3[0]["class_id"] in {c["class_id"] for c in top3}:
-                inst["label_shown"] = c3[0]["label"]
+            if d["label"] in COCO_FOOD:
+                match = next((r for r in regions if _iou(r["bbox"], d["bbox"])[0] > 0.5), None)
+                if match:
+                    match.update(detector_label=d["label"], detector_score=round(d["score"], 3))
+                else:
+                    regions.append({"bbox": d["bbox"], "area_frac": d["area_frac"], "source": "yolo11n-seg",
+                                    "detector_label": d["label"], "detector_score": round(d["score"], 3), "has_mask": True})
+            if d["label"] in COCO_DISH_CONTAINERS | COCO_REFERENCE:
+                containers.append({"label": d["label"], "score": round(d["score"], 3), "bbox": d["bbox"],
+                                   "area_frac": round(d["area_frac"], 4)})
+        if prop["plate_area_frac"]:
+            containers.append({"label": "dining table", "score": None, "source": "segmentation (white plate)",
+                               "bbox": {"x": 0, "y": 0, "w": 1, "h": 1}, "area_frac": prop["plate_area_frac"]})
+        for r in regions:
+            r["top"] = classify(_crop_full(full, r["bbox"]))
+        # merge touching fragments that the classifier agrees on (one food split into colours)
+        changed = True
+        while changed:
+            changed = False
+            for i, a in enumerate(regions):
+                for b in regions[i + 1:]:
+                    if a["top"][0]["class_id"] == b["top"][0]["class_id"] and a["top"][0]["score"] >= UNKNOWN_MIN \
+                            and b["top"][0]["score"] >= UNKNOWN_MIN and _iou(a["bbox"], b["bbox"])[1] > 0.05:
+                        a["bbox"], a["area_frac"] = _union(a["bbox"], b["bbox"]), a["area_frac"] + b["area_frac"]
+                        a["top"] = max(a["top"], b["top"], key=lambda t: t[0]["score"])
+                        regions.remove(b)
+                        changed = True
+                        break
+                if changed:
+                    break
         t2 = time.perf_counter()
-        overlay = str(Path(path).with_name(f"{view}_overlay.jpg"))
-        _overlay(img, instances, Path(overlay))
-    refs = [{"label": i["label"], "score": round(i["score"], 3), "bbox": i["bbox"], "area_frac": round(i["area_frac"], 4)}
-            for i in instances if i["kind"] in ("reference", "container")]
+
+    items = []
+    # small = tiny box, or a tiny mask (masks undercount foods with white/dark parts removed as plate/shadow)
+    small = lambda r: r["source"] == "segmentation" and (r["bbox"]["w"] * r["bbox"]["h"] < MIN_ITEM_AREA
+                                                         or r["area_frac"] < MIN_ITEM_AREA / 2)
+    named = [r for r in regions if r["top"][0]["score"] >= UNKNOWN_MIN and not small(r)]
+    # unidentified fragments that touch a named food listed in their top-3 are part of that food
+    for r in [r for r in regions if r not in named and not small(r)]:
+        host = next((o for o in named if o["top"][0]["class_id"] in {c["class_id"] for c in r["top"]}
+                     and _iou(o["bbox"], r["bbox"])[1] > 0.0), None)
+        if host:
+            host["bbox"], host["area_frac"] = _union(host["bbox"], r["bbox"]), host["area_frac"] + r["area_frac"]
+            regions.remove(r)
+    dominant = next((r for r in named if r["area_frac"] >= 0.80), None)   # one dish fills the photo
+    for n, r in enumerate(sorted(regions, key=lambda r: (r["bbox"]["y"], r["bbox"]["x"])), 1):
+        top = r["top"][0]
+        if r in named and (dominant is None or r is dominant):
+            kind = "food"
+        else:
+            inside = any(o is not r and _iou(r["bbox"], o["bbox"])[1] > 0.6 and o["area_frac"] > r["area_frac"] for o in named)
+            kind = "suggestion" if (inside or small(r) or dominant is not None) else "unknown"
+        items.append({"region_id": f"{view}-{n}", "kind": kind, "model_label": top["label"] if kind == "food" else None,
+                      "class_id": top["class_id"] if kind == "food" else None,
+                      "nutrition_key": top["nutrition_key"] if kind == "food" else None,
+                      "match": top["match"] if kind == "food" else "none", "score": top["score"], "candidates": r["top"],
+                      "bbox": r["bbox"], "area_frac": r["area_frac"], "instance": r["source"],
+                      "detector_label": r["detector_label"], "detector_score": r["detector_score"],
+                      "has_mask": r["has_mask"], "view": view, "model": "classifier"})
+    wc = whole[0]
+    if wc["score"] >= 0.60 and not any(i["kind"] == "food" and i["class_id"] == wc["class_id"] for i in items):
+        # the photo as a whole is confidently one class that no single region captured: give it to the largest
+        # region that lists it among its top-3, or add it as a whole-photo item
+        hosts = [i for i in items if i["kind"] != "food" and any(c["class_id"] == wc["class_id"] for c in i["candidates"])]
+        host = max(hosts, key=lambda i: i["area_frac"]) if hosts else None
+        if host:
+            host.update(kind="food", model_label=wc["label"], class_id=wc["class_id"], nutrition_key=wc["nutrition_key"],
+                        match=wc["match"], score=wc["score"], candidates=whole, instance=host["instance"] + " + whole-photo agreement")
+        elif wc["score"] >= 0.60 and len([i for i in items if i["kind"] == "food"]) <= 1:
+            items.insert(0, {"region_id": f"{view}-0", "kind": "food", "model_label": wc["label"], "class_id": wc["class_id"],
+                             "nutrition_key": wc["nutrition_key"], "match": wc["match"], "score": wc["score"],
+                             "candidates": whole, "bbox": None, "area_frac": 1.0, "instance": "whole photo",
+                             "detector_label": None, "detector_score": None, "has_mask": False, "view": view, "model": "classifier"})
+    if whole[0]["score"] >= WHOLE_DISH and any(i["kind"] == "food" and i["class_id"] == whole[0]["class_id"] for i in items):
+        for i in items:   # single-dish photo: other regions are offered as possible extra items (one tap to add)
+            if i["kind"] == "unknown" or (i["kind"] == "food" and i["class_id"] != whole[0]["class_id"]):
+                i.update(kind="suggestion", model_label=None, class_id=None, nutrition_key=None, match="none")
+    unknown = sorted((i for i in items if i["kind"] == "unknown"), key=lambda i: -i["area_frac"])
+    for i in unknown[MAX_UNKNOWN:]:   # keep the review short: the largest unidentified regions are listed, the rest offered
+        i["kind"] = "suggestion"
+    if not any(i["kind"] == "food" for i in items):
+        # no region was identifiable: a confident whole-photo class becomes the item (single-dish photo) and the
+        # weak regions are offered as possible extra items; otherwise the weak regions stay "unidentified"
+        if whole[0]["score"] >= PROPOSE_MIN:
+            for i in items:
+                i["kind"] = "suggestion"
+            items.insert(0, {"region_id": f"{view}-0", "kind": "food", "model_label": whole[0]["label"],
+                             "class_id": whole[0]["class_id"], "nutrition_key": whole[0]["nutrition_key"],
+                             "match": whole[0]["match"], "score": whole[0]["score"], "candidates": whole, "bbox": None,
+                             "area_frac": 1.0, "instance": "whole photo", "detector_label": None, "detector_score": None,
+                             "has_mask": False, "view": view, "model": "classifier"})
     return {
-        "view": view, "ok": True, "items": items, "containers": refs, "overlay_path": overlay,
-        "instances": [{"label": i["label"], "kind": i["kind"], "score": round(i["score"], 3), "area_frac": round(i["area_frac"], 4),
-                       "top": (i.get("top") or [None])[0]} for i in instances],
-        "top_labels": [{"label": c["label"], "score": c["score"], "class_id": c["class_id"]} for c in top3],
+        "view": view, "ok": True, "items": items, "containers": containers, "overlay_path": None,
+        "instances": [{"label": i["model_label"] or "unidentified", "kind": i["kind"], "score": i["score"],
+                       "area_frac": i["area_frac"], "source": i["instance"]} for i in items],
+        "top_labels": [{"label": c["label"], "score": c["score"], "class_id": c["class_id"]} for c in whole],
         "latency_ms": {"detector": round((t1 - t0) * 1000, 1), "classifier": round((t2 - t1) * 1000, 1)},
-        "device": _state["device"],
+        "device": _state["device"], "regions": len(regions),
     }
 
 
 def merge(results: list[dict]) -> list[dict]:
-    """Merge the same class across views (top & side photo); keep the strongest evidence and its candidates."""
-    merged: dict[int, dict] = {}
+    """Items are itemised from the first photo that yields food; other views only add foods not already present."""
+    out, seen = [], set()
     for r in results:
         for it in r["items"]:
-            cur = merged.get(it["class_id"])
-            if cur is None:
-                merged[it["class_id"]] = {**it, "views": [it["view"]], "instances": 1}
+            if out and it["kind"] == "food" and it["class_id"] in seen and it["view"] != out[0]["view"]:
                 continue
-            if it["view"] not in cur["views"]:
-                cur["views"].append(it["view"])
-            if it["score"] > cur["score"]:
-                cur.update({k: it[k] for k in ("score", "candidates", "view")})
-            if it["bbox"] and not cur["bbox"]:
-                cur.update(bbox=it["bbox"], area_frac=it["area_frac"], has_mask=it["has_mask"], instance=it["instance"])
-    return sorted(merged.values(), key=lambda x: -x["score"])
+            out.append({**it, "views": [it["view"]], "instances": 1})
+            if it["kind"] == "food":
+                seen.add(it["class_id"])
+    return out
