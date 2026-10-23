@@ -259,12 +259,15 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
         _load()
         if not _state["cls"]:
             return {"view": view, "ok": False, "error": status()["error"], "items": [], "instances": [], "top_labels": []}
-        src = original_path if original_path and Path(original_path).exists() else path
-        img = ImageOps.exif_transpose(Image.open(src)).convert("RGB")
+        # display copy (orientation-corrected, <=1024 px) for detection, crops and overlay: fast on any photo size
+        img = Image.open(path).convert("RGB")
+        # whole-photo classification on the original upload, exactly as in EXP-002 evaluation
+        full = (ImageOps.exif_transpose(Image.open(original_path)).convert("RGB")
+                if original_path and Path(original_path).exists() else img)
         t0 = time.perf_counter()
         dets = [d for d in (_segment(img) if _state["seg"] else []) if d["score"] >= DET_MIN]
         t1 = time.perf_counter()
-        top3 = classify(img)
+        top3 = classify(full)
         items = [{"model_label": top3[0]["label"], "class_id": top3[0]["class_id"], "nutrition_key": top3[0]["nutrition_key"],
                   "match": top3[0]["match"], "score": top3[0]["score"], "candidates": top3, "bbox": None, "area_frac": 1.0,
                   "instance": "whole photo", "has_mask": False, "view": view, "model": "classifier"}]

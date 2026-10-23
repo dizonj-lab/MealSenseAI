@@ -16,7 +16,13 @@ PREFERRED = ["qwen2.5", "qwen3", "llama3.2", "llama3.1", "phi3", "phi4", "gemma2
 _status = {"checked": 0.0, "data": None}
 
 
+BACKOFF_S = 300  # after a timeout or error, skip the SLM for 5 minutes (rule-based fallback is used)
+
+
 def status(force: bool = False) -> dict:
+    if time.time() < _status.get("down_until", 0) and not force:
+        return {"available": False, "url": settings.ollama_url, "models": [], "selected": None,
+                "error": "SLM paused after a timeout/error; using rule-based fallback"}
     if not force and _status["data"] and time.time() - _status["checked"] < 30:
         return _status["data"]
     data = {"available": False, "url": settings.ollama_url, "models": [], "selected": None, "error": None}
@@ -65,7 +71,9 @@ def chat_json(task: str, system: str, prompt: str, schema: type[BaseModel]):
         return out
     except (httpx.HTTPError, ValidationError, json.JSONDecodeError, KeyError) as e:
         _log(task, st["selected"], False, (time.perf_counter() - t0) * 1000, extra={"error": str(e)[:300]})
-        log.warning("SLM %s failed: %s", task, e)
+        if isinstance(e, httpx.HTTPError):
+            _status["down_until"] = time.time() + BACKOFF_S
+        log.warning("SLM %s failed (%s); pausing SLM for %ss", task, type(e).__name__, BACKOFF_S)
         return None
 
 

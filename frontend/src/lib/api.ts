@@ -15,6 +15,7 @@ export async function api<T = any>(path: string, opts: RequestInit & { json?: un
   const r = await fetch(`/api/v1${path}`, { ...opts, headers, body })
   if (r.status === 401 && t) { tokenStore.set(null); window.location.assign('/login') }
   if (!r.ok) {
+    if (r.status === 504 || r.status === 502) throw new ApiError(r.status, 'The server took too long or is restarting. Please try again in a moment; if it keeps happening, check `docker compose logs backend`.')
     let msg = r.statusText
     try {
       const j = await r.json()
