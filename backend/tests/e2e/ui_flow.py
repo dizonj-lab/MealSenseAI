@@ -8,7 +8,7 @@ from playwright.sync_api import expect, sync_playwright
 
 BASE, OUT = sys.argv[1], Path(sys.argv[2])
 OUT.mkdir(parents=True, exist_ok=True)
-FIX = Path(__file__).parents[1] / "fixtures" / "coffee.png"
+FIX = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(__file__).parents[1] / "fixtures" / "coffee.png"
 EMAIL = f"demo{int(time.time())}@mealsense.ai"
 
 
@@ -83,7 +83,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(600)
     shot(page, "10_dashboard")
     page.goto(f"{BASE}/ai")
-    expect(page.get_by_text("EfficientNet-Lite0")).to_be_visible()
+    expect(page.get_by_text("YOLO11n-seg").first).to_be_visible()
     shot(page, "11_ai_insights")
     page.goto(f"{BASE}/insights")
     page.wait_for_timeout(600)

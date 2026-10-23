@@ -17,3 +17,4 @@ datasets/processed/
 ml/models/*.pt
 ml/models/*.onnx
 ml/runs/
+ml/models/backbones/

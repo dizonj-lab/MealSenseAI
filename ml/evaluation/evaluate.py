@@ -1,9 +1,11 @@
-"""Evaluate the vision pipeline on a labeled image folder and persist an Experiment row.
+"""End-to-end evaluation of the app's inference pipeline (detection + classification + fallbacks) on labeled
+images, persisted as an Experiment.
 
-Layout: <root>/<class_name>/*.jpg  (e.g. Food-101: food-101/images). Only classes listed in
-CLASS_MAP (overlap with the models' vocabulary) are scored; others are skipped and reported.
-Usage: python ml/evaluation/evaluate.py <root> [--per-class 50] [--name food101-overlap]
+Inputs: a folder per class (<root>/<class_name>/*.jpg, e.g. food-101/images) or a held-out manifest from
+ml/training (--manifest datasets/processed/<ds>/test.csv). Only classes in CLASS_MAP are scored.
+Usage: python ml/evaluation/evaluate.py <root> [--manifest test.csv] [--per-class 50] [--name food101-overlap]
 """
+import csv
 import argparse
 import sys
 import time
@@ -20,22 +22,38 @@ CLASS_MAP = {
     "pizza": "pizza", "hot_dog": "hot_dog", "hamburger": "cheeseburger", "ice_cream": "ice_cream",
     "guacamole": "guacamole", "spaghetti_carbonara": "carbonara", "donuts": "donut",
     "chocolate_cake": "chocolate_cake", "breakfast_burrito": "burrito", "club_sandwich": "sandwich",
+    "steak": "beef_steak", "sushi": "sushi", "french_fries": "french_fries", "fried_rice": "nasi_goreng",
 }
+
+
+def _tmp_copy(img: Path) -> str:
+    """analyze() writes an overlay next to the image; keep dataset folders untouched."""
+    import shutil
+    import tempfile
+    d = Path(tempfile.mkdtemp())
+    return str(shutil.copy(img, d / img.name))
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("root", type=Path)
     ap.add_argument("--per-class", type=int, default=50)
+    ap.add_argument("--manifest", default=None, help="CSV with path,label columns relative to root")
     ap.add_argument("--name", default="food101-overlap")
     a = ap.parse_args()
-    classes = sorted(d.name for d in a.root.iterdir() if d.is_dir())
+    if a.manifest:
+        with open(a.root / a.manifest) as f:
+            rows = [(r["label"], a.root / r["path"]) for r in csv.DictReader(f)]
+    else:
+        rows = [(d.name, p) for d in sorted(a.root.iterdir()) if d.is_dir()
+                for p in sorted(d.glob("*.jp*g"))[: a.per_class]]
+    classes = sorted({c for c, _ in rows})
     used = [c for c in classes if c in CLASS_MAP]
     y_true, y_pred, lat = [], [], []
-    for c in used:
-        for img in sorted((a.root / c).glob("*.jp*g"))[: a.per_class]:
+    for c, img in rows:
+        if c in CLASS_MAP:
             t = time.perf_counter()
-            preds = vision.merge([vision.analyze(str(img), "top")])
+            preds = vision.merge([vision.analyze(_tmp_copy(img), "top")])
             lat.append((time.perf_counter() - t) * 1000)
             y_true.append(CLASS_MAP[c])
             y_pred.append(preds[0]["nutrition_key"] if preds else "none")
@@ -61,7 +79,8 @@ def main():
     }
     Base.metadata.create_all(engine)
     with SessionLocal() as db:
-        db.add(Experiment(name=a.name, model_name="EfficientNet-Lite0 + EfficientDet-Lite0", dataset=str(a.root),
+        names = " + ".join(m["name"] for m in vision.models().values())
+        db.add(Experiment(name=a.name, model_name=names, dataset=f"{a.root}" + (f" [{a.manifest}]" if a.manifest else ""),
                           n_samples=len(y_true), has_ground_truth=True, metrics=metrics,
                           notes=f"Scored classes: {used}. Skipped {len(classes) - len(used)} classes outside model vocabulary."))
         db.commit()

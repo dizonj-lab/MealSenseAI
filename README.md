@@ -34,15 +34,28 @@ python tests/e2e/ui_flow.py http://localhost:8000 /tmp/shots     # mobile UI flo
 python ../ml/evaluation/evaluate.py /path/to/food-101/images     # accuracy/P/R/F1 on labeled data
 ```
 
-## What the AI actually is (honest scope)
-| Component | Implementation | Limits |
+## Inference pipeline (see `02-Solution Architecture/`)
+| # | Stage | Implementation |
 |---|---|---|
-| Recognition | MediaPipe **EfficientNet-Lite0** (ImageNet-1k, ~40 food classes) + **EfficientDet-Lite0** (COCO, 10 food classes, bounding boxes) | General-purpose models; **most Singapore dishes are not recognisable**, so use the description or manual entry. Scores are raw, **not calibrated**; the UI shows strong / moderate / weak. |
-| Portions | Typical-serving priors (±50%), area ratio against a detected plate/bowl when a reference is selected (±35%), grams you enter (±15%) | **No volume or depth measurement** from two photos. |
-| Nutrition | 81-record table (`datasets/nutrition/foods.json`): USDA FDC-style values plus Singapore HPB hawker dishes | Values are **transcribed approximations** (`transcribed_unverified`); replace them with a verified import before relying on them. |
-| Glucose insight | Composition-based: available carbs, sugar, fibre, glycemic load only when published GI covers ≥70% of the carbs, else UNCERTAIN | Does not predict an individual's glucose response. |
-| SLM | Ollama (text only): description parsing, provisional matches labeled *unverified*, grounded explanations | Never used for nutrient numbers or vision. |
-| Evaluation | `ml/evaluation/evaluate.py` stores accuracy, precision, recall, F1, latency and throughput as Experiments | **No accuracy has been measured yet** (Food-101 was not available in the build environment). |
+| 1 | Meal capture | Mobile camera or upload: top view plus optional side view, description, reference object, serving note |
+| 2 | Image pre-processing | Validation, EXIF orientation, RGB, resize to ≤1024 px, originals retained |
+| 3 | Food instance detection | **YOLO11n-seg** (COCO, ONNX) instance masks for 10 COCO food classes plus dish containers (bowl, cup); EfficientDet-Lite0 fallback (boxes only) |
+| 4 | Food classification | Each instance crop (and the whole image) is classified by the **fine-tuned EfficientNet-B0** from `ml/training`, falling back to ImageNet EfficientNet-Lite0 |
+| 5 | Portion estimation | Typical-serving priors (±50%), mask-area ratio against a detected plate or bowl (±35%), instance counts, grams you enter (±15%). **No volume measurement.** |
+| 6 | Nutrition mapping | Deterministic lookup in the sourced composition table (`datasets/nutrition/foods.json`, 82 records) |
+| 7 | Meal aggregation | Item totals; glycemic load only when published GI covers ≥70% of the carbohydrate |
+| 8 | AI contextualisation | Local Ollama SLM explains the computed numbers and your goals; it never produces nutrient values |
+| 9 | Recommendations | Rule-based and goal-aware, educational only |
+| 10 | Application output | Editable review (confirm, edit food, edit portion, remove, add) with original predictions kept for evaluation |
+
+Training pipeline (`ml/training/`, see its README): validation → label harmonisation → pre-processing → augmentation →
+balancing → stratified 70/15/15 split → transfer learning → evaluation (accuracy, P/R/F1, confusion matrix, top-5) → ONNX export.
+
+## Honest scope
+- Scores are raw model outputs, **not calibrated**; the UI labels them strong / moderate / weak.
+- The COCO detector only knows 10 foods. Hawker dishes therefore depend on the fine-tuned classifier and on its training classes.
+- Nutrition values are transcribed approximations (`transcribed_unverified`); replace them with a verified import.
+- No personal glucose prediction, no clinical targets, no medication advice.
 
 User corrections (confirm, edit food, edit portion, add, remove) are saved with the original prediction so they can be used for evaluation later.
 

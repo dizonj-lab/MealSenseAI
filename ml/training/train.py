@@ -67,6 +67,11 @@ def backbone(cfg: dict, n_classes: int) -> nn.Module:
         urllib.request.urlretrieve(t["backbone_weights_url"], cache)
     model = timm.create_model(t["backbone"], pretrained=True, num_classes=n_classes,
                               pretrained_cfg_overlay={"file": str(cache)})
+    # timm's default head init (uniform ±1/sqrt(n_classes)) gives very large initial logits for few classes,
+    # which a short frozen-backbone phase cannot undo; start the new head near zero instead.
+    head = model.get_classifier()
+    nn.init.normal_(head.weight, std=0.01)
+    nn.init.zeros_(head.bias)
     return model
 
 

@@ -141,7 +141,7 @@ def run(db: Session, meal: Meal, profile) -> list[dict]:
             grams, pinfo = 0, dict(UNKNOWN_PORTION)
         pred = {k: p.get(k) for k in ("model_label", "nutrition_key", "score", "bbox", "model", "model_name", "view",
                                        "views", "instance", "detector_label", "detector_score", "classifier_top",
-                                       "area_frac", "has_mask", "instances")}
+                                       "area_frac", "has_mask", "instances", "deferred_from")}
         pred.update(score_band=vision.score_band(p["score"]), score_type="raw model score (uncalibrated)")
         f = MealFood(origin="model", label=label, grams=grams, portion=pinfo, original_prediction=pred)
         apply_mapping(f, key, quality)

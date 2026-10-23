@@ -47,8 +47,8 @@ COCO_DISH_CONTAINERS = {"bowl", "cup", "wine glass"}  # their contents get class
 COCO_REFERENCE = {"dining table", "bowl", "fork", "knife", "spoon"}
 DET_MIN = 0.30
 IMAGENET_MIN = 0.12
-FINETUNED_MIN = 0.50
-SCENE_MIN = {"imagenet": 0.30, "finetuned": 0.60}
+FINETUNED_MIN = 0.70  # closed-set model: below this, defer to the open-vocabulary ImageNet classifier
+SCENE_MIN = {"imagenet": 0.30, "finetuned": 0.75}
 PALETTE = [(20, 184, 166), (14, 165, 233), (245, 158, 11), (16, 185, 129), (139, 92, 246), (244, 63, 94)]
 
 _lock = threading.RLock()
@@ -219,21 +219,34 @@ def _detect_boxes(img: Image.Image) -> list[dict]:
 
 # ---------------------------------------------------------------- stage 4: classification
 def _classify(crop: Image.Image) -> dict:
-    """Top-5 food candidates for one crop from the active classifier."""
+    """Top-5 food candidates for one crop: fine-tuned model first, ImageNet model when it is not confident."""
     if _state["ft"]:
-        ft = _state["ft"]
-        inp = ft["card"]["input"]
-        s = inp["resize"] / min(crop.size)
-        im = crop.resize((max(inp["size"], round(crop.width * s)), max(inp["size"], round(crop.height * s))), Image.BILINEAR)
-        l, t = (im.width - inp["size"]) // 2, (im.height - inp["size"]) // 2
-        arr = np.asarray(im.crop((l, t, l + inp["size"], t + inp["size"])), dtype=np.float32) / 255.0
-        arr = ((arr - inp["mean"]) / inp["std"]).transpose(2, 0, 1)[None].astype(np.float32)
-        logits = ft["session"].run(None, {"input": arr})[0][0]
-        p = np.exp(logits - logits.max()); p /= p.sum()
-        classes = ft["card"]["classes"]
-        top = [{"label": classes[i]["name"], "nutrition_key": classes[i]["nutrition_key"], "score": round(float(p[i]), 3)}
-               for i in p.argsort()[::-1][:5]]
-        return {"model": "finetuned", "model_name": ft["card"]["name"], "top": top, "min_score": FINETUNED_MIN}
+        c = _classify_finetuned(crop)
+        if c["top"][0]["score"] >= FINETUNED_MIN or not _state["cls"]:
+            return c
+        im = _classify_imagenet(crop)
+        im["deferred_from"] = {"model_name": c["model_name"], "top": c["top"][:3]}
+        return im
+    return _classify_imagenet(crop)
+
+
+def _classify_finetuned(crop: Image.Image) -> dict:
+    ft = _state["ft"]
+    inp = ft["card"]["input"]
+    s = inp["resize"] / min(crop.size)
+    im = crop.resize((max(inp["size"], round(crop.width * s)), max(inp["size"], round(crop.height * s))), Image.BILINEAR)
+    l, t = (im.width - inp["size"]) // 2, (im.height - inp["size"]) // 2
+    arr = np.asarray(im.crop((l, t, l + inp["size"], t + inp["size"])), dtype=np.float32) / 255.0
+    arr = ((arr - inp["mean"]) / inp["std"]).transpose(2, 0, 1)[None].astype(np.float32)
+    logits = ft["session"].run(None, {"input": arr})[0][0]
+    p = np.exp(logits - logits.max()); p /= p.sum()
+    classes = ft["card"]["classes"]
+    top = [{"label": classes[i]["name"], "nutrition_key": classes[i]["nutrition_key"], "score": round(float(p[i]), 3)}
+           for i in p.argsort()[::-1][:5]]
+    return {"model": "finetuned", "model_name": ft["card"]["name"], "top": top, "min_score": FINETUNED_MIN}
+
+
+def _classify_imagenet(crop: Image.Image) -> dict:
     import mediapipe as mp
     cats = _state["cls"].classify(mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(crop))).classifications[0].categories
     top = [{"label": c.category_name, "nutrition_key": IMAGENET_FOOD.get(c.category_name),
@@ -302,6 +315,8 @@ def analyze(path: str, view: str) -> dict:
                 continue
             c = _classify(img if inst["kind"] == "scene" else _crop(img, inst["bbox"]))
             inst["classification"] = {k: c[k] for k in ("model", "model_name", "top")}
+            if c.get("deferred_from"):
+                inst["classification"]["deferred_from"] = c["deferred_from"]
             if inst["kind"] == "food":
                 best = _best_food(c)
                 if c["model"] == "finetuned" and best and best["nutrition_key"]:
@@ -322,7 +337,7 @@ def analyze(path: str, view: str) -> dict:
                               "has_mask": inst["mask"] is not None,
                               "model": "detector" if food["source"] == "detector" else "classifier",
                               "model_name": (models()["detector"]["name"] if food["source"] == "detector" else c["model_name"]),
-                              "classifier_top": c["top"][:3], "view": view})
+                              "classifier_top": c["top"][:3], "deferred_from": c.get("deferred_from"), "view": view})
         t2 = time.perf_counter()
         overlay = str(Path(path).with_name(f"{view}_overlay.jpg"))
         _overlay(img, instances, Path(overlay))

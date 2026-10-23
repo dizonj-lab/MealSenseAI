@@ -21,6 +21,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageChops, ImageOps, UnidentifiedImageError
 
 from common import ROOT, dataset_dir, load_config, norm_label, resolve, sha1_file, write_json
@@ -36,7 +37,7 @@ EXTS = {".jpg", ".jpeg", ".png", ".webp", ".heic"}
 
 def dhash(img: Image.Image, size: int = 8) -> int:
     g = img.convert("L").resize((size + 1, size), Image.BILINEAR)
-    px = list(g.getdata())
+    px = np.asarray(g).ravel().tolist()
     bits = 0
     for r in range(size):
         for c in range(size):
