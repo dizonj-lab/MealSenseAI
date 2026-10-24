@@ -49,7 +49,7 @@ def _log(task, model, ok, ms, tokens=None, extra=None):
         db.commit()
 
 
-def chat_json(task: str, system: str, prompt: str, schema: type[BaseModel], timeout: float | None = None):
+def chat_json(task: str, system: str, prompt: str, schema: type[BaseModel], timeout: float | None = None, stats: dict | None = None):
     st = status()
     if not st["available"]:
         return None
@@ -67,6 +67,10 @@ def chat_json(task: str, system: str, prompt: str, schema: type[BaseModel], time
         out = schema.model_validate(json.loads(body["message"]["content"]))
         ms = (time.perf_counter() - t0) * 1000
         _log(task, st["selected"], True, ms, body.get("eval_count", 0) + body.get("prompt_eval_count", 0))
+        if stats is not None:   # Ollama's own counters: input/output tokens and generation time
+            out_tok, gen_ns = body.get("eval_count", 0), body.get("eval_duration", 0)
+            stats.update(prompt_tokens=body.get("prompt_eval_count", 0), output_tokens=out_tok, wall_ms=round(ms),
+                         tokens_per_s=round(out_tok / (gen_ns / 1e9), 1) if gen_ns else None)
         cache.set(ck, out.model_dump(), ttl=86400)
         return out
     except (httpx.HTTPError, ValidationError, json.JSONDecodeError, KeyError) as e:

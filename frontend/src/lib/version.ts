@@ -1,7 +1,15 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.7.0'
+export const APP_VERSION = '0.8.0'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.8.0', title: 'Minimal design, grounded conversations', changes: [
+    'New minimalist landing, sign-in and register pages; Privacy, Terms and Contact pages (drafts)',
+    'Onboarding is now enforced by the server; age range, other goals and a “why we ask” note added',
+    'Meal Advisor rebuilt: every fact is traced to you, the photo model, the food table or approved guidance',
+    'Follow-up questions, “what if I remove the rice?” (never saved), how a food was identified, low-confidence checks',
+    'Replies from the local language model are checked against your data; urgent and medication questions handled safely',
+    'Conversations are kept on the server for 30 days and can be cleared',
+  ] },
   { version: '0.7.0', title: 'Meal Advisor, About page, easier saving', changes: [
     'Meal Advisor chat grounded in your meals, profile and the food table; medication questions declined',
     'Meal type and Save pinned at the top of the meal review',

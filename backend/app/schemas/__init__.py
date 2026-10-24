@@ -4,7 +4,8 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 DiabetesStatus = Literal["none", "prediabetes", "type1", "type2", "gestational", "prefer_not_to_disclose"]
-Goal = Literal["carb_awareness", "calorie_awareness", "weight_management", "balanced_nutrition", "diabetes_friendly", "heart_health"]
+AgeRange = Literal["under_18", "18-29", "30-44", "45-59", "60-74", "75+"]
+Goal = Literal["general_wellness", "carb_awareness", "calorie_awareness", "weight_management", "balanced_nutrition", "diabetes_friendly", "heart_health"]
 
 
 class RegisterIn(BaseModel):
@@ -26,6 +27,7 @@ class TokenOut(BaseModel):
 class ProfileIn(BaseModel):
     health_consent: bool = False
     age: int | None = Field(default=None, ge=1, le=120)
+    age_range: AgeRange | None = None
     sex: Literal["female", "male", "other", "prefer_not_to_say"] | None = None
     height_cm: float | None = Field(default=None, ge=50, le=260)
     weight_kg: float | None = Field(default=None, ge=10, le=400)
@@ -40,6 +42,7 @@ class ProfileIn(BaseModel):
     has_cgm: bool | None = None
     clinician_targets: str | None = Field(default=None, max_length=1000)
     goals: list[Goal] = []
+    other_goal: str | None = Field(default=None, max_length=200)
     calorie_goal: float | None = Field(default=None, ge=500, le=6000)
     carb_goal_g: float | None = Field(default=None, ge=20, le=800)
     protein_goal_g: float | None = Field(default=None, ge=10, le=400)

@@ -28,4 +28,14 @@ def auth(client):
     r = client.post("/api/v1/auth/register",
                     json={"email": f"u{uuid.uuid4().hex[:8]}@test.io", "password": "secret123", "name": "Test"})
     assert r.status_code == 201, r.text
+    h = {"Authorization": f"Bearer {r.json()['access_token']}"}
+    assert client.put("/api/v1/users/health-profile", json={}, headers=h).status_code == 200   # finish onboarding
+    return h
+
+
+@pytest.fixture
+def fresh(client):
+    """A signed-in account that has NOT finished onboarding."""
+    import uuid
+    r = client.post("/api/v1/auth/register", json={"email": f"n{uuid.uuid4().hex[:8]}@test.io", "password": "secret123"})
     return {"Authorization": f"Bearer {r.json()['access_token']}"}

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core import cache
 from app.core.db import get_db
-from app.core.security import current_user
+from app.core.security import active_user
 from app.models import Correction, CustomFood, Experiment, InferenceLog, User
 from app.services import custom_foods, nutrition, portion, slm, vision
 
@@ -22,7 +22,7 @@ def _latency(db: Session, name: str) -> dict:
 
 
 @router.get("/ai/models")
-def models(user: User = Depends(current_user), db: Session = Depends(get_db)):
+def models(user: User = Depends(active_user), db: Session = Depends(get_db)):
     v = vision.status()
     s = slm.status(force=True)
     corr = dict(db.execute(select(Correction.kind, func.count()).where(Correction.user_id == user.id)
@@ -65,12 +65,12 @@ def models(user: User = Depends(current_user), db: Session = Depends(get_db)):
 
 
 @router.get("/taxonomy/search", tags=["foods"])
-def search_taxonomy(q: str = Query("", max_length=100), user: User = Depends(current_user)):
+def search_taxonomy(q: str = Query("", max_length=100), user: User = Depends(active_user)):
     return vision.search_taxonomy(q)
 
 
 @router.get("/foods/search", tags=["foods"])
-def search_foods(q: str = Query("", max_length=100), user: User = Depends(current_user)):
+def search_foods(q: str = Query("", max_length=100), user: User = Depends(active_user)):
     mine = custom_foods.search(user.id, q)
     return mine + (nutrition.search(q) if q.strip() else [nutrition.summary(f) for f in nutrition.all_foods()])
 
@@ -99,12 +99,12 @@ def _validate(body: CustomFoodIn) -> dict:
 
 
 @router.get("/foods/custom", tags=["foods"])
-def list_custom(user: User = Depends(current_user), db: Session = Depends(get_db)):
+def list_custom(user: User = Depends(active_user), db: Session = Depends(get_db)):
     return [_custom_out(cf) for cf in db.scalars(select(CustomFood).where(CustomFood.user_id == user.id).order_by(CustomFood.name))]
 
 
 @router.post("/foods/custom", tags=["foods"], status_code=201)
-def create_custom(body: CustomFoodIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+def create_custom(body: CustomFoodIn, user: User = Depends(active_user), db: Session = Depends(get_db)):
     cf = CustomFood(user_id=user.id, name=body.name.strip(), serving_g=body.serving_g, serving_desc=body.serving_desc,
                     per_100g=_validate(body), glycemic_index=body.glycemic_index, aliases=body.aliases)
     db.add(cf)
@@ -114,7 +114,7 @@ def create_custom(body: CustomFoodIn, user: User = Depends(current_user), db: Se
 
 
 @router.put("/foods/custom/{cf_id}", tags=["foods"])
-def update_custom(cf_id: int, body: CustomFoodIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+def update_custom(cf_id: int, body: CustomFoodIn, user: User = Depends(active_user), db: Session = Depends(get_db)):
     cf = db.get(CustomFood, cf_id)
     if not cf or cf.user_id != user.id:
         raise HTTPException(404, "Custom food not found")
@@ -126,7 +126,7 @@ def update_custom(cf_id: int, body: CustomFoodIn, user: User = Depends(current_u
 
 
 @router.get("/foods/{key}", tags=["foods"])
-def food_detail(key: str, user: User = Depends(current_user)):
+def food_detail(key: str, user: User = Depends(active_user)):
     f = nutrition.get(key) if custom_foods.owned(key, user.id) else None
     return f or {}
 

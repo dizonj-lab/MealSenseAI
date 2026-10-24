@@ -27,8 +27,9 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errors.append(str(e)))
 
     page.goto(f"{BASE}/")   # public landing page before login
-    expect(page.get_by_role("heading", name="Understand what's on your plate — before you eat it.")).to_be_visible()
-    expect(page.get_by_role("tab", name="Create account")).to_have_attribute("aria-selected", "true")
+    expect(page.get_by_role("heading", name="Understand your food. Make healthier choices.")).to_be_visible()
+    expect(page.get_by_role("link", name="Get Started").first).to_have_attribute("href", "/register")
+    expect(page.get_by_role("link", name="Sign In")).to_have_attribute("href", "/login")
     shot(page, "00_landing")
     page.goto(f"{BASE}/register")
     shot(page, "01_register")
@@ -37,7 +38,8 @@ with sync_playwright() as p:
     page.get_by_label("Password").fill("secret123")
     page.get_by_role("button", name="Create account").click()
     expect(page.get_by_text("Let's personalise")).to_be_visible()
-    page.get_by_label("Age").fill("42")
+    page.get_by_label("Exact age (optional)").fill("42")
+    page.locator("select").first.select_option("30-44")
     page.get_by_role("button", name="Moderate").click()
     page.get_by_role("button", name="Halal").click()
     shot(page, "02_onboarding_personal")
@@ -185,7 +187,8 @@ with sync_playwright() as p:
     sheet.get_by_role("button", name="Close").click()
     expect(page.get_by_role("button", name="Ask the Meal Advisor")).to_be_visible()
     page.goto(f"{BASE}/advisor")   # grounded Meal Advisor
-    page.get_by_role("button", name="How am I doing today?").click()
+    page.get_by_label("Message").fill("How many carbohydrates did I consume today?")
+    page.get_by_role("button", name="Send").click()
     expect(page.get_by_text("Today so far")).to_be_visible(timeout=60000)
     page.get_by_label("Message").fill("How many units of insulin should I take?")
     page.get_by_role("button", name="Send").click()

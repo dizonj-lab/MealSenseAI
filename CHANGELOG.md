@@ -2,6 +2,15 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.8.0 — Minimal design, grounded conversations
+
+- New minimalist landing, sign-in and register pages; Privacy, Terms and Contact pages (drafts)
+- Onboarding is now enforced by the server; age range, other goals and a “why we ask” note added
+- Meal Advisor rebuilt: every fact is traced to you, the photo model, the food table or approved guidance
+- Follow-up questions, “what if I remove the rice?” (never saved), how a food was identified, low-confidence checks
+- Replies from the local language model are checked against your data; urgent and medication questions handled safely
+- Conversations are kept on the server for 30 days and can be cleared
+
 ## v0.7.0 — Meal Advisor, About page, easier saving
 
 - Meal Advisor chat grounded in your meals, profile and the food table; medication questions declined

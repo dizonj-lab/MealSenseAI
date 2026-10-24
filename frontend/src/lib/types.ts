@@ -1,9 +1,9 @@
 export type Nutrients = { calories_kcal: number | null; carbs_g: number | null; protein_g: number | null; fat_g: number | null; sat_fat_g?: number | null; sugar_g: number | null; fiber_g: number | null; sodium_mg: number | null }
 export type Profile = {
-  health_consent: boolean; age: number | null; sex: string | null; height_cm: number | null; weight_kg: number | null
+  health_consent: boolean; age: number | null; age_range?: string | null; sex: string | null; height_cm: number | null; weight_kg: number | null
   activity_level: string | null; diet_preferences: string[]; diabetes_status: string | null; allergies: string[]; restrictions: string[]
   glucose_unit: string; known_readings: string | null; hba1c: number | null; has_cgm: boolean | null; clinician_targets: string | null
-  goals: string[]; calorie_goal: number | null; carb_goal_g: number | null; protein_goal_g: number | null
+  goals: string[]; other_goal?: string | null; calorie_goal: number | null; carb_goal_g: number | null; protein_goal_g: number | null
 }
 export type User = { id: number; email: string; name: string; onboarded: boolean; training_consent?: boolean; created_at: string; profile: Profile | null }
 export type BBox = { x: number; y: number; w: number; h: number }

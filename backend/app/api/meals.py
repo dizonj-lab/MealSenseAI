@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import owned_meal
 from app.core.config import settings
 from app.core.db import get_db
-from app.core.security import current_user
+from app.core.security import active_user
 from app.models import Correction, Meal, MealFood, User
 from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut, MergeIn, SimulateIn
 from app.services import analysis, custom_foods, forecast, imaging, insights, memory, nutrition, portion, vision
@@ -33,7 +33,7 @@ def _model_name(f: MealFood) -> str | None:
 async def capture(top: UploadFile | None = File(None), side: UploadFile | None = File(None),
                   description: str | None = Form(None), reference_object: str | None = Form(None),
                   serving_note: str | None = Form(None), meal_type: str | None = Form(None),
-                  user: User = Depends(current_user), db: Session = Depends(get_db)):
+                  user: User = Depends(active_user), db: Session = Depends(get_db)):
     uploads = [(v, u) for v, u in (("top", top), ("side", side)) if u is not None and u.filename]
     if not uploads and not (description or "").strip():
         raise HTTPException(422, "Provide at least one photo or a food description")
@@ -76,7 +76,7 @@ async def capture(top: UploadFile | None = File(None), side: UploadFile | None =
 
 
 @router.post("/analyze", response_model=MealOut, summary="Run recognition, portion, nutrition and insights")
-def analyze(body: AnalyzeIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+def analyze(body: AnalyzeIn, user: User = Depends(active_user), db: Session = Depends(get_db)):
     meal = owned_meal(body.meal_id, user, db)
     analysis.run(db, meal, user.profile)
     db.commit()
@@ -87,7 +87,7 @@ def analyze(body: AnalyzeIn, user: User = Depends(current_user), db: Session = D
 @router.get("/history", response_model=HistoryOut)
 def history(start: date | None = Query(None), end: date | None = Query(None),
             tz_offset_min: int = Query(0, description="Client UTC offset in minutes (e.g. 480 for SGT)"),
-            user: User = Depends(current_user), db: Session = Depends(get_db)):
+            user: User = Depends(active_user), db: Session = Depends(get_db)):
     tz = timezone(timedelta(minutes=tz_offset_min))
     q = select(Meal).where(Meal.user_id == user.id, Meal.status != "captured").order_by(Meal.eaten_at.desc())
     if start:
@@ -125,7 +125,7 @@ def get_image(view: str, original: bool = False, meal: Meal = Depends(owned_meal
 
 
 @router.post("/{meal_id}/forecast", summary="Educational post-meal forecast and what-if activity scenarios")
-def meal_forecast(body: ForecastIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user)):
+def meal_forecast(body: ForecastIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user)):
     foods = [analysis.food_dict(f) for f in meal.foods if not f.removed and f.nutrition_key]
     if not foods:
         raise HTTPException(422, "Add at least one food with a nutrition match first")
@@ -140,7 +140,7 @@ def analysis_progress(meal: Meal = Depends(owned_meal)):
 
 
 @router.post("/{meal_id}/explain", response_model=MealOut, summary="Write the local-SLM explanation (after results are shown)")
-def explain(meal: Meal = Depends(owned_meal), user: User = Depends(current_user), db: Session = Depends(get_db)):
+def explain(meal: Meal = Depends(owned_meal), user: User = Depends(active_user), db: Session = Depends(get_db)):
     if (meal.insights or {}).get("explanation", {}).get("source") != "pending":
         return meal
     foods = [analysis.food_dict(f) for f in meal.foods if not f.removed]
@@ -154,7 +154,7 @@ def explain(meal: Meal = Depends(owned_meal), user: User = Depends(current_user)
 
 
 @router.post("/{meal_id}/simulate", summary="Portion what-if: original vs modified portions (nothing is saved)")
-def simulate(body: SimulateIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user)):
+def simulate(body: SimulateIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user)):
     foods = [f for f in meal.foods if not f.removed and f.nutrition_key]
     if not foods:
         raise HTTPException(422, "Add at least one food with a nutrition match first")
@@ -169,7 +169,7 @@ def simulate(body: SimulateIn, meal: Meal = Depends(owned_meal), user: User = De
 
 
 @router.put("/{meal_id}/confirm", response_model=MealOut)
-def confirm(body: ConfirmIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user),
+def confirm(body: ConfirmIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user),
             db: Session = Depends(get_db)):
     active = [f for f in meal.foods if not f.removed]
     if not active:
@@ -198,7 +198,7 @@ def confirm(body: ConfirmIn, meal: Meal = Depends(owned_meal), user: User = Depe
 
 @router.put("/{meal_id}/foods/{food_id}", response_model=MealOut, summary="Edit food label and/or portion")
 def update_food(food_id: int, body: FoodUpdateIn, meal: Meal = Depends(owned_meal),
-                user: User = Depends(current_user), db: Session = Depends(get_db)):
+                user: User = Depends(active_user), db: Session = Depends(get_db)):
     f = next((x for x in meal.foods if x.id == food_id and (not x.removed or body.restore)), None)
     if not f:
         raise HTTPException(404, "Food not found")
@@ -258,7 +258,7 @@ def update_food(food_id: int, body: FoodUpdateIn, meal: Meal = Depends(owned_mea
 
 
 @router.post("/{meal_id}/foods/merge", response_model=MealOut, summary="Merge several detections into one food")
-def merge_foods(body: MergeIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user),
+def merge_foods(body: MergeIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user),
                 db: Session = Depends(get_db)):
     foods = [next((f for f in meal.foods if f.id == i and not f.removed), None) for i in body.food_ids]
     if any(f is None for f in foods):
@@ -291,7 +291,7 @@ def merge_foods(body: MergeIn, meal: Meal = Depends(owned_meal), user: User = De
 
 
 @router.post("/{meal_id}/foods", response_model=MealOut, status_code=201, summary="Add a missing food")
-def add_food(body: FoodAddIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user),
+def add_food(body: FoodAddIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user),
              db: Session = Depends(get_db)):
     tax = None
     if not custom_foods.owned(body.nutrition_key, user.id):
@@ -330,7 +330,7 @@ def add_food(body: FoodAddIn, meal: Meal = Depends(owned_meal), user: User = Dep
 
 
 @router.delete("/{meal_id}/foods/{food_id}", response_model=MealOut, summary="Remove a food (kept for evaluation)")
-def remove_food(food_id: int, meal: Meal = Depends(owned_meal), user: User = Depends(current_user),
+def remove_food(food_id: int, meal: Meal = Depends(owned_meal), user: User = Depends(active_user),
                 db: Session = Depends(get_db)):
     f = next((x for x in meal.foods if x.id == food_id and not x.removed), None)
     if not f:

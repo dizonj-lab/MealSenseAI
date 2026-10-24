@@ -8,6 +8,13 @@ FIX = Path(__file__).parent / "fixtures"
 API = "/api/v1"
 
 
+def onboarded(client, email):
+    tok = client.post(f"{API}/auth/register", json={"email": email, "password": "secret123"}).json()["access_token"]
+    h = {"Authorization": f"Bearer {tok}"}
+    client.put(f"{API}/users/health-profile", json={}, headers=h)
+    return h
+
+
 def jpeg(color=(200, 200, 200), size=(400, 300)):
     b = io.BytesIO()
     Image.new("RGB", size, color).save(b, "JPEG")
@@ -142,8 +149,8 @@ def test_unsupported_image_then_manual_and_corrections(client, auth):
     assert ai["vision"]["models"][0]["latency"]["count"] >= 1
     # image access is owner-only
     assert client.get(f"{API}/meals/{mid}/images/top", headers=auth).status_code == 200
-    other = client.post(f"{API}/auth/register", json={"email": "other@test.io", "password": "secret123"}).json()
-    assert client.get(f"{API}/meals/{mid}", headers={"Authorization": f"Bearer {other['access_token']}"}).status_code == 404
+    oh = onboarded(client, "other@test.io")
+    assert client.get(f"{API}/meals/{mid}", headers=oh).status_code == 404
     assert client.delete(f"{API}/meals/{mid}", headers=auth).status_code == 204
 
 
@@ -285,8 +292,7 @@ def test_custom_food_memory_and_training_samples(client, auth):
     assert "recognised from your earlier labels" in next(s for s in meal2["stages"] if s["key"] == "classify")["detail"]
     # consent toggle; another user cannot use or see this custom food
     assert client.put(f"{API}/users/me/training-consent", headers=auth, json={"consent": True}).json()["training_consent"] is True
-    tok = client.post(f"{API}/auth/register", json={"email": "third@test.io", "password": "secret123"}).json()["access_token"]
-    other = {"Authorization": f"Bearer {tok}"}
+    other = onboarded(client, "third@test.io")
     assert not any(f.get("custom") for f in client.get(f"{API}/foods/search?q=grandma", headers=other).json())
     m3 = client.post(f"{API}/meals/capture", headers=other, data={"description": "rice"}).json()
     assert client.post(f"{API}/meals/{m3['id']}/foods", headers=other, json={"nutrition_key": cf["key"]}).status_code == 422
@@ -302,17 +308,16 @@ def test_meal_advisor_grounded_and_safe(client, auth, monkeypatch):
     r = ask("How many carbs in chicken rice?")
     assert r["source"] == "rules" and "chicken rice" in r["reply"].lower() and "carbs" in r["reply"]
     assert "White rice" not in r["reply"] and "recognises it" in r["reply"]
-    assert any(g["kind"] == "food" for g in r["grounding"])
+    assert any(e["level"] == "L3" and "chicken rice" in e["label"].lower() for e in r["evidence"])
     r = ask("What's a lower-carb swap for nasi lemak?")
-    assert "Lower-carb options" in r["reply"] and any(g["kind"] == "swaps" for g in r["grounding"])
+    assert "Lower-carb options" in r["reply"]
     r = ask("Is this meal ok?", meal_id=meal["id"])
-    assert "This meal" in r["reply"] and "kcal" in r["reply"]
+    assert "kcal" in r["reply"] and "glucose impact" in r["reply"] and "carbohydrate" in r["reply"]
     r = ask("How am I doing today?")
     assert "Today so far" in r["reply"]
     r = ask("How many units of insulin should I take for this?", meal_id=meal["id"])
     assert r["source"] == "safety" and "can't help with medication" in r["reply"]
-    tok = client.post(f"{API}/auth/register", json={"email": "fourth@test.io", "password": "secret123"}).json()["access_token"]
-    assert client.post(f"{API}/advisor/chat", headers={"Authorization": f"Bearer {tok}"}, json={"message": "hi", "meal_id": meal["id"]}).status_code == 404
+    assert client.post(f"{API}/advisor/chat", headers=onboarded(client, "fourth@test.io"), json={"message": "hi", "meal_id": meal["id"]}).status_code == 404
 
 
 def test_meal_advisor_week_advice_and_smalltalk(client, auth, monkeypatch):
@@ -335,8 +340,25 @@ def test_meal_advisor_week_advice_and_smalltalk(client, auth, monkeypatch):
     r = ask("How is my food nutritional going on?")["reply"]
     assert "Today so far" in r and "Last 7 days" in r and "Advice:" in r
     r = ask("how are you")["reply"]
-    assert r.startswith("I'm doing well") and "Last 7 days" not in r
+    assert "I'm doing well" in r and "Last 7 days" not in r
     r = ask("any tips?")["reply"]
     assert "Advice:" in r and "•" in r
     g = client.post(f"{API}/advisor/chat", headers=auth, json={"message": "how was my week"}).json()["grounding"]
-    assert any(x["kind"] == "week" for x in g)
+    assert any(x["label"] == "Last 7 days" for x in g)
+
+
+
+def test_onboarding_required_server_side(client, fresh):
+    """A signed-in account that skipped onboarding can only use account/profile endpoints (API-level, not UI)."""
+    blocked = [("get", "/meals/history"), ("post", "/meals/capture"), ("get", "/dashboard/summary"), ("get", "/glucose"),
+               ("get", "/foods/search?q=rice"), ("get", "/foods/custom"), ("get", "/ai/models"), ("get", "/taxonomy/search?q=rice"),
+               ("post", "/advisor/chat"), ("get", "/advisor/threads"), ("put", "/users/me/training-consent")]
+    for method, path in blocked:
+        r = getattr(client, method)(f"{API}{path}", headers=fresh, **({"json": {}} if method in ("post", "put") else {}))
+        assert r.status_code == 403 and r.json()["detail"] == "onboarding_required", (path, r.status_code)
+    me = client.get(f"{API}/users/me", headers=fresh)
+    assert me.status_code == 200 and me.json()["onboarded"] is False
+    r = client.put(f"{API}/users/health-profile", headers=fresh, json={"age_range": "30-44", "goals": ["general_wellness"], "other_goal": "more energy"})
+    assert r.status_code == 200 and r.json()["onboarded"] and r.json()["profile"]["age_range"] == "30-44"
+    assert client.get(f"{API}/meals/history", headers=fresh).status_code == 200
+    assert client.get(f"{API}/meals/history").status_code == 401

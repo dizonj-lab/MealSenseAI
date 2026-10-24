@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import { useAuth } from './lib/auth'
 import AuthPage from './pages/Auth'
 import Landing from './pages/Landing'
+import { Contact, Privacy, Terms } from './pages/Legal'
 import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
 import Capture from './pages/Capture'
@@ -29,6 +30,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<AuthPage mode="login" />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/register" element={<AuthPage mode="register" />} />
       <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
       <Route element={<Protected><Layout /></Protected>}>

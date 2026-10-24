@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
-from app.core.security import current_user
+from app.core.security import active_user
 from app.models import Meal, User
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
@@ -14,7 +14,7 @@ KEYS = ("calories_kcal", "carbs_g", "protein_g", "fat_g", "fiber_g", "sugar_g", 
 
 @router.get("/summary")
 def summary(tz_offset_min: int = Query(0), days: int = Query(7, ge=1, le=90),
-            user: User = Depends(current_user), db: Session = Depends(get_db)):
+            user: User = Depends(active_user), db: Session = Depends(get_db)):
     tz = timezone(timedelta(minutes=tz_offset_min))
     today = datetime.now(tz).date()
     start = datetime.combine(today - timedelta(days=days - 1), datetime.min.time(), tz)

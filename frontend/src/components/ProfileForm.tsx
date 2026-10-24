@@ -4,16 +4,16 @@ import type { Profile } from '../lib/types'
 import { Toggle } from './ui'
 
 export const EMPTY_PROFILE: Profile = {
-  health_consent: false, age: null, sex: null, height_cm: null, weight_kg: null, activity_level: null, diet_preferences: [],
+  health_consent: false, age: null, age_range: null, sex: null, height_cm: null, weight_kg: null, activity_level: null, diet_preferences: [],
   diabetes_status: null, allergies: [], restrictions: [], glucose_unit: 'mmol/L', known_readings: null, hba1c: null, has_cgm: null,
-  clinician_targets: null, goals: [], calorie_goal: null, carb_goal_g: null, protein_goal_g: null,
+  clinician_targets: null, goals: [], other_goal: null, calorie_goal: null, carb_goal_g: null, protein_goal_g: null,
 }
 export const STEPS = ['Personal', 'Health', 'Diabetes context', 'Goals'] as const
 
 const DIET: [string, string][] = [['vegetarian', 'Vegetarian'], ['vegan', 'Vegan'], ['halal', 'Halal'], ['pescatarian', 'Pescatarian'], ['low_carb', 'Lower carb'], ['no_beef', 'No beef'], ['no_pork', 'No pork']]
 const ALLERGY: [string, string][] = [['peanut', 'Peanut'], ['shellfish', 'Shellfish'], ['fish', 'Fish'], ['egg', 'Egg'], ['dairy', 'Dairy'], ['gluten', 'Gluten'], ['soy', 'Soy']]
 const DIABETES: [string, string][] = [['none', 'None'], ['prediabetes', 'Prediabetes'], ['type1', 'Type 1'], ['type2', 'Type 2'], ['gestational', 'Gestational'], ['prefer_not_to_disclose', 'Prefer not to say']]
-const GOALS: [string, string][] = [['carb_awareness', 'Carbohydrate awareness'], ['calorie_awareness', 'Calorie awareness'], ['weight_management', 'Weight management'], ['balanced_nutrition', 'Balanced nutrition'], ['diabetes_friendly', 'Diabetes-friendly choices'], ['heart_health', 'Heart health (salt & saturated fat)']]
+const GOALS: [string, string][] = [['general_wellness', 'General wellness'], ['carb_awareness', 'Carbohydrate awareness'], ['calorie_awareness', 'Calorie awareness'], ['weight_management', 'Weight management'], ['balanced_nutrition', 'Balanced nutrition'], ['diabetes_friendly', 'Diabetes-friendly choices'], ['heart_health', 'Heart health (salt & saturated fat)']]
 
 const num = (v: string) => (v === '' ? null : Number(v))
 function Num({ label, value, onChange, unit, step = 1 }: { label: string; value: number | null; onChange: (v: number | null) => void; unit?: string; step?: number }) {
@@ -26,8 +26,13 @@ export function ProfileStep({ step, p, set }: { step: number; p: Profile; set: (
   const [custom, setCustom] = useState('')
   if (step === 0) return (
     <div className="space-y-4">
+      <p className="text-xs text-slate-500">Used to put portions and energy in context. Everything here is optional.</p>
       <div className="grid grid-cols-2 gap-3">
-        <Num label="Age" value={p.age} onChange={u('age')} />
+        <label className="block"><span className="label">Age range</span>
+          <select className="input" value={p.age_range ?? ''} onChange={e => u('age_range')(e.target.value || null)}>
+            <option value="">—</option>{['under_18', '18-29', '30-44', '45-59', '60-74', '75+'].map(r => <option key={r} value={r}>{r === 'under_18' ? 'Under 18' : r}</option>)}
+          </select></label>
+        <Num label="Exact age (optional)" value={p.age} onChange={u('age')} />
         <label className="block"><span className="label">Sex <span className="text-slate-400 font-normal">(optional)</span></span>
           <select className="input" value={p.sex ?? ''} onChange={e => u('sex')(e.target.value || null)}>
             <option value="">—</option><option value="female">Female</option><option value="male">Male</option><option value="other">Other</option><option value="prefer_not_to_say">Prefer not to say</option>
@@ -47,6 +52,8 @@ export function ProfileStep({ step, p, set }: { step: number; p: Profile; set: (
         <span className="text-sm text-slate-700"><b className="flex items-center gap-1"><Lock className="size-3.5" />I consent to MealSenseAI storing my health information</b>
           Used only to tailor educational insights. Optional, editable and deletable anytime. Without consent, diabetes details are not stored.</span>
       </label>
+      <details className="text-xs text-slate-500"><summary className="cursor-pointer font-medium">Why do we ask?</summary>
+        <p className="mt-1">Your health context changes which numbers matter, for example carbohydrate for diabetes or sodium for heart health. It is only used for your own insights and the Meal Advisor, never shown to anyone else, and never used to diagnose anything. Meal photos are not used to infer a condition.</p></details>
       <div><label className="label">Diabetes status</label><Toggle options={DIABETES} value={p.diabetes_status} onChange={u('diabetes_status')} /></div>
       <div><label className="label">Allergies</label><Toggle multi options={ALLERGY} value={p.allergies} onChange={u('allergies')} /></div>
       <div><label className="label">Other dietary restrictions</label>
@@ -66,7 +73,7 @@ export function ProfileStep({ step, p, set }: { step: number; p: Profile; set: (
       </div>
       <label className="block"><span className="label">Known readings <span className="text-slate-400 font-normal">(optional)</span></span>
         <textarea className="input" rows={2} placeholder={`e.g. fasting 6.1 ${p.glucose_unit}`} value={p.known_readings ?? ''} onChange={e => u('known_readings')(e.target.value || null)} /></label>
-      <label className="block"><span className="label">Targets provided by your clinician <span className="text-slate-400 font-normal">(optional)</span></span>
+      <label className="block"><span className="label">Glucose targets from your clinician <span className="text-slate-400 font-normal">(optional, e.g. 4–7 {p.glucose_unit} before meals)</span></span>
         <textarea className="input" rows={2} value={p.clinician_targets ?? ''} onChange={e => u('clinician_targets')(e.target.value || null)} />
         <p className="text-xs text-slate-400 mt-1">MealSenseAI never sets clinical targets or gives medication advice.</p></label>
     </div>
@@ -74,6 +81,8 @@ export function ProfileStep({ step, p, set }: { step: number; p: Profile; set: (
   return (
     <div className="space-y-4">
       <div><label className="label">What would you like help with?</label><Toggle multi options={GOALS} value={p.goals} onChange={u('goals')} /></div>
+      <label className="block"><span className="label">Other goal <span className="text-slate-400 font-normal">(optional)</span></span>
+        <input className="input" maxLength={200} placeholder="e.g. more energy in the afternoon" value={p.other_goal ?? ''} onChange={e => u('other_goal')(e.target.value || null)} /></label>
       <div className="grid grid-cols-3 gap-3">
         <Num label="Daily calories" unit="kcal" value={p.calorie_goal} onChange={u('calorie_goal')} />
         <Num label="Daily carbs" unit="g" value={p.carb_goal_g} onChange={u('carb_goal_g')} />

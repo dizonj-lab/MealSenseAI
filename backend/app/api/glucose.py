@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
-from app.core.security import current_user
+from app.core.security import active_user
 from app.models import GlucoseReading, Meal, User
 
 router = APIRouter(prefix="/glucose", tags=["glucose"])
@@ -34,7 +34,7 @@ def out(r: GlucoseReading) -> dict:
 
 @router.get("")
 def list_readings(meal_id: int | None = None, days: int = Query(30, ge=1, le=365),
-                  user: User = Depends(current_user), db: Session = Depends(get_db)):
+                  user: User = Depends(active_user), db: Session = Depends(get_db)):
     q = select(GlucoseReading).where(GlucoseReading.user_id == user.id)
     if meal_id is not None:
         q = q.where(GlucoseReading.meal_id == meal_id)
@@ -44,7 +44,7 @@ def list_readings(meal_id: int | None = None, days: int = Query(30, ge=1, le=365
 
 
 @router.post("", status_code=201)
-def add_reading(body: ReadingIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+def add_reading(body: ReadingIn, user: User = Depends(active_user), db: Session = Depends(get_db)):
     mmol = body.value / MGDL_PER_MMOL if body.unit == "mg/dL" else body.value
     if not 1.0 <= mmol <= 35.0:
         raise HTTPException(422, "Value outside the range a glucose meter reports (1–35 mmol/L / 18–630 mg/dL)")
@@ -59,7 +59,7 @@ def add_reading(body: ReadingIn, user: User = Depends(current_user), db: Session
 
 
 @router.delete("/{reading_id}", status_code=204)
-def delete_reading(reading_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+def delete_reading(reading_id: int, user: User = Depends(active_user), db: Session = Depends(get_db)):
     r = db.get(GlucoseReading, reading_id)
     if not r or r.user_id != user.id:
         raise HTTPException(404, "Reading not found")

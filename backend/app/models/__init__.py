@@ -27,6 +27,7 @@ class HealthProfile(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     health_consent: Mapped[bool] = mapped_column(Boolean, default=False)
     age: Mapped[int | None] = mapped_column(Integer)
+    age_range: Mapped[str | None] = mapped_column(String(10))
     sex: Mapped[str | None] = mapped_column(String(20))
     height_cm: Mapped[float | None] = mapped_column(Float)
     weight_kg: Mapped[float | None] = mapped_column(Float)
@@ -41,6 +42,7 @@ class HealthProfile(Base):
     has_cgm: Mapped[bool | None] = mapped_column(Boolean)
     clinician_targets: Mapped[str | None] = mapped_column(Text)
     goals: Mapped[list] = mapped_column(JSON, default=list)
+    other_goal: Mapped[str | None] = mapped_column(String(200))
     calorie_goal: Mapped[float | None] = mapped_column(Float)
     carb_goal_g: Mapped[float | None] = mapped_column(Float)
     protein_goal_g: Mapped[float | None] = mapped_column(Float)
@@ -182,3 +184,23 @@ class TrainingSample(Base):
     model_version: Mapped[str | None] = mapped_column(String(80))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class ChatThread(Base):
+    """A Meal Advisor conversation, owned by one user and optionally about one meal. Kept 30 days after last use."""
+    __tablename__ = "chat_threads"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    meal_id: Mapped[int | None] = mapped_column(ForeignKey("meals.id", ondelete="CASCADE"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now, index=True)
+
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    thread_id: Mapped[int] = mapped_column(ForeignKey("chat_threads.id", ondelete="CASCADE"), index=True)
+    role: Mapped[str] = mapped_column(String(10))            # user | assistant
+    content: Mapped[str] = mapped_column(Text)
+    meta: Mapped[dict] = mapped_column(JSON, default=dict)   # source, evidence, validation, latency, follow-ups
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)

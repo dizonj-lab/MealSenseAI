@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
-from app.core.security import current_user
+from app.core.security import active_user, current_user
 from app.models import HealthProfile, User
 from app.schemas import ProfileIn, UserOut
 
@@ -21,7 +21,7 @@ class TrainingConsentIn(BaseModel):
 
 
 @router.put("/me/training-consent", response_model=UserOut)
-def training_consent(body: TrainingConsentIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+def training_consent(body: TrainingConsentIn, user: User = Depends(active_user), db: Session = Depends(get_db)):
     """Opt in/out of exporting your corrected photo regions as training data (memory works either way)."""
     user.training_consent = body.consent
     db.commit()

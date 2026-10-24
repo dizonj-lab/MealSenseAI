@@ -21,6 +21,10 @@ export async function api<T = any>(path: string, opts: RequestInit & { json?: un
       const j = await r.json()
       msg = typeof j.detail === 'string' ? j.detail : (j.detail || []).map((d: any) => `${d.loc?.slice(-1)[0]}: ${d.msg}`).join('; ')
     } catch { /* not json */ }
+    if (r.status === 403 && msg === 'onboarding_required' && !window.location.pathname.startsWith('/onboarding')) {
+      window.location.assign('/onboarding')   // the server enforces onboarding; send the user to finish it
+      msg = 'Please finish setting up your profile first.'
+    }
     throw new ApiError(r.status, msg)
   }
   return r.status === 204 ? (undefined as T) : r.json()

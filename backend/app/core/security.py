@@ -38,3 +38,11 @@ def current_user(token: str = Depends(oauth2), db: Session = Depends(get_db)):
     if not user:
         raise err
     return user
+
+
+def active_user(user=Depends(current_user)):
+    """Signed in AND onboarding finished. Every feature endpoint uses this; only account/profile/onboarding
+    endpoints accept an account that has not finished onboarding (enforced server-side, not just in the UI)."""
+    if not user.onboarded:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "onboarding_required")
+    return user

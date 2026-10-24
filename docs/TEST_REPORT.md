@@ -72,6 +72,14 @@ segmentation-mask quality, the uncertainty band's coverage, and any glucose accu
 | Fingerprint threshold check | sqrt-probability fingerprints, cosine ≥ 0.70: 94/120 held-out Food-101 photos matched, **all correct** (3 classes, 3 remembered photos each; steak 24/40). Small test — precision with many foods is not measured. |
 | Export (`ml/export/export_training_samples.py`) | Ran on the test database: 1 consented sample cropped to `user_labels/<class>/`, manifest + summary listing classes not in EXP-002 |
 
+## v0.8.0: onboarding enforcement, minimalist UI, grounded assistant (24 Oct 2026)
+| Test | Result |
+|---|---|
+| pytest | **31 passed**: onboarding access matrix (11 feature endpoints → 403 until onboarded; 401 without login); assistant: meal retrieval and multi-food, actual raw scores, carb arithmetic, hypothetical not saved, follow-up “yes”, server-side thread and clearing, unnamed/low-confidence clarifying questions, measured vs estimated glucose, medication/diagnosis/urgent safety, prompt injection, cross-user isolation, SLM reply validation (hallucinated number rejected) |
+| Phone UI flow, light and dark | **PASS**, no JS errors |
+| Labelled assistant set (38 cases, `ml/evaluation/advisor_eval.py`) | **38/38**, unsupported-claim rate 0.0, latency mean 13 ms / p95 18 ms (rule engine; SLM offline in sandbox) |
+| Not measured | SLM latency/tokens/throughput, SLM rejection rate, GPU utilisation (need Ollama/GPU on Buddy; see `docs/DEPLOY_v0.8.0.md`) |
+
 ## Not tested / outstanding
 1. **GPU path:** the `gpu` image (CUDA 12.8, cuDNN 9, onnxruntime-gpu) was **not built or run**: no GPU and
    insufficient disk in the test environment. CUDA auto-selection is implemented with a CPU fallback, but is unverified.
