@@ -14,7 +14,7 @@ from app.core.db import get_db
 from app.core.security import active_user
 from app.models import Correction, Meal, MealFood, User
 from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut, MergeIn, SimulateIn
-from app.services import analysis, custom_foods, forecast, imaging, insights, memory, nutrition, portion, vision
+from app.services import analysis, custom_foods, forecast, glucose_scale, imaging, insights, memory, nutrition, portion, vision
 
 router = APIRouter(prefix="/meals", tags=["meals"])
 
@@ -125,12 +125,15 @@ def get_image(view: str, original: bool = False, meal: Meal = Depends(owned_meal
 
 
 @router.post("/{meal_id}/forecast", summary="Educational post-meal forecast and what-if activity scenarios")
-def meal_forecast(body: ForecastIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user)):
+def meal_forecast(body: ForecastIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user),
+                  db: Session = Depends(get_db)):
     foods = [analysis.food_dict(f) for f in meal.foods if not f.removed and f.nutrition_key]
     if not foods:
         raise HTTPException(422, "Add at least one food with a nutrition match first")
-    return forecast.forecast(foods, meal.totals, meal.insights, user.profile,
-                             [s.model_dump() for s in body.scenarios], body.horizon_min)
+    out = forecast.forecast(foods, meal.totals, meal.insights, user.profile,
+                            [s.model_dump() for s in body.scenarios], body.horizon_min)
+    out["glucose_scale"] = glucose_scale.scale(db, user, meal, out["meal_peak_units"])
+    return out
 
 
 @router.get("/{meal_id}/progress", summary="Live analysis stages while /meals/analyze runs")
@@ -154,7 +157,7 @@ def explain(meal: Meal = Depends(owned_meal), user: User = Depends(active_user),
 
 
 @router.post("/{meal_id}/simulate", summary="Portion what-if: original vs modified portions (nothing is saved)")
-def simulate(body: SimulateIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user)):
+def simulate(body: SimulateIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user), db: Session = Depends(get_db)):
     foods = [f for f in meal.foods if not f.removed and f.nutrition_key]
     if not foods:
         raise HTTPException(422, "Add at least one food with a nutrition match first")
@@ -165,7 +168,9 @@ def simulate(body: SimulateIn, meal: Meal = Depends(owned_meal), user: User = De
         raise HTTPException(422, "Portions must be between 0 and 3000 g")
     items = [{"id": f.id, "label": f.label, "nutrition_key": f.nutrition_key, "grams": f.grams,
               "new_grams": body.portions.get(f.id, f.grams), "range_g": (f.portion or {}).get("range_g")} for f in foods]
-    return forecast.portion_whatif(items, user.profile, body.horizon_min)
+    out = forecast.portion_whatif(items, user.profile, body.horizon_min)
+    out["glucose_scale"] = glucose_scale.scale(db, user, meal, out["meal_peak_units"])
+    return out
 
 
 @router.put("/{meal_id}/confirm", response_model=MealOut)

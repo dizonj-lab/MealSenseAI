@@ -1,7 +1,13 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.9.0'
+export const APP_VERSION = '0.10.0'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.10.0', title: 'Glucose estimates in mmol/L', changes: [
+    'Forecast and portion simulator charts now show glucose in mmol/L (or mg/dL from your profile) instead of a relative index',
+    'Starts from your logged pre-meal reading; without one, the chart shows the estimated rise above your pre-meal level',
+    'Population estimate with a wide range; after 3 meals with before and after readings it calibrates to your own response',
+    'Always labelled an estimate, even with a known baseline; your measured readings are shown as dots for comparison',
+  ] },
   { version: '0.9.0', title: 'A friendlier Meal Advisor', changes: [
     'Warm, witty personality that adapts its tone: playful for food chat, careful for diabetes topics, serious for urgent ones',
     '“You missed my sausage!” offers a one-tap Add button; the meal updates when you tap it',

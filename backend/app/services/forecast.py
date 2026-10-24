@@ -12,8 +12,9 @@ Two deterministic models, both explicit about their assumptions:
          (available carbs x GI/100, gamma-shaped absorption whose peak is delayed by fat, fibre and protein),
    k   = insulin-mediated clearance rate (slower with reduced insulin sensitivity — illustrative values),
    U_ex = extra uptake by working muscle = CHO oxidation rate x fraction drawn from blood glucose.
-   Output is a RELATIVE index (meal-only peak = 100). It is not a prediction of anyone's blood glucose;
-   individual responses vary widely and need a validated, personalised model (e.g. CGM-calibrated).
+   Output is a RELATIVE index (meal-only peak = 100). services/glucose_scale.py converts it to an estimated mmol/L
+   value (baseline + rise) with an explicit OGTT anchor or your own readings. Either way it is an estimate, not a
+   prediction of anyone's blood glucose; individual responses vary widely.
 """
 import math
 
@@ -269,6 +270,7 @@ def forecast(foods: list[dict], totals: dict, ins: dict, profile, scenarios: lis
                       "glucose and not medical advice. Individual responses vary widely (sleep, stress, medication, "
                       "fitness, insulin sensitivity). Use a glucose meter or CGM and your care team's guidance.",
         "time_min": list(range(0, horizon + 1, 5)),
+        "meal_peak_units": peak,
         "inputs": {**meal, "body_mass_kg": weight, "body_mass_source": "profile" if profile and profile.weight_kg else "default 70 kg",
                    "clearance": k_label, "clearance_half_life_min": round(math.log(2) / k)},
         "baseline": baseline, "scenarios": out_scen,
@@ -311,7 +313,7 @@ def _diff(a, b):
 
 def portion_whatif(items: list[dict], profile, horizon: int = 240) -> dict:
     """Original vs modified portions (nothing is saved). items: {id, label, nutrition_key, grams, new_grams, range_g}.
-    The glucose curves are a relative index (original peak = 100), not mmol/L. The band around the modified curve
+    The glucose curves are a relative index (original peak = 100); glucose_scale converts them to estimated mmol/L. The band around the modified curve
     re-runs the simulation at the low and high ends of each food's portion-uncertainty range; it reflects portion
     uncertainty only, not individual physiological variation."""
     weight = (profile.weight_kg if profile and profile.weight_kg else None) or DEFAULT_WEIGHT_KG
@@ -352,7 +354,7 @@ def portion_whatif(items: list[dict], profile, horizon: int = 240) -> dict:
         foods.append({"id": it["id"], "label": it["label"], "original": o, "modified": m,
                       "diff": {n: _diff(o.get(n), m.get(n)) for n in (*WHATIF_NUTRIENTS, "grams", "glycemic_load")}})
     return {
-        "simulation_version": SIM_VERSION, "kind": "simulated",
+        "simulation_version": SIM_VERSION, "kind": "simulated", "meal_peak_units": peak,
         "time_min": list(range(0, horizon + 1, 5)),
         "curves": {"original": idx["original"], "modified": idx["modified"],
                    "modified_low": [min(a, b) for a, b in zip(idx["low"], idx["high"])],
@@ -362,8 +364,8 @@ def portion_whatif(items: list[dict], profile, horizon: int = 240) -> dict:
                                    "diff": {n: _diff(orig.get(n), mod.get(n)) for n in (*WHATIF_NUTRIENTS, "grams", "glycemic_load", "peak_index", "auc_index")}},
         "assumptions": [f"Clearance: {k_label}, half-life {round(math.log(2) / k)} min", f"Body mass {weight} kg",
                         f"Foods without a GI value use an assumed GI of {DEFAULT_GI}",
-                        "Curves are a relative index (original peak = 100), not blood-glucose concentrations",
+                        "mmol/L = your pre-meal reading (if logged) + the estimated rise; the rise comes from a population anchor or your own readings, never from a measurement",
                         "Nutrients scale linearly with grams from the same reference record"],
-        "disclaimer": "Illustrative simulation from population-average physiology — not a prediction of your blood glucose "
+        "disclaimer": "Estimate from population-average physiology. Even when it starts from your measured pre-meal reading, it is not a prediction of your blood glucose "
                       "and not medical advice. Do not use it to adjust medication or insulin.",
     }

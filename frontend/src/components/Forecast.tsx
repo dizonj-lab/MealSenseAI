@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CartesianGrid, Legend, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, CartesianGrid, ComposedChart, Legend, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Activity, AlertTriangle, BookOpen, CheckCircle2, Info, Plus, ShieldAlert, Sigma, Trash2, TrendingDown } from 'lucide-react'
 import { api, fmt } from '../lib/api'
+import { GlucoseEstimateNote, glucoseAxis, yDomain } from '../lib/glucose'
 import { Card, Section, Spinner, Tag, Toggle } from './ui'
 
 type Scenario = { activity: string; intensity: 'moderate' | 'high'; start_min: number; duration_min: number }
@@ -83,9 +84,11 @@ export default function Forecast({ mealId, version }: { mealId: number; version:
   if (err) return <Card title="Forecast & what-if"><p className="text-sm text-rose-600">{err}</p></Card>
   if (!d) return <Card title="Forecast & what-if"><div className="py-8 grid place-items-center"><Spinner /></div></Card>
 
+  const ax = glucoseAxis(d.glucose_scale)
   const series = d.time_min.map((t: number, i: number) => {
-    const row: any = { t, base: d.baseline.glucose_index[i], baseE: d.baseline.energy_cum_kcal[i] }
-    d.scenarios.forEach((s: any, j: number) => { row[`s${j}`] = s.glucose_index[i]; row[`e${j}`] = s.energy_cum_kcal[i] })
+    const b = d.baseline.glucose_index[i]
+    const row: any = { t, base: ax.value(b), band: [ax.low(b), ax.high(b)], baseE: d.baseline.energy_cum_kcal[i] }
+    d.scenarios.forEach((s: any, j: number) => { row[`s${j}`] = ax.value(s.glucose_index[i]); row[`e${j}`] = s.energy_cum_kcal[i] })
     return row
   })
   const adv = d.advisory
@@ -123,17 +126,19 @@ export default function Forecast({ mealId, version }: { mealId: number; version:
             <ScenarioRow key={i} s={s} i={i} acts={d.activities} onChange={n => setScen(scen.map((x, j) => (j === i ? n : x)))} onRemove={() => setScen(scen.filter((_, j) => j !== i))} />))}</div>
         </div>
 
-        <h3 className="mt-5 text-sm font-semibold text-slate-700">Relative glucose excursion <span className="font-normal text-slate-400">(meal-only peak = 100; not mmol/L)</span></h3>
-        <div className="h-64 mt-1"><ResponsiveContainer><LineChart data={series} margin={{ left: -18, right: 8, top: 8 }}>
+        <h3 className="mt-5 text-sm font-semibold text-slate-700">{ax.title}</h3>
+        <GlucoseEstimateNote gs={d.glucose_scale} />
+        <div className="h-64 mt-2"><ResponsiveContainer><ComposedChart data={series} margin={{ left: -12, right: 8, top: 8 }}>
           <CartesianGrid stroke="#f1f5f9" vertical={false} />
           <XAxis dataKey="t" tickFormatter={hm} ticks={[0, 60, 120, 180, 240, 300]} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} domain={[0, 110]} />
-          <Tooltip labelFormatter={(t: number) => `${hm(t)} after meal`} formatter={(v: number, n: string) => [v.toFixed(0), n]} />
+          <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} domain={yDomain(series.flatMap((r: any) => [...r.band, ...d.scenarios.map((_: any, j: number) => r[`s${j}`])]), ax.known, ax.unit)} allowDecimals={ax.unit !== 'mg/dL'} />
+          <Tooltip labelFormatter={(t: number) => `${hm(t)} after meal`} formatter={(v: any, n: string) => [Array.isArray(v) ? `${v[0]}–${v[1]} ${ax.unit}` : `${v} ${ax.unit} (estimate)`, n]} />
           <Legend iconType="plainline" wrapperStyle={{ fontSize: 11 }} />
           {d.scenarios.map((s: any, j: number) => <ReferenceArea key={j} x1={s.start_min} x2={Math.min(s.start_min + s.duration_min, 300)} fill={COLORS[j]} fillOpacity={0.08} />)}
+          <Area dataKey="band" name="Uncertainty range" fill="#94a3b8" fillOpacity={0.15} stroke="none" isAnimationActive={false} />
           <Line dataKey="base" name="Office day (no workout)" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} />
           {d.scenarios.map((s: any, j: number) => <Line key={j} dataKey={`s${j}`} name={`Scenario ${j + 1}`} stroke={COLORS[j]} strokeWidth={2.5} dot={false} isAnimationActive={false} />)}
-        </LineChart></ResponsiveContainer></div>
+        </ComposedChart></ResponsiveContainer></div>
 
         <h3 className="mt-4 text-sm font-semibold text-slate-700">Energy used vs meal energy <span className="font-normal text-slate-400">(cumulative kcal)</span></h3>
         <div className="h-52 mt-1"><ResponsiveContainer><LineChart data={series} margin={{ left: -10, right: 8, top: 8 }}>

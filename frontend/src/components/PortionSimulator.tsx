@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Area, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts'
 import { Check, RotateCcw, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { api, fmt } from '../lib/api'
+import { GlucoseEstimateNote, glucoseAxis, yDomain } from '../lib/glucose'
 import type { Meal } from '../lib/types'
 import { ErrorNote, InfoTip, Section, Spinner, Tag } from './ui'
 import { markSimulatorTried } from './GettingStarted'
@@ -11,10 +12,10 @@ const TIP = { fontSize: 11, whiteSpace: 'normal' as const }
 const TIP_WRAP = { maxWidth: '65%', zIndex: 5 }
 const ROWS: [string, string, number][] = [['grams', 'Portion (g)', 0], ['calories_kcal', 'Calories (kcal)', 0], ['carbs_g', 'Carbs (g)', 1],
   ['sugar_g', 'Sugar (g)', 1], ['protein_g', 'Protein (g)', 1], ['fat_g', 'Fat (g)', 1], ['sat_fat_g', 'Sat. fat (g)', 1], ['fiber_g', 'Fibre (g)', 1],
-  ['sodium_mg', 'Sodium (mg)', 0], ['glycemic_load', 'Glycaemic load', 1], ['peak_index', 'Simulated peak (index)', 0], ['auc_index', 'Simulated area (index·h)', 1]]
+  ['sodium_mg', 'Sodium (mg)', 0], ['glycemic_load', 'Glycaemic load', 1]]
 
-/** Portion what-if: nothing is saved until the user presses "Apply". Simulated curves (relative index) are kept
- *  apart from measured readings (mmol/L) so the two are never confused. */
+/** Portion what-if: nothing is saved until the user presses "Apply". Simulated curves are shown in mmol/L (or mg/dL)
+ *  as baseline + estimated rise and are always labelled as estimates; measured readings are drawn as separate dots. */
 export default function PortionSimulator({ meal, onChange, readOnly }: { meal: Meal; onChange: (m: Meal) => void; readOnly: boolean }) {
   const foods = useMemo(() => meal.foods.filter(f => !f.removed && f.nutrition_key), [meal])
   const [grams, setGrams] = useState<Record<number, number>>({})
@@ -50,15 +51,18 @@ export default function PortionSimulator({ meal, onChange, readOnly }: { meal: M
   }
   const eaten = new Date(meal.eaten_at).getTime()
   const pts = readings.map(r => ({ ...r, min: Math.round((new Date(r.measured_at).getTime() - eaten) / 60000) }))
-  const data = sim ? sim.time_min.map((t: number, i: number) => ({ t, original: sim.curves.original[i], modified: sim.curves.modified[i],
-    band: [sim.curves.modified_low[i], sim.curves.modified_high[i]] })) : []
+  const ax = sim ? glucoseAxis(sim.glucose_scale) : null
+  const data = sim && ax ? sim.time_min.map((t: number, i: number) => ({ t, original: ax.value(sim.curves.original[i]), modified: ax.value(sim.curves.modified[i]),
+    band: [ax.low(sim.curves.modified_low[i]), ax.high(sim.curves.modified_high[i])] })) : []
+  const overlay = ax?.known && sim ? pts.filter(p => p.min >= 0 && p.min <= sim.time_min[sim.time_min.length - 1]).map(p => ({ t: p.min, measured: ax.mmol(p.value_mmol) })) : []
+  const peakRow = sim && ax ? [ax.rise(sim.totals.original.peak_index), ax.rise(sim.totals.modified.peak_index)] : null
   const T = sim?.totals
 
   return (
     <Section title="Portion simulator" icon={<SlidersHorizontal className="size-5 text-teal-600" />} tag={<Tag kind="estimate" />}
       summary={changed.length ? `${changed.length} change(s) not applied` : readings.length ? `${readings.length} reading(s) logged` : 'Try smaller portions before saving'} defaultOpen={changed.length > 0}>
       <p className="text-xs text-slate-500 mb-3 flex items-start gap-1"><span>Change portions to compare the original and a modified meal. Nothing is saved until you press <b>Apply</b>.</span>
-        <InfoTip label="Portion simulator" align="right" text="Drag a slider to try a different amount of that food. The table shows the change in nutrients and glycaemic load; the curve is an educational simulation (not your glucose). Apply saves the new portions to the meal; Reset discards them." /></p>
+        <InfoTip label="Portion simulator" align="right" text="Drag a slider to try a different amount of that food. The table shows the change in nutrients and glycaemic load; the curve is an estimate of the glucose rise in your unit (starting from your pre-meal reading if you logged one), never a measurement. Apply saves the new portions to the meal; Reset discards them." /></p>
       <div className="space-y-2.5">{foods.map(f => {
         const g = grams[f.id] ?? f.grams
         return <div key={f.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
@@ -74,17 +78,24 @@ export default function PortionSimulator({ meal, onChange, readOnly }: { meal: M
             <tr key={k} className="border-t border-slate-100 text-right">
               <td className="text-left py-1 text-slate-600">{l}</td><td>{fmt(T.original[k], d)}</td><td className="font-semibold">{fmt(T.modified[k], d)}</td>
               <td className={df.abs ? (neg ? 'text-emerald-700' : 'text-rose-700') : 'text-slate-400'}>{df.abs == null ? '—' : `${df.abs > 0 ? '+' : ''}${fmt(df.abs, d)}`}</td>
-              <td className="text-slate-500">{df.pct == null ? '—' : `${df.pct > 0 ? '+' : ''}${fmt(df.pct, 0)}%`}</td></tr>) })}</tbody></table>
+              <td className="text-slate-500">{df.pct == null ? '—' : `${df.pct > 0 ? '+' : ''}${fmt(df.pct, 0)}%`}</td></tr>) })}
+            {peakRow && <tr className="border-t border-slate-100 text-right">
+              <td className="text-left py-1 text-slate-600">Est. peak rise ({ax!.unit})</td><td>~{peakRow[0]}</td><td className="font-semibold">~{peakRow[1]}</td>
+              <td className={peakRow[1] < peakRow[0] ? 'text-emerald-700' : peakRow[1] > peakRow[0] ? 'text-rose-700' : 'text-slate-400'}>{peakRow[1] === peakRow[0] ? '—' : `${peakRow[1] > peakRow[0] ? '+' : ''}${ax!.round(peakRow[1] - peakRow[0])}`}</td>
+              <td className="text-slate-500">estimate</td></tr>}</tbody></table>
           <p className="mt-1 text-[11px] text-slate-400">GL: {T.modified.gl_coverage}. “—” means the value is not available in the nutrition table.</p></div>
 
-        <h4 className="mt-4 text-sm font-semibold text-slate-700 flex items-center gap-2">Simulated glucose response <span className="chip bg-amber-50 text-amber-700">Simulated · relative index</span></h4>
-        <ResponsiveContainer width="100%" height={220}><ComposedChart data={data} margin={{ left: -18, right: 8, top: 8 }}>
-          <CartesianGrid stroke="#e2e8f0" vertical={false} /><XAxis dataKey="t" fontSize={11} unit=" min" /><YAxis fontSize={11} />
-          <Tooltip wrapperStyle={TIP_WRAP} contentStyle={TIP} formatter={(v: any, n: string) => Array.isArray(v) ? [`${v[0]}–${v[1]}`, n] : [v, n]} labelFormatter={t => `${t} min after eating`} />
+        <h4 className="mt-4 text-sm font-semibold text-slate-700 flex items-center gap-2 flex-wrap">{ax!.title} <span className="chip bg-amber-50 text-amber-700">Estimate</span></h4>
+        <GlucoseEstimateNote gs={sim.glucose_scale} />
+        <ResponsiveContainer width="100%" height={220}><ComposedChart data={data} margin={{ left: -12, right: 8, top: 8 }}>
+          <CartesianGrid stroke="#e2e8f0" vertical={false} /><XAxis dataKey="t" type="number" domain={[0, sim.time_min[sim.time_min.length - 1]]} ticks={[0, 60, 120, 180, 240, 300].filter(t => t <= sim.time_min[sim.time_min.length - 1])} fontSize={11} unit=" min" />
+          <YAxis fontSize={11} domain={yDomain(data.flatMap((r: any) => [r.original, ...r.band]).concat(overlay.map(o => o.measured)), ax!.known, ax!.unit)} allowDecimals={ax!.unit !== 'mg/dL'} />
+          <Tooltip wrapperStyle={TIP_WRAP} contentStyle={TIP} formatter={(v: any, n: string) => Array.isArray(v) ? [`${v[0]}–${v[1]} ${ax!.unit}`, n] : [`${v} ${ax!.unit}${n.startsWith('Measured') ? '' : ' (estimate)'}`, n]} labelFormatter={t => `${t} min after eating`} />
           <Legend wrapperStyle={{ fontSize: 11 }} />
-          <Area dataKey="band" name="Modified: portion range" fill="#14b8a6" fillOpacity={0.15} stroke="none" />
+          <Area dataKey="band" name="Estimate range (portion + calibration)" fill="#14b8a6" fillOpacity={0.15} stroke="none" />
           <Line dataKey="original" name="Original meal" stroke="#94a3b8" strokeDasharray="5 4" dot={false} strokeWidth={2} />
           <Line dataKey="modified" name="Modified meal" stroke="#0d9488" dot={false} strokeWidth={2.5} />
+          {overlay.length > 0 && <Scatter data={overlay} dataKey="measured" name="Measured (your readings)" fill="#2563eb" />}
         </ComposedChart></ResponsiveContainer>
         <details className="text-[11px] text-slate-500"><summary className="cursor-pointer">Assumptions · {sim.simulation_version}</summary>
           <ul className="list-disc pl-4 mt-1">{sim.assumptions.map((a: string) => <li key={a}>{a}</li>)}<li>Shaded band: {sim.band}</li></ul></details>

@@ -2,6 +2,13 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.10.0 — Glucose estimates in mmol/L
+
+- Forecast and portion simulator charts now show glucose in mmol/L (or mg/dL from your profile) instead of a relative index
+- Starts from your logged pre-meal reading; without one, the chart shows the estimated rise above your pre-meal level
+- Population estimate with a wide range; after 3 meals with before and after readings it calibrates to your own response
+- Always labelled an estimate, even with a known baseline; your measured readings are shown as dots for comparison
+
 ## v0.9.0 — A friendlier Meal Advisor
 
 - Warm, witty personality that adapts its tone: playful for food chat, careful for diabetes topics, serious for urgent ones
