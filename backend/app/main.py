@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app import models  # noqa: F401  (register tables)
-from app.api import advisor, ai, auth, dashboard, glucose, meals, users
+from app.api import advisor, ai, auth, contact, dashboard, glucose, meals, users
 from app.core import cache
 from app.core.config import settings
 from app.core.db import SessionLocal, engine
@@ -66,7 +66,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allo
                    allow_methods=["*"], allow_headers=["*"])
 
 api = APIRouter(prefix="/api/v1")
-for r in (auth.router, users.router, meals.router, dashboard.router, ai.router, glucose.router, advisor.router):
+for r in (auth.router, users.router, meals.router, dashboard.router, ai.router, glucose.router, advisor.router, contact.router):
     api.include_router(r)
 
 

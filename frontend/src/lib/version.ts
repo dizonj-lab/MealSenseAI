@@ -1,7 +1,12 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.10.0'
+export const APP_VERSION = '0.11.0'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.11.0', title: 'Contact form and creator links', changes: [
+    'Contact page now has a form; messages are saved and emailed to the creator',
+    'Removed the draft notices from the Privacy, Terms and Contact pages',
+    'Creator profile links to LinkedIn',
+  ] },
   { version: '0.10.0', title: 'Glucose estimates in mmol/L', changes: [
     'Forecast and portion simulator charts now show glucose in mmol/L (or mg/dL from your profile) instead of a relative index',
     'Starts from your logged pre-meal reading; without one, the chart shows the estimated rise above your pre-meal level',

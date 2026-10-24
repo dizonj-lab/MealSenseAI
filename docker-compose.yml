@@ -21,6 +21,12 @@ services:
       OLLAMA_URL: ${OLLAMA_URL:-http://127.0.0.1:9}     # optional local SLM; unreachable = rule-based fallback
       OLLAMA_MODEL: ${OLLAMA_MODEL:-}
       INFERENCE_DEVICE: ${INFERENCE_DEVICE:-auto}
+      CONTACT_TO: ${CONTACT_TO:-joel.dizon@live.com}   # contact-form messages are stored, and emailed here when SMTP_HOST is set
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     volumes: ["uploads:/data"]      # meal photos
     depends_on: { db: { condition: service_healthy }, init-perms: { condition: service_completed_successfully } }
     restart: unless-stopped

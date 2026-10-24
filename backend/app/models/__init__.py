@@ -204,3 +204,15 @@ class ChatMessage(Base):
     content: Mapped[str] = mapped_column(Text)
     meta: Mapped[dict] = mapped_column(JSON, default=dict)   # source, evidence, validation, latency, follow-ups
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class ContactMessage(Base):
+    """A message from the public contact form. email_status: sent | not_configured | failed."""
+    __tablename__ = "contact_messages"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(120))
+    email: Mapped[str] = mapped_column(String(255))
+    topic: Mapped[str] = mapped_column(String(40))
+    message: Mapped[str] = mapped_column(Text)
+    email_status: Mapped[str] = mapped_column(String(20), default="not_configured")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)

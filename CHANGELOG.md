@@ -2,6 +2,12 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.11.0 — Contact form and creator links
+
+- Contact page now has a form; messages are saved and emailed to the creator
+- Removed the draft notices from the Privacy, Terms and Contact pages
+- Creator profile links to LinkedIn
+
 ## v0.10.0 — Glucose estimates in mmol/L
 
 - Forecast and portion simulator charts now show glucose in mmol/L (or mg/dL from your profile) instead of a relative index

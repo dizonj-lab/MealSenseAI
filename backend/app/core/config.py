@@ -21,6 +21,13 @@ class Settings(BaseSettings):
     nutrition_db: Path = ROOT / "datasets" / "nutrition" / "foods.json"
     frontend_dist: Path = ROOT / "frontend" / "dist"
     max_upload_mb: int = 12
+    # contact form: messages are always stored; they are also emailed to contact_to when smtp_host is set
+    contact_to: str = "joel.dizon@live.com"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""   # defaults to smtp_user
 
 
 settings = Settings()
