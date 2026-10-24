@@ -1,6 +1,6 @@
 import shutil
-from pathlib import Path
 import time
+from pathlib import Path
 from datetime import date, datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
@@ -14,7 +14,7 @@ from app.core.db import get_db
 from app.core.security import current_user
 from app.models import Correction, Meal, MealFood, User
 from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut, MergeIn, SimulateIn
-from app.services import analysis, forecast, imaging, nutrition, portion, vision
+from app.services import analysis, forecast, imaging, insights, nutrition, portion, vision
 
 router = APIRouter(prefix="/meals", tags=["meals"])
 
@@ -43,27 +43,29 @@ async def capture(top: UploadFile | None = File(None), side: UploadFile | None =
                 reference_object=reference_object, serving_note=serving_note, meal_type=meal_type)
     db.add(meal)
     db.flush()
-    t0 = time.perf_counter()
-    images = []
+    images, read_s, proc_s = [], 0.0, 0.0     # timed separately: upload receipt (capture) vs image processing
     try:
         for view, up in uploads:
+            t0 = time.perf_counter()
             raw = await up.read()
+            t1 = time.perf_counter()
+            read_s += t1 - t0
             if len(raw) > settings.max_upload_mb * 1024 * 1024:
                 raise imaging.ImageError(f"{view}: file exceeds {settings.max_upload_mb} MB")
             images.append(imaging.process(raw, settings.data_dir / "uploads" / str(user.id) / str(meal.id), view))
+            proc_s += time.perf_counter() - t1
     except imaging.ImageError as e:
         db.rollback()
         raise HTTPException(422, str(e))
     meal.images = images
     warn = [w for im in images for w in im["warnings"]]
-    capture_ms = round((time.perf_counter() - t0) * 1000, 1)
     views = ", ".join(im["view"] for im in images) or "none"
     meal.stages = [
-        {"key": "capture", "name": "Meal capture", "status": "done", "latency_ms": capture_ms,
+        {"key": "capture", "name": "Meal capture", "status": "done", "latency_ms": round(read_s * 1000, 1),
          "detail": f"Photos: {views}" + ("; description provided" if meal.description else "")
                    + (f"; reference: {portion.REFERENCE_OBJECTS[reference_object]}" if reference_object else "")},
         {"key": "preprocess", "name": "Image pre-processing", "status": "done" if images else "skipped",
-         "latency_ms": capture_ms,
+         "latency_ms": round(proc_s * 1000, 1),
          "detail": (f"{len(images)} image(s) validated and orientation-corrected; originals retained. The classifier "
                     "uses the original with the EXP-002 evaluation preprocessing (resize 256, centre-crop 224, "
                     "ImageNet normalisation); a ≤1024 px copy is kept for display." if images else "No photo provided.")
@@ -129,6 +131,26 @@ def meal_forecast(body: ForecastIn, meal: Meal = Depends(owned_meal), user: User
         raise HTTPException(422, "Add at least one food with a nutrition match first")
     return forecast.forecast(foods, meal.totals, meal.insights, user.profile,
                              [s.model_dump() for s in body.scenarios], body.horizon_min)
+
+
+@router.get("/{meal_id}/progress", summary="Live analysis stages while /meals/analyze runs")
+def analysis_progress(meal: Meal = Depends(owned_meal)):
+    return analysis.progress(meal.id) or {"stages": meal.stages, "done": len(meal.stages), "total": len(analysis.STAGE_ORDER),
+                                          "current": None, "elapsed_ms": None}
+
+
+@router.post("/{meal_id}/explain", response_model=MealOut, summary="Write the local-SLM explanation (after results are shown)")
+def explain(meal: Meal = Depends(owned_meal), user: User = Depends(current_user), db: Session = Depends(get_db)):
+    if (meal.insights or {}).get("explanation", {}).get("source") != "pending":
+        return meal
+    foods = [analysis.food_dict(f) for f in meal.foods if not f.removed]
+    t0 = time.perf_counter()
+    exp = insights.contextualise(foods, meal.totals, meal.insights, user.profile, timeout=90)
+    exp["latency_ms"] = round((time.perf_counter() - t0) * 1000)
+    meal.insights = {**meal.insights, "explanation": exp}
+    db.commit()
+    db.refresh(meal)
+    return meal
 
 
 @router.post("/{meal_id}/simulate", summary="Portion what-if: original vs modified portions (nothing is saved)")

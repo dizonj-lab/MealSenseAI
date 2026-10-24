@@ -67,10 +67,27 @@ def _provisional(label: str) -> str | None:
     return res.key if res and nutrition.get(res.key) else None
 
 
+STAGE_ORDER = ["capture", "preprocess", "detect", "classify", "portion", "nutrition", "aggregate", "contextualise",
+               "recommend", "output"]
+PROGRESS: dict[int, dict] = {}   # meal_id -> live stage list while an analysis runs (single-process backend)
+
+
+def progress(meal_id: int) -> dict | None:
+    p = PROGRESS.get(meal_id)
+    if not p:
+        return None
+    done = len(p["stages"])
+    return {"stages": p["stages"], "done": done, "total": len(STAGE_ORDER),
+            "current": STAGE_ORDER[done] if done < len(STAGE_ORDER) else None,
+            "elapsed_ms": round((time.perf_counter() - p["t0"]) * 1000)}
+
+
 class _Stages:
-    def __init__(self, existing: list[dict]):
+    def __init__(self, existing: list[dict], meal_id: int | None = None):
         self.items = [s for s in existing if s["key"] in ("capture", "preprocess")]
         self.t = time.perf_counter()
+        if meal_id is not None:
+            PROGRESS[meal_id] = {"stages": self.items, "t0": self.t}   # same list object: appends are visible live
 
     def add(self, key, name, status, detail, **extra):
         now = time.perf_counter()
@@ -80,7 +97,14 @@ class _Stages:
 
 
 def run(db: Session, meal: Meal, profile) -> list[dict]:
-    st = _Stages(meal.stages)
+    try:
+        return _run(db, meal, profile)
+    finally:
+        PROGRESS.pop(meal.id, None)
+
+
+def _run(db: Session, meal: Meal, profile) -> list[dict]:
+    st = _Stages(meal.stages, meal.id)
     vstat = vision.status()
     mods = vstat["models"]
 
@@ -198,11 +222,11 @@ def run(db: Session, meal: Meal, profile) -> list[dict]:
     st.add("aggregate", "Meal aggregation", "done",
            f"{meal.totals['calories_kcal'] or 0} kcal · {meal.totals['carbs_g'] or 0} g carbs across "
            f"{meal.totals['item_count']} item(s)")
-    # 8: AI contextualisation
-    ins["explanation"] = insights.contextualise(foods, meal.totals, ins, profile)
-    st.add("contextualise", "AI contextualisation", "done" if ins["explanation"]["text"] else "fallback",
-           f"Explanation by {ins['explanation']['source'].replace('slm:', 'local SLM ')}" if ins["explanation"]["text"]
-           else "Local SLM offline — composition-grounded rule engine used.")
+    # 8: AI contextualisation (deferred: the local SLM writes it after results are shown, so it never delays analysis)
+    ins["explanation"] = insights.pending_explanation(foods)
+    st.add("contextualise", "AI contextualisation", "deferred" if ins["explanation"]["source"] == "pending" else "fallback",
+           f"Local SLM {ins['explanation'].get('model')} writes the explanation after results are shown (does not delay analysis)"
+           if ins["explanation"]["source"] == "pending" else "Local SLM offline — composition-grounded rule engine used.")
     st.items.append({"key": "recommend", "name": "Recommendations", "status": "done",
                      "detail": f"{len(ins['recommendations'])} recommendation(s), glucose impact {ins['glucose']['level']}",
                      "latency_ms": 0.0})

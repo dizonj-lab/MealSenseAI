@@ -1,17 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Camera, CheckCircle2, CircleDashed, ImagePlus, Loader2, RefreshCw, Sparkles, X, XCircle } from 'lucide-react'
+import { Camera, ImagePlus, Loader2, RefreshCw, Sparkles, X } from 'lucide-react'
 import { api } from '../lib/api'
 import type { Meal, Stage } from '../lib/types'
 import MealReview from '../components/MealReview'
+import PipelineDrawer from '../components/PipelineDrawer'
 import { Card, ErrorNote } from '../components/ui'
 
-const STAGES = [
-  ['capture', 'Meal capture'], ['preprocess', 'Image pre-processing'], ['detect', 'Food instance detection'],
-  ['classify', 'Food classification'], ['portion', 'Portion estimation'], ['nutrition', 'Nutrition mapping'],
-  ['aggregate', 'Meal aggregation'], ['contextualise', 'AI contextualisation'], ['recommend', 'Recommendations'],
-  ['output', 'Application output'],
-] as const
 const REFS: [string, string][] = [['none', 'None'], ['dinner_plate', 'Dinner plate'], ['rice_bowl', 'Rice bowl'], ['credit_card', 'Credit card'], ['hand', 'Hand']]
 
 function PhotoSlot({ label, hint, file, onFile }: { label: string; hint: string; file: File | null; onFile: (f: File | null) => void }) {
@@ -40,31 +35,6 @@ function PhotoSlot({ label, hint, file, onFile }: { label: string; hint: string;
   )
 }
 
-function StageList({ stages, running }: { stages: Stage[]; running: number }) {
-  return (
-    <ol className="space-y-2.5">
-      {STAGES.map(([key, name], i) => {
-        const s = stages.find(x => x.key === key)
-        const icon = s ? (s.status === 'done' ? <CheckCircle2 className="size-5 text-emerald-600" /> : s.status === 'unsupported' || s.status === 'fallback' || s.status === 'uncertain' ? <XCircle className="size-5 text-amber-500" /> : <CircleDashed className="size-5 text-slate-400" />)
-          : i === running ? <Loader2 className="size-5 text-brand-600 animate-spin" /> : <CircleDashed className="size-5 text-slate-300" />
-        return (
-          <li key={key} className="flex gap-3">
-            <span className="mt-0.5">{icon}</span>
-            <div className="min-w-0 flex-1">
-              <div className="flex justify-between gap-2 text-sm"><span className={`font-medium ${s || i === running ? 'text-slate-800' : 'text-slate-400'}`}>{i + 1}. {name}</span>
-                {s && <span className="text-xs text-slate-400 shrink-0">{s.latency_ms} ms</span>}</div>
-              {s && <p className="text-xs text-slate-500 mt-0.5">{s.detail}</p>}
-              {s?.per_view?.map(v => v.top_labels?.length > 0 && (
-                <p key={v.view} className="text-[11px] text-slate-400 mt-0.5">{v.view} view, whole-image top-5: {v.top_labels.map((t: any) => `${t.label} ${t.score.toFixed(2)}`).join(', ')}</p>))}
-              {s?.per_view?.map(v => v.instances?.length > 0 && (
-                <p key={v.view + 'i'} className="text-[11px] text-slate-400 mt-0.5">{v.view} view instances: {v.instances.map((i: any) => `${i.label} (${i.kind}, ${(i.area_frac * 100).toFixed(0)}% of image${i.food ? ` → ${i.food.label}` : ''})`).join('; ')}</p>))}
-            </div>
-          </li>)
-      })}
-    </ol>
-  )
-}
-
 export default function Capture() {
   const nav = useNavigate()
   const [top, setTop] = useState<File | null>(null)
@@ -74,13 +44,16 @@ export default function Capture() {
   const [note, setNote] = useState('')
   const [meal, setMeal] = useState<Meal | null>(null)
   const [stages, setStages] = useState<Stage[]>([])
-  const [running, setRunning] = useState(-1)
+  const [current, setCurrent] = useState<string | null>(null)
+  const [elapsed, setElapsed] = useState<number | null>(null)
   const [err, setErr] = useState<string | null>(null)
   const reviewRef = useRef<HTMLDivElement>(null)
 
   const analyze = async () => {
-    setErr(null); setMeal(null); setStages([]); setRunning(0)
+    setErr(null); setMeal(null); setStages([]); setCurrent('capture'); setElapsed(0)
     let timer: number | undefined
+    const t0 = performance.now()
+    const tick = window.setInterval(() => setElapsed(performance.now() - t0), 100)
     try {
       const fd = new FormData()
       if (top) fd.append('top', top)
@@ -89,16 +62,16 @@ export default function Capture() {
       if (ref !== 'none') fd.append('reference_object', ref)
       if (note.trim()) fd.append('serving_note', note.trim())
       const captured = await api<Meal>('/meals/capture', { method: 'POST', body: fd })
-      setStages(captured.stages); setRunning(2)
-      // stages 3–10 run server-side in one request; advance the indicator while waiting
-      timer = window.setInterval(() => setRunning(r => Math.min(r + 1, 9)), 500)
+      setStages(captured.stages); setCurrent('detect')
+      // stages 3–10 run server-side in one request; poll the live stage list the server records as each step finishes
+      timer = window.setInterval(() => api<any>(`/meals/${captured.id}/progress`).then(p => { if (p.current) { setStages(p.stages); setCurrent(p.current) } }).catch(() => {}), 400)
       const analyzed = await api<Meal>('/meals/analyze', { method: 'POST', json: { meal_id: captured.id } })
       setStages(analyzed.stages); setMeal(analyzed)
       setTimeout(() => reviewRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
-    } catch (e: any) { setErr(e.message) } finally { clearInterval(timer); setRunning(-1) }
+    } catch (e: any) { setErr(e.message) } finally { clearInterval(timer); clearInterval(tick); setCurrent(null) }
   }
   const reset = () => { setTop(null); setSide(null); setDesc(''); setNote(''); setRef('none'); setMeal(null); setStages([]) }
-  const busy = running >= 0
+  const busy = current !== null
   const ready = !!top || !!side || !!desc.trim()
 
   return (
@@ -123,9 +96,10 @@ export default function Capture() {
           {busy ? <Loader2 className="size-5 animate-spin" /> : <Sparkles className="size-5" />}ANALYZE MEAL</button>
       </Card>}
 
-      {(busy || stages.length > 0) && <Card title="Analysis pipeline" action={meal && <button className="btn-ghost py-1.5 text-xs" onClick={reset}>New capture</button>}>
-        <StageList stages={stages} running={running} />
-      </Card>}
+      {(busy || stages.length > 0) && <div className="space-y-2">
+        <PipelineDrawer stages={stages} current={current} elapsedMs={elapsed} meal={meal} />
+        {meal && <button className="btn-ghost w-full py-2 text-sm" onClick={reset}><Camera className="size-4" />New capture</button>}
+      </div>}
 
       <div ref={reviewRef}>{meal && <MealReview meal={meal} onChange={setMeal} onSaved={m => nav(`/meals/${m.id}`, { state: { saved: true } })} />}</div>
     </div>

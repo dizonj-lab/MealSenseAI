@@ -49,7 +49,7 @@ def _log(task, model, ok, ms, tokens=None, extra=None):
         db.commit()
 
 
-def chat_json(task: str, system: str, prompt: str, schema: type[BaseModel]):
+def chat_json(task: str, system: str, prompt: str, schema: type[BaseModel], timeout: float | None = None):
     st = status()
     if not st["available"]:
         return None
@@ -58,7 +58,7 @@ def chat_json(task: str, system: str, prompt: str, schema: type[BaseModel]):
         return schema.model_validate(hit)
     t0 = time.perf_counter()
     try:
-        r = httpx.post(f"{settings.ollama_url}/api/chat", timeout=settings.ollama_timeout_s, json={
+        r = httpx.post(f"{settings.ollama_url}/api/chat", timeout=timeout or settings.ollama_timeout_s, json={
             "model": st["selected"], "stream": False, "format": schema.model_json_schema(),
             "options": {"temperature": 0.1},
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]})
@@ -110,9 +110,9 @@ def suggest_match(label: str, catalog: list[dict]):
                      f"Food: {label}\nCatalog:\n{cat}", Match)
 
 
-def explain(facts: dict):
+def explain(facts: dict, timeout: float | None = None):
     return chat_json("insight_explanation",
                      "You explain meal nutrition facts for general education. Use ONLY the numbers given. "
                      "Do not predict the person's blood glucose, give medical advice, mention medication, "
                      "or cite studies. Mention uncertainty when stated.",
-                     json.dumps(facts), Explanation)
+                     json.dumps(facts), Explanation, timeout=timeout)

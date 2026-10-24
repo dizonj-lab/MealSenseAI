@@ -243,3 +243,19 @@ def test_portion_simulator_glucose_readings_personalised(client, auth):
     assert len(rows) == 1 and rows[0]["kind"] == "measured"
     assert client.delete(f"{API}/glucose/{rows[0]['id']}", headers=auth).status_code == 204
     assert client.get(f"{API}/glucose?meal_id={mid}", headers=auth).json() == []
+
+
+def test_progress_and_deferred_slm_explanation(client, auth, monkeypatch):
+    from app.services import slm
+    monkeypatch.setattr(slm, "status", lambda force=False: {"available": True, "selected": "fake-slm", "models": ["fake-slm"], "error": None})
+    calls = []
+    monkeypatch.setattr(slm, "explain", lambda facts, timeout=None: calls.append(timeout) or slm.Explanation(summary="Mostly carbohydrate from rice."))
+    meal = client.post(f"{API}/meals/capture", headers=auth, data={"description": "chicken rice"}).json()
+    meal = client.post(f"{API}/meals/analyze", json={"meal_id": meal["id"]}, headers=auth).json()
+    ctx = next(s for s in meal["stages"] if s["key"] == "contextualise")
+    assert ctx["status"] == "deferred" and ctx["latency_ms"] < 1000 and not calls      # analysis never waits for the SLM
+    assert meal["insights"]["explanation"]["source"] == "pending"
+    p = client.get(f"{API}/meals/{meal['id']}/progress", headers=auth).json()
+    assert p["done"] == p["total"] == 10 and p["current"] is None
+    meal = client.post(f"{API}/meals/{meal['id']}/explain", headers=auth).json()
+    assert meal["insights"]["explanation"]["text"] == "Mostly carbohydrate from rice." and calls == [90]

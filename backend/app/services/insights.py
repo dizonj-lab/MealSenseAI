@@ -222,7 +222,7 @@ def core(foods: list[dict], profile) -> tuple[dict, dict]:
                "allergy_warnings": allergy_warnings(foods, profile), "personalised": personalised(foods, t, g, profile)}
 
 
-def contextualise(foods: list[dict], t: dict, ins: dict, profile) -> dict:
+def contextualise(foods: list[dict], t: dict, ins: dict, profile, timeout: float | None = None) -> dict:
     """Stage 8: SLM explanation grounded in the computed numbers and the user's stated goals."""
     if not foods:
         return {"text": None, "source": "none"}
@@ -231,12 +231,18 @@ def contextualise(foods: list[dict], t: dict, ins: dict, profile) -> dict:
              "glycemic_load": ins["glucose"]["glycemic_load"], "portion_uncertainty": "photo-based estimates, ±35–50%",
              "user_goals": list(profile.goals or []) if profile else [],
              "recommendations": [r["title"] for r in ins["recommendations"]]}
-    res = slm.explain(facts)
+    res = slm.explain(facts, timeout=timeout)
     return {"text": res.summary, "source": f"slm:{slm.status()['selected']}"} if res else {"text": None, "source": "none"}
+
+
+def pending_explanation(foods: list[dict]) -> dict:
+    """The SLM explanation is written after results are shown (POST /meals/{id}/explain), never inline."""
+    st = slm.status()
+    return {"text": None, "source": "pending", "model": st["selected"]} if foods and st["available"] else {"text": None, "source": "none"}
 
 
 def build(foods: list[dict], profile, use_slm: bool = True) -> tuple[dict, dict]:
     t, ins = core(foods, profile)
-    ins["explanation"] = contextualise(foods, t, ins, profile) if use_slm else {"text": None, "source": "none"}
+    ins["explanation"] = pending_explanation(foods) if use_slm else {"text": None, "source": "none"}
     ins["generated_at"] = datetime.now(timezone.utc).isoformat()
     return t, ins
