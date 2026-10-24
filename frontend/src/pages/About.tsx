@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { BookOpen, Cpu, Database, FlaskConical, History, ShieldAlert } from 'lucide-react'
+import { BookOpen, Cpu, Database, FlaskConical, History, ShieldAlert, UserRound } from 'lucide-react'
 import { useApi } from '../lib/hooks'
 import { APP_VERSION, CHANGELOG } from '../lib/version'
 import { Card } from '../components/ui'
+import CreatorProfile from '../components/CreatorProfile'
 
 const Row = ({ k, v }: { k: string; v: React.ReactNode }) => (
   <div className="grid grid-cols-[8.5rem_minmax(0,1fr)] gap-3 py-1.5 border-b border-slate-100 last:border-0 text-sm"><dt className="text-slate-500">{k}</dt><dd className="text-slate-800">{v}</dd></div>)
@@ -19,6 +20,10 @@ export default function About() {
         <p className="text-sm text-slate-600">MealSenseAI recognises the foods in a meal photo, estimates portions and nutrition, and explains what the meal may mean for your energy and glucose, with every step open to correction. It is an educational tool, not a medical device.</p>
         <dl className="mt-3"><Row k="App version" v={`v${APP_VERSION}`} /><Row k="Server" v={h ? `v${h.version ?? '?'} · vision ${h.vision ? 'online' : 'offline'} · text SLM ${h.slm ? h.slm_model : 'offline'}` : '…'} /></dl>
       </Card>
+
+      <section id="creator" className="scroll-mt-20"><Card title="About the creator" icon={<UserRound className="size-5 text-brand-600" />}>
+        <CreatorProfile />
+      </Card></section>
 
       <Card title="Datasets" icon={<Database className="size-5 text-sky-600" />}>
         <p className="text-sm text-slate-600 mb-3">The food classifier was trained on two public research datasets, harmonised into one 320-class taxonomy.</p>

@@ -13,7 +13,7 @@ export default function PublicShell({ children }: { children: ReactNode }) {
       </header>
       <main className="flex-1">{children}</main>
       <footer className="w-full max-w-5xl mx-auto px-5 sm:px-8 py-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm border-t" style={{ borderColor: 'var(--p-border)', color: 'var(--p-muted)' }}>
-        <span className="mr-auto">© MealSenseAI</span>
+        <span className="mr-auto">© MealSenseAI · Created by <Link to="/creator" className="underline">Joselito Villanueva Dizon</Link></span>
         <Link to="/privacy">Privacy Policy</Link><Link to="/terms">Terms of Service</Link><Link to="/contact">Contact</Link>
       </footer>
     </div>

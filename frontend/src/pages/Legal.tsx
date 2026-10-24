@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import PublicShell from '../components/PublicShell'
+import CreatorProfile from '../components/CreatorProfile'
 
 const DRAFT = 'Draft for review. This text has not been reviewed by a lawyer.'
 
@@ -58,5 +59,16 @@ export function Contact() {
       <p>Questions, feedback or data requests: <b>[contact email]</b></p>
       <p style={{ color: 'var(--p-muted)' }}>For medical concerns, please contact your doctor. In an emergency, call your local emergency number.</p>
     </Page>
+  )
+}
+
+export function Creator() {
+  return (
+    <PublicShell>
+      <article className="max-w-2xl mx-auto px-5 sm:px-8 py-14">
+        <p className="text-xs font-medium uppercase tracking-wider mb-6" style={{ color: 'var(--p-muted)' }}>About the creator</p>
+        <CreatorProfile />
+      </article>
+    </PublicShell>
   )
 }
