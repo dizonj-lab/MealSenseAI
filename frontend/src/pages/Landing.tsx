@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import PublicShell from '../components/PublicShell'
-import { CaptureArt, IdentifyArt } from '../components/LandingArt'
 
 const STEPS: [string, string][] = [
   ['Capture', 'Take a photo of your meal. One top view is enough.'],
@@ -44,29 +43,14 @@ export default function Landing() {
   const muted = { color: 'var(--p-muted)' }
   return (
     <PublicShell>
-      <section className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 sm:pt-28 pb-20 sm:pb-28 text-center">
+      <section className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 sm:pt-28 pb-12 sm:pb-16 text-center">
         <h1 className="text-[38px] sm:text-6xl font-semibold tracking-tight leading-[1.08]">Understand your food.<br className="hidden sm:block" /> Make healthier choices.</h1>
         <p className="mt-6 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto" style={muted}>MealSenseAI helps you identify what's on your plate, estimate nutrition, and understand how your meals may affect your glucose and energy.</p>
-        <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-          <Link to="/register" className="rounded-xl px-7 py-3.5 text-base font-medium text-white" style={{ background: 'var(--p-primary)' }}>Get Started</Link>
-          <a href="#how" className="rounded-xl px-7 py-3.5 text-base font-medium border" style={{ borderColor: 'var(--p-border)' }}>See How It Works</a>
-        </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-5 sm:px-8 -mt-6 sm:-mt-10 pb-20" aria-label="From photo to every food on the plate">
-        <div className="grid sm:grid-cols-[auto_auto_minmax(0,1fr)] items-center justify-center gap-6 sm:gap-8">
-          <CaptureArt />
-          <svg viewBox="0 0 48 24" className="w-12 mx-auto rotate-90 sm:rotate-0" aria-hidden="true"><path d="M2 12h40m-8-8 8 8-8 8" fill="none" stroke="var(--p-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          <div className="w-full max-w-sm mx-auto"><IdentifyArt /></div>
-        </div>
-        <p className="mt-4 text-center text-xs" style={muted}>Illustration</p>
-      </section>
-
-      <section id="how" className="border-t scroll-mt-4" style={{ borderColor: 'var(--p-border)' }}>
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-20">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center">How it works</h2>
-          <p className="mt-3 text-center text-sm" style={muted}>Real screens from the app.</p>
-          <ol className="mt-12 grid sm:grid-cols-3 gap-14 sm:gap-8">{STEPS.map(([t, b], i) => (
+      <section id="how" className="scroll-mt-4">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-20">
+          <ol className="grid sm:grid-cols-3 gap-14 sm:gap-8">{STEPS.map(([t, b], i) => (
             <li key={t} className="text-center sm:text-left">
               <div className="h-[400px] sm:h-[370px] lg:h-[410px] flex items-start justify-center mb-6 overflow-hidden">
                 <StepShots shots={SHOTS[i]} />

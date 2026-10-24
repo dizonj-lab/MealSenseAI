@@ -1,0 +1,5 @@
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: http://192.0.2.2:4173/
+2:54:53 PM [vite] http proxy error: /api/v1/auth/register
+Error: connect ECONNREFUSED 127.0.0.1:8000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
