@@ -25,6 +25,10 @@ with sync_playwright() as p:
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
 
+    page.goto(f"{BASE}/")   # public landing page before login
+    expect(page.get_by_role("heading", name="Understand what's on your plate — before you eat it.")).to_be_visible()
+    expect(page.get_by_role("tab", name="Create account")).to_have_attribute("aria-selected", "true")
+    shot(page, "00_landing")
     page.goto(f"{BASE}/register")
     shot(page, "01_register")
     page.get_by_label("Name").fill("Joel")
@@ -48,6 +52,8 @@ with sync_playwright() as p:
     page.get_by_label("Daily carbs").fill("200")
     page.get_by_role("button", name="Finish").click()
     expect(page.get_by_text("Hi Joel")).to_be_visible()
+    expect(page.get_by_text("Getting started")).to_be_visible()
+    expect(page.get_by_text("1 of 5 done")).to_be_visible()
     shot(page, "04_dashboard_empty")
 
     page.get_by_role("link", name="Capture meal").first.click()
@@ -55,7 +61,7 @@ with sync_playwright() as p:
     page.get_by_placeholder("e.g. chicken rice and kopi").fill("kaya toast and 2 boiled eggs")
     shot(page, "05_capture")
     page.get_by_role("button", name="ANALYZE MEAL").click()
-    expect(page.get_by_text("Potential Glucose Impact")).to_be_visible(timeout=30000)
+    expect(page.get_by_text("Key takeaways")).to_be_visible(timeout=30000)
     page.wait_for_timeout(800)
     shot(page, "06_analysis_review")
     # pipeline drawer: compact progress bar, telemetry opens on demand
@@ -67,6 +73,11 @@ with sync_playwright() as p:
     page.wait_for_timeout(300)
     page.screenshot(path=str(OUT / "06a_telemetry_drawer.png"))
     drawer.get_by_role("button", name="Close").click()
+    # simple view by default: compact cards and collapsed sections; then switch to detailed for the full flow
+    expect(page.get_by_text("Key takeaways")).to_be_visible()
+    expect(page.get_by_role("button", name="Meal composition")).to_have_attribute("aria-expanded", "false")
+    shot(page, "06c_simple_view")
+    page.get_by_role("button", name="Detailed").click()
     # top-3 candidates: switch to candidate 2, verify, switch back (confirm/override workflow)
     cands = page.locator("button", has_text="%").filter(has_text=". ")
     expect(cands.first).to_be_visible()
@@ -85,7 +96,7 @@ with sync_playwright() as p:
     card.get_by_role("button", name="Portion").click()
     card.locator("input[type=number]").fill("140")
     card.get_by_role("button", name="Save").click()
-    expect(card.get_by_text("140 g")).to_be_visible()
+    expect(card.get_by_text("140 g").first).to_be_visible()
     # add missing food
     page.get_by_role("button", name="Add missing food").click()
     page.get_by_placeholder("Search e.g.").fill("cucumber")
@@ -131,11 +142,11 @@ with sync_playwright() as p:
     expect(page.get_by_text("Meal saved to your history")).to_be_visible()
     shot(page, "08_saved_meal")
     # forecast & what-if: add a second scenario and check cautions render
-    expect(page.get_by_text("Forecast & what-if analysis")).to_be_visible(timeout=15000)
+    expect(page.get_by_text("Forecast & what-if", exact=True)).to_be_visible(timeout=15000)
     page.get_by_role("button", name="Run hard right after").click()
     expect(page.get_by_text("Scenario 2:")).to_be_visible(timeout=15000)
     expect(page.get_by_text("within 15 min of eating").first).to_be_visible()
-    page.get_by_text("Forecast & what-if analysis").scroll_into_view_if_needed()
+    page.get_by_text("Forecast & what-if", exact=True).scroll_into_view_if_needed()
     page.wait_for_timeout(500)
     shot(page, "08b_forecast")
 
@@ -164,7 +175,7 @@ with sync_playwright() as p:
     dpage.wait_for_timeout(600)
     shot(dpage, "14_desktop_dashboard")
     dpage.get_by_role("link", name="Kaya toast", exact=False).first.click()
-    expect(dpage.get_by_text("Potential Glucose Impact")).to_be_visible()
+    expect(dpage.get_by_text("Key takeaways")).to_be_visible()
     dpage.wait_for_timeout(600)
     shot(dpage, "15_desktop_meal")
     print("EMAIL", EMAIL)

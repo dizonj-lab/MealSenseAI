@@ -4,6 +4,7 @@ import { Camera, Salad, TrendingUp } from 'lucide-react'
 import { fmt, tzOffset } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { useApi } from '../lib/hooks'
+import GettingStarted from '../components/GettingStarted'
 import MealRow from '../components/MealRow'
 import { Card, Empty, Progress, Spinner, Stat } from '../components/ui'
 
@@ -25,6 +26,8 @@ export default function Dashboard() {
           <div className="text-white/85 text-sm mt-1">{t.meals ? `${t.meals} meal(s) logged today.` : 'No meals logged yet today.'}</div></div>
         <Link to="/capture" className="btn bg-white text-brand-700 hover:bg-brand-50 py-3 px-5 text-base shadow"><Camera className="size-5" />Capture Meal</Link>
       </div>
+
+      <GettingStarted totalMeals={d.total_meals} confirmed={d.recent_meals.some((m: any) => m.status === 'confirmed')} />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="Calories today" value={fmt(t.calories_kcal)} unit="kcal" tone="teal" sub={g.calorie_goal && `of ${g.calorie_goal} goal`} />

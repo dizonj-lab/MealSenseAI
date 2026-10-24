@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { Loader2 } from 'lucide-react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { ChevronDown, Loader2 } from 'lucide-react'
 
 export const Spinner = ({ className = 'size-6' }: { className?: string }) => <Loader2 className={`animate-spin text-brand-600 ${className}`} />
 
@@ -66,3 +66,38 @@ export const Tag = ({ kind }: { kind: 'prediction' | 'estimate' | 'measured' | '
   return <span className={`chip text-[10px] uppercase tracking-wide ${t[1]}`}>{t[0]}</span>
 }
 
+
+/** Simple / Detailed view: explanations stay one tap away instead of filling the screen. */
+const DetailCtx = createContext<{ detailed: boolean; setDetailed: (v: boolean) => void }>({ detailed: false, setDetailed: () => {} })
+export function DetailProvider({ children }: { children: ReactNode }) {
+  const [detailed, set] = useState<boolean>(() => { try { return localStorage.getItem('mealsense.detail') === '1' } catch { return false } })
+  const setDetailed = (v: boolean) => { set(v); try { localStorage.setItem('mealsense.detail', v ? '1' : '0') } catch { /* private mode */ } }
+  return <DetailCtx.Provider value={{ detailed, setDetailed }}>{children}</DetailCtx.Provider>
+}
+export const useDetail = () => useContext(DetailCtx)
+
+export function DetailSwitch() {
+  const { detailed, setDetailed } = useDetail()
+  return <div className="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-semibold" role="group" aria-label="Amount of detail">
+    {([['Simple', false], ['Detailed', true]] as const).map(([l, v]) => <button key={l} onClick={() => setDetailed(v)} aria-pressed={detailed === v}
+      className={`rounded-lg px-3 py-1.5 transition ${detailed === v ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>{l}</button>)}
+  </div>
+}
+
+/** A card that shows a one-line summary when collapsed. Opens by default in Detailed view. */
+export function Section({ title, icon, summary, tag, children, defaultOpen = false }: { title: ReactNode; icon?: ReactNode; summary?: ReactNode; tag?: ReactNode; children: ReactNode; defaultOpen?: boolean }) {
+  const { detailed } = useDetail()
+  const [open, setOpen] = useState<boolean | null>(null)
+  useEffect(() => setOpen(null), [detailed])
+  const isOpen = open ?? (detailed || defaultOpen)
+  return (
+    <section className="card">
+      <button className="w-full flex items-center gap-2 p-4 sm:px-5 text-left" aria-expanded={isOpen} onClick={() => setOpen(!isOpen)}>
+        {icon}<span className="font-semibold text-slate-800 shrink-0">{title}</span>{isOpen && tag}
+        <span className="ml-auto min-w-0 truncate text-xs text-slate-500">{!isOpen && summary}</span>
+        <ChevronDown className={`size-4 shrink-0 text-slate-400 transition ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      {isOpen && <div className="px-4 sm:px-5 pb-4 sm:pb-5 -mt-1">{children}</div>}
+    </section>
+  )
+}

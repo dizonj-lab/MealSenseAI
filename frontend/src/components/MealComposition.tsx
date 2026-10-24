@@ -1,7 +1,7 @@
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { fmt } from '../lib/api'
 import type { Food, Meal } from '../lib/types'
-import { Card, Tag } from './ui'
+import { Section, Tag } from './ui'
 
 const TIP = { fontSize: 11, whiteSpace: 'normal' as const }
 const TIP_WRAP = { maxWidth: '65%', zIndex: 5 }
@@ -33,7 +33,7 @@ export default function MealComposition({ meal, items, colors }: { meal: Meal; i
   // a nutrient is incomplete only when a matched food lacks it (unnamed items are reported separately)
   const missing = new Set(N.map(x => x[0]).filter(k => mapped.some(({ f }) => f.nutrients[k] == null)))
   return (
-    <Card title="Meal composition" action={<Tag kind="estimate" />}>
+    <Section title="Meal composition" tag={<Tag kind="estimate" />} summary={`${fmt(t.calories_kcal)} kcal · ${fmt(t.carbs_g)} g carbs · charts by food`}>
       <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 text-center">
         {N.map(([k, l, u]) => <div key={k} className="rounded-xl bg-slate-50 py-2">
           <div className="text-[10px] text-slate-500">{l}</div>
@@ -80,6 +80,6 @@ export default function MealComposition({ meal, items, colors }: { meal: Meal; i
           <p className="text-[11px] text-slate-400">GL = GI × available carbohydrate (carbs − fibre) ÷ 100; meal GL ≤10 low, 11–19 medium, ≥20 high (Atkinson et al. 2021).
             {noGi.length > 0 && ` No GI value, so not included: ${noGi.join(', ')}.`}</p></div>
       </div>
-    </Card>
+    </Section>
   )
 }

@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import { useAuth } from './lib/auth'
 import AuthPage from './pages/Auth'
+import Landing from './pages/Landing'
 import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
 import Capture from './pages/Capture'
@@ -17,7 +18,7 @@ function Protected({ children }: { children: JSX.Element }) {
   const { user, loading } = useAuth()
   const loc = useLocation()
   if (loading) return <div className="h-full grid place-items-center"><Spinner /></div>
-  if (!user) return <Navigate to="/login" replace state={{ from: loc.pathname }} />
+  if (!user) return loc.pathname === '/' ? <Landing /> : <Navigate to="/login" replace state={{ from: loc.pathname }} />
   if (!user.onboarded && loc.pathname !== '/onboarding') return <Navigate to="/onboarding" replace />
   return children
 }

@@ -3,7 +3,8 @@ import { Area, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, 
 import { Check, RotateCcw, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { api, fmt } from '../lib/api'
 import type { Meal } from '../lib/types'
-import { Card, ErrorNote, Spinner, Tag } from './ui'
+import { ErrorNote, Section, Spinner, Tag } from './ui'
+import { markSimulatorTried } from './GettingStarted'
 
 type Reading = { id: number; measured_at: string; value_mmol: number; entered_unit: string; context: string; source: string }
 const TIP = { fontSize: 11, whiteSpace: 'normal' as const }
@@ -54,7 +55,8 @@ export default function PortionSimulator({ meal, onChange, readOnly }: { meal: M
   const T = sim?.totals
 
   return (
-    <Card title="Portion simulator" icon={<SlidersHorizontal className="size-5 text-teal-600" />} action={<Tag kind="estimate" />}>
+    <Section title="Portion simulator" icon={<SlidersHorizontal className="size-5 text-teal-600" />} tag={<Tag kind="estimate" />}
+      summary={changed.length ? `${changed.length} change(s) not applied` : readings.length ? `${readings.length} reading(s) logged` : 'Try smaller portions before saving'} defaultOpen={changed.length > 0}>
       <p className="text-xs text-slate-500 mb-3">Change portions to compare the original and a modified meal. Nothing is saved until you press <b>Apply</b>.</p>
       <div className="space-y-2.5">{foods.map(f => {
         const g = grams[f.id] ?? f.grams
@@ -62,7 +64,7 @@ export default function PortionSimulator({ meal, onChange, readOnly }: { meal: M
           <div className="text-sm text-slate-700 truncate">{f.label} <span className="text-slate-400">· was {fmt(f.grams)} g</span></div>
           <div className="text-sm font-semibold tabular-nums">{fmt(g)} g <span className="text-xs font-normal text-slate-400">({fmt(f.grams ? g / f.grams * 100 : 0)}%)</span></div>
           <input aria-label={`${f.label} portion`} type="range" min={0} max={Math.max(f.grams * 2, 50)} step={Math.max(1, Math.round(f.grams / 20))} value={g}
-            onChange={e => setGrams(s => ({ ...s, [f.id]: Number(e.target.value) }))} className="col-span-2 accent-teal-600" />
+            onChange={e => { markSimulatorTried(); setGrams(s => ({ ...s, [f.id]: Number(e.target.value) })) }} className="col-span-2 accent-teal-600" />
         </div> })}</div>
       {!sim ? <div className="py-6 grid place-items-center"><Spinner /></div> : <>
         <div className="mt-4 overflow-x-auto"><table className="w-full text-sm tabular-nums [&_th]:pl-3 [&_td]:pl-3">
@@ -111,6 +113,6 @@ export default function PortionSimulator({ meal, onChange, readOnly }: { meal: M
         <button className="btn-ghost flex-1" onClick={() => setGrams({})}><RotateCcw className="size-4" />Reset</button>
         <button className="btn-primary flex-1" disabled={busy} onClick={apply}>{busy ? <Spinner className="size-4 text-white" /> : <Check className="size-4" />}Apply {changed.length} portion change(s)</button>
       </div>}
-    </Card>
+    </Section>
   )
 }
