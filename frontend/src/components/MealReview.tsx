@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AlertTriangle, Check, MessageCircle, Droplet, Flame, Info, Lightbulb, Merge, Pencil, Plus, RotateCcw, Scale, Sparkles, Trash2 } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { api, fmt } from '../lib/api'
+import { useAdvisor } from '../lib/advisor'
 import { useAuthImage } from '../lib/hooks'
 import type { Food, Meal } from '../lib/types'
 import FoodPicker from './FoodPicker'
@@ -218,6 +218,8 @@ export default function MealReview(props: ReviewProps) {
 }
 
 function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
+  const advisor = useAdvisor()
+  useEffect(() => { advisor.setContextMeal(meal.id); return () => advisor.setContextMeal(null) }, [meal.id])  // eslint-disable-line react-hooks/exhaustive-deps
   const [adding, setAdding] = useState(false)
   const [mealType, setMealType] = useState(meal.meal_type ?? guessMealType())
   const [err, setErr] = useState<string | null>(null)
@@ -295,11 +297,13 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
         </div>
       </div>
       <InsightCards meal={meal} onChange={onChange} />
-      <Link to={`/advisor?meal=${meal.id}`} className="card p-4 flex items-center gap-3 hover:ring-1 hover:ring-brand-200">
-        <span className="size-9 shrink-0 rounded-xl bg-brand-50 text-brand-700 grid place-items-center"><MessageCircle className="size-5" /></span>
-        <span className="flex-1"><span className="block font-semibold text-slate-800">Ask the Meal Advisor about this meal</span>
-          <span className="block text-xs text-slate-500">“Is this OK for my goal?” · “What's a lower-carb swap?”</span></span>
-      </Link>
+      <div className="card p-4">
+        <div className="flex items-center gap-3">
+          <span className="size-9 shrink-0 rounded-xl bg-brand-50 text-brand-700 grid place-items-center"><MessageCircle className="size-5" /></span>
+          <span className="font-semibold text-slate-800">Ask the Meal Advisor about this meal</span></div>
+        <div className="mt-3 flex flex-wrap gap-1.5">{['Is this meal OK for my goal?', 'Which food adds the most carbs?', 'Suggest a lower-carb swap for this meal'].map(q => (
+          <button key={q} onClick={() => advisor.openAdvisor({ prompt: q, mealId: meal.id })} className="chip bg-brand-50 text-brand-700 px-3 py-1.5">{q}</button>))}</div>
+      </div>
       <MealComposition meal={meal} items={items} colors={ITEM_COLORS} />
       <PortionSimulator meal={meal} onChange={onChange} readOnly={readOnly} />
       {(meal.totals?.calories_kcal ?? 0) > 0 && <Forecast mealId={meal.id} version={meal.insights?.generated_at ?? ''} />}

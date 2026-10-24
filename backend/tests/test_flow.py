@@ -308,8 +308,35 @@ def test_meal_advisor_grounded_and_safe(client, auth, monkeypatch):
     r = ask("Is this meal ok?", meal_id=meal["id"])
     assert "This meal" in r["reply"] and "kcal" in r["reply"]
     r = ask("How am I doing today?")
-    assert "Today you've saved" in r["reply"]
+    assert "Today so far" in r["reply"]
     r = ask("How many units of insulin should I take for this?", meal_id=meal["id"])
     assert r["source"] == "safety" and "can't help with medication" in r["reply"]
     tok = client.post(f"{API}/auth/register", json={"email": "fourth@test.io", "password": "secret123"}).json()["access_token"]
     assert client.post(f"{API}/advisor/chat", headers={"Authorization": f"Bearer {tok}"}, json={"message": "hi", "meal_id": meal["id"]}).status_code == 404
+
+
+def test_meal_advisor_week_advice_and_smalltalk(client, auth, monkeypatch):
+    from datetime import datetime, timedelta, timezone
+    from app.services import slm
+    monkeypatch.setattr(slm, "status", lambda force=False: {"available": False, "selected": None, "models": [], "error": "off"})
+    client.put(f"{API}/users/health-profile", headers=auth, json={
+        "health_consent": True, "goals": ["carb_awareness", "weight_management"], "calorie_goal": 1500, "carb_goal_g": 150})
+    now = datetime.now(timezone.utc)
+    for days_ago, desc in ((0, "nasi lemak and teh tarik"), (1, "chicken rice"), (2, "nasi lemak"), (3, "chicken rice and kopi")):
+        m = client.post(f"{API}/meals/capture", headers=auth, data={"description": desc}).json()
+        client.post(f"{API}/meals/analyze", json={"meal_id": m["id"]}, headers=auth)
+        client.put(f"{API}/meals/{m['id']}/confirm", headers=auth,
+                   json={"meal_type": "lunch", "eaten_at": (now - timedelta(days=days_ago)).isoformat()})
+    ask = lambda q: client.post(f"{API}/advisor/chat", headers=auth, json={"message": q}).json()
+    r = ask("how is my weekly nutrition going on? what is the trajectory ? any advice?")["reply"]
+    print("\nWEEKLY REPLY:\n" + r)
+    assert "Last 7 days" in r and "Trajectory:" in r and "Calories by day" in r and "Advice:" in r
+    assert "Biggest carb sources" in r and "Today so far" not in r
+    r = ask("How is my food nutritional going on?")["reply"]
+    assert "Today so far" in r and "Last 7 days" in r and "Advice:" in r
+    r = ask("how are you")["reply"]
+    assert r.startswith("I'm doing well") and "Last 7 days" not in r
+    r = ask("any tips?")["reply"]
+    assert "Advice:" in r and "•" in r
+    g = client.post(f"{API}/advisor/chat", headers=auth, json={"message": "how was my week"}).json()["grounding"]
+    assert any(x["kind"] == "week" for x in g)

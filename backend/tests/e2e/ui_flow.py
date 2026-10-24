@@ -176,9 +176,17 @@ with sync_playwright() as p:
     page.goto(f"{BASE}/insights")
     page.wait_for_timeout(600)
     shot(page, "12_nutrition_insights")
+    # advisor from anywhere: one-tap question on the insights page opens the sheet
+    page.get_by_role("button", name="How was my week?").first.click()
+    sheet = page.get_by_role("dialog", name="Meal Advisor")
+    expect(sheet.get_by_text("Trajectory:").first).to_be_visible(timeout=60000)
+    expect(sheet.get_by_text("Advice:").first).to_be_visible()
+    shot(page, "12a_advisor_sheet")
+    sheet.get_by_role("button", name="Close").click()
+    expect(page.get_by_role("button", name="Ask the Meal Advisor")).to_be_visible()
     page.goto(f"{BASE}/advisor")   # grounded Meal Advisor
     page.get_by_role("button", name="How am I doing today?").click()
-    expect(page.get_by_text("Today you've saved")).to_be_visible(timeout=60000)
+    expect(page.get_by_text("Today so far")).to_be_visible(timeout=60000)
     page.get_by_label("Message").fill("How many units of insulin should I take?")
     page.get_by_role("button", name="Send").click()
     expect(page.get_by_text("can't help with medication")).to_be_visible(timeout=30000)

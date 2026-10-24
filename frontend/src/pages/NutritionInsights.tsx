@@ -5,6 +5,7 @@ import { fmt, tzOffset } from '../lib/api'
 import { useApi } from '../lib/hooks'
 import { Card, Empty, Spinner, Stat, Toggle } from '../components/ui'
 import { MACRO_COLORS } from './Dashboard'
+import AskCard from '../components/AskCard'
 
 export default function NutritionInsights() {
   const [days, setDays] = useState('7')
@@ -17,6 +18,7 @@ export default function NutritionInsights() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2"><p className="text-sm text-slate-500">Averages over days with logged meals.</p>
         <Toggle options={[['7', '7 days'], ['30', '30 days']]} value={days} onChange={v => v && setDays(v)} /></div>
+      <AskCard title="Make sense of these trends" prompts={["What's my trajectory? Any advice?", 'What are my biggest carb sources?', 'How was my week?']} />
       {!logged.length ? <Card><Empty icon={<BarChart3 className="size-6" />} title="No data yet">Save a few meals to see trends.</Empty></Card> : <>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Stat label="Avg calories / day" value={fmt(avg('calories_kcal'))} unit="kcal" tone="teal" />

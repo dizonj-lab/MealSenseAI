@@ -4,6 +4,7 @@ import { Camera, Salad, TrendingUp } from 'lucide-react'
 import { fmt, tzOffset } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { useApi } from '../lib/hooks'
+import AskCard from '../components/AskCard'
 import GettingStarted from '../components/GettingStarted'
 import MealRow from '../components/MealRow'
 import { Card, Empty, Progress, Spinner, Stat } from '../components/ui'
@@ -28,6 +29,7 @@ export default function Dashboard() {
       </div>
 
       <GettingStarted totalMeals={d.total_meals} confirmed={d.recent_meals.some((m: any) => m.status === 'confirmed')} />
+      {d.total_meals > 0 && <AskCard title="Ask your Meal Advisor" prompts={['How am I doing today?', 'How was my week?', 'Any advice for my next meal?']} />}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="Calories today" value={fmt(t.calories_kcal)} unit="kcal" tone="teal" sub={g.calorie_goal && `of ${g.calorie_goal} goal`} />

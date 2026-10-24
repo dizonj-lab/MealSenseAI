@@ -4,6 +4,8 @@ import { Activity, BarChart3, Info, MessageCircle, Monitor, Moon, Sun, Camera, C
 import { useAuth } from '../lib/auth'
 import { useTheme } from '../lib/theme'
 import { APP_VERSION } from '../lib/version'
+import { AdvisorProvider } from '../lib/advisor'
+import AdvisorSheet from './AdvisorSheet'
 import { api } from '../lib/api'
 
 export const NAV = [
@@ -59,6 +61,7 @@ export default function Layout() {
   ))
 
   return (
+    <AdvisorProvider>
     <div className="min-h-full flex">
       <aside className={`hidden md:flex flex-col shrink-0 border-r border-slate-200 bg-white sticky top-0 h-screen transition-all ${collapsed ? 'w-[72px]' : 'w-64'}`}>
         <div className={`h-16 flex items-center px-4 ${collapsed ? 'justify-center' : ''}`}><Brand compact={collapsed} /></div>
@@ -104,7 +107,9 @@ export default function Layout() {
           ))}
         </div>
       </nav>
+      <AdvisorSheet />
     </div>
+    </AdvisorProvider>
   )
 }
 
