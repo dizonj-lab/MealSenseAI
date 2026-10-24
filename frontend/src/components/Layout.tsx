@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, BarChart3, Monitor, Moon, Sun, Camera, ChevronsLeft, ChevronsRight, Cpu, History, LayoutDashboard, LogOut, Menu, Settings, UserRound, X } from 'lucide-react'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Activity, BarChart3, Info, MessageCircle, Monitor, Moon, Sun, Camera, ChevronsLeft, ChevronsRight, Cpu, History, LayoutDashboard, LogOut, Menu, Settings, UserRound, X } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { useTheme } from '../lib/theme'
+import { APP_VERSION } from '../lib/version'
 import { api } from '../lib/api'
 
 export const NAV = [
@@ -10,17 +11,20 @@ export const NAV = [
   { to: '/capture', label: 'Capture Meal', short: 'Capture', icon: Camera },
   { to: '/history', label: 'Meal History', short: 'History', icon: History },
   { to: '/insights', label: 'Nutrition Insights', short: 'Insights', icon: BarChart3 },
+  { to: '/advisor', label: 'Meal Advisor', short: 'Advisor', icon: MessageCircle },
   { to: '/profile', label: 'Health Profile', short: 'Profile', icon: UserRound },
   { to: '/ai', label: 'AI Model Insights', short: 'AI', icon: Cpu },
   { to: '/settings', label: 'Settings', short: 'Settings', icon: Settings },
+  { to: '/about', label: 'About MealSenseAI', short: 'About', icon: Info },
 ]
-const BOTTOM = [NAV[0], NAV[2], NAV[1], NAV[3], NAV[4]]
+const BOTTOM = [NAV[0], NAV[2], NAV[1], NAV[4], NAV[3]]
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
       <img src="/favicon.svg" className="size-8" alt="" />
       {!compact && <div className="leading-tight"><div className="font-bold text-slate-900">MealSense<span className="text-brand-600">AI</span></div><div className="text-[10px] uppercase tracking-wider text-slate-400">Nutrition intelligence</div></div>}
+      <Link to="/about#whats-new" className="chip bg-slate-100 text-slate-600 px-2 py-0.5 text-[10px] font-semibold" title="What's new">v{APP_VERSION}</Link>
     </div>
   )
 }

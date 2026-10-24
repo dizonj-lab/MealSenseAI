@@ -16,10 +16,20 @@ export function applyTheme(pref: ThemePref) {
 
 /** Theme preference (system / light / dark), stored per device and applied to <html>. */
 export function useTheme() {
-  const [pref, setPref] = useState<ThemePref>(readPref)
+  const [pref, setLocal] = useState<ThemePref>(readPref)
+  const setPref = (p: ThemePref | ((x: ThemePref) => ThemePref)) => setLocal(prev => {
+    const next = typeof p === 'function' ? p(prev) : p
+    try { localStorage.setItem(KEY, next) } catch { /* private mode */ }
+    window.dispatchEvent(new CustomEvent('mealsense-theme', { detail: next }))   // keep every theme control in sync
+    return next
+  })
+  useEffect(() => {
+    const on = (e: Event) => setLocal((e as CustomEvent).detail)
+    window.addEventListener('mealsense-theme', on)
+    return () => window.removeEventListener('mealsense-theme', on)
+  }, [])
   useEffect(() => {
     applyTheme(pref)
-    try { localStorage.setItem(KEY, pref) } catch { /* private mode */ }
     if (pref !== 'system') return
     const m = mq(), on = () => applyTheme('system')
     m.addEventListener('change', on)

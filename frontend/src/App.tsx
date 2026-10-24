@@ -12,6 +12,8 @@ import NutritionInsights from './pages/NutritionInsights'
 import HealthProfile from './pages/HealthProfile'
 import ModelInsights from './pages/ModelInsights'
 import Settings from './pages/Settings'
+import Advisor from './pages/Advisor'
+import About from './pages/About'
 import { Spinner } from './components/ui'
 
 function Protected({ children }: { children: JSX.Element }) {
@@ -38,6 +40,8 @@ export default function App() {
         <Route path="/profile" element={<HealthProfile />} />
         <Route path="/ai" element={<ModelInsights />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/advisor" element={<Advisor />} />
+        <Route path="/about" element={<About />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

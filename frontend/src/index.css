@@ -44,3 +44,6 @@ body { @apply bg-slate-50 text-slate-800 antialiased; -webkit-tap-highlight-colo
 .dark .recharts-default-tooltip { background: var(--surface) !important; border-color: var(--color-slate-200) !important; color: var(--color-slate-800); }
 .dark .recharts-text { fill: var(--color-slate-500); }
 .dark img { filter: none; }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

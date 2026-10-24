@@ -290,3 +290,26 @@ def test_custom_food_memory_and_training_samples(client, auth):
     assert not any(f.get("custom") for f in client.get(f"{API}/foods/search?q=grandma", headers=other).json())
     m3 = client.post(f"{API}/meals/capture", headers=other, data={"description": "rice"}).json()
     assert client.post(f"{API}/meals/{m3['id']}/foods", headers=other, json={"nutrition_key": cf["key"]}).status_code == 422
+
+
+def test_meal_advisor_grounded_and_safe(client, auth, monkeypatch):
+    from app.services import slm
+    monkeypatch.setattr(slm, "status", lambda force=False: {"available": False, "selected": None, "models": [], "error": "off"})
+    meal = client.post(f"{API}/meals/capture", headers=auth, data={"description": "nasi lemak and teh tarik"}).json()
+    meal = client.post(f"{API}/meals/analyze", json={"meal_id": meal["id"]}, headers=auth).json()
+    client.put(f"{API}/meals/{meal['id']}/confirm", json={"meal_type": "lunch"}, headers=auth)
+    ask = lambda m, **kw: client.post(f"{API}/advisor/chat", headers=auth, json={"message": m, **kw}).json()
+    r = ask("How many carbs in chicken rice?")
+    assert r["source"] == "rules" and "chicken rice" in r["reply"].lower() and "carbs" in r["reply"]
+    assert "White rice" not in r["reply"] and "recognises it" in r["reply"]
+    assert any(g["kind"] == "food" for g in r["grounding"])
+    r = ask("What's a lower-carb swap for nasi lemak?")
+    assert "Lower-carb options" in r["reply"] and any(g["kind"] == "swaps" for g in r["grounding"])
+    r = ask("Is this meal ok?", meal_id=meal["id"])
+    assert "This meal" in r["reply"] and "kcal" in r["reply"]
+    r = ask("How am I doing today?")
+    assert "Today you've saved" in r["reply"]
+    r = ask("How many units of insulin should I take for this?", meal_id=meal["id"])
+    assert r["source"] == "safety" and "can't help with medication" in r["reply"]
+    tok = client.post(f"{API}/auth/register", json={"email": "fourth@test.io", "password": "secret123"}).json()["access_token"]
+    assert client.post(f"{API}/advisor/chat", headers={"Authorization": f"Bearer {tok}"}, json={"message": "hi", "meal_id": meal["id"]}).status_code == 404

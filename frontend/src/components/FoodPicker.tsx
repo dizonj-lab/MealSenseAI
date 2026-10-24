@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Plus, Search, X } from 'lucide-react'
 import { api } from '../lib/api'
+import { InfoTip } from './ui'
 import type { FoodRef } from '../lib/types'
 
 export default function FoodPicker({ title, onPick, onClose, initial = '' }: { title: string; onPick: (f: FoodRef, grams: number | null) => void; onClose: () => void; initial?: string }) {
@@ -21,6 +22,11 @@ export default function FoodPicker({ title, onPick, onClose, initial = '' }: { t
         {creating ? <CustomFoodForm name={q} onCancel={() => setCreating(false)} onCreated={(f, g) => onPick(f, g)} /> : <>
         <div className="px-4 relative"><Search className="size-4 absolute left-7 top-3.5 text-slate-400" />
           <input autoFocus className="input pl-9" placeholder="Search e.g. chicken rice, laksa, apple" value={q} onChange={e => { setQ(e.target.value); setSel(null) }} /></div>
+        <div className="px-4 pt-2 pb-1 border-b border-slate-100 flex items-center gap-1">
+          <button onClick={() => setCreating(true)} className="flex-1 min-w-0 text-left rounded-xl px-3 py-2.5 flex items-center gap-2 text-brand-700 font-semibold bg-brand-50 hover:bg-brand-100">
+            <Plus className="size-4 shrink-0" /><span className="truncate">Can't find it? Create “{q.trim() || 'a new food'}”</span></button>
+          <InfoTip label="Create your own food" align="right" text="Not in the list? Add it with your usual portion and the nutrients you know (blank = unknown). It is saved to your foods, and this photo region is remembered so it is recognised next time." />
+        </div>
         <ul className="overflow-y-auto px-2 py-2 flex-1">
           {list.map(f => (
             <li key={f.key}><button onClick={() => { setSel(f); setGrams(String(f.default_serving_g)) }}
@@ -28,8 +34,6 @@ export default function FoodPicker({ title, onPick, onClose, initial = '' }: { t
               <span><span className="font-medium text-slate-800">{f.name}</span>{f.region === 'sg' && <span className="chip bg-sky-50 text-sky-700 ml-2">SG</span>}
                 {f.custom && <span className="chip bg-violet-50 text-violet-700 ml-2">Yours</span>}</span>
               <span className="text-xs text-slate-400 shrink-0">{f.serving_desc} · {f.default_serving_g} g</span></button></li>))}
-          <li className="pt-1"><button onClick={() => setCreating(true)} className="w-full text-left rounded-xl px-3 py-3 flex items-center gap-2 text-brand-700 font-semibold hover:bg-brand-50">
-            <Plus className="size-4" />Can't find it? Create “{q.trim() || 'a new food'}”</button></li>
         </ul>
         {sel && <div className="border-t border-slate-100 p-4 flex gap-2 items-end">
           <label className="block flex-1"><span className="label">Portion (grams)</span><input className="input" type="number" inputMode="decimal" value={grams} onChange={e => setGrams(e.target.value)} /></label>

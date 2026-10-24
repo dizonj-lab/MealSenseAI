@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { AlertTriangle, Check, Droplet, Flame, Info, Lightbulb, Merge, Pencil, Plus, RotateCcw, Scale, Sparkles, Trash2 } from 'lucide-react'
+import { AlertTriangle, Check, MessageCircle, Droplet, Flame, Info, Lightbulb, Merge, Pencil, Plus, RotateCcw, Scale, Sparkles, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { api, fmt } from '../lib/api'
 import { useAuthImage } from '../lib/hooks'
 import type { Food, Meal } from '../lib/types'
@@ -7,7 +8,7 @@ import FoodPicker from './FoodPicker'
 import Forecast from './Forecast'
 import MealComposition from './MealComposition'
 import PortionSimulator from './PortionSimulator'
-import { Card, DetailProvider, DetailSwitch, ErrorNote, LevelBadge, Progress, Section, Spinner, Tag, useDetail } from './ui'
+import { Card, DetailProvider, DetailSwitch, ErrorNote, InfoTip, LevelBadge, Progress, Section, Spinner, Tag, useDetail } from './ui'
 
 const ORIGIN: Record<string, string> = { model: 'AI recognised', memory: 'Known from your earlier label', description: 'From description', manual: 'Added by you', slm: 'SLM suggestion' }
 const MAPQ: Record<string, [string, string]> = {
@@ -79,7 +80,8 @@ function FoodCard({ f, n, meal, onChange, readOnly, selected, onSelect, mergeChe
         </div>
         {busy && <Spinner className="size-4" />}
         {!readOnly && <label className="flex items-center gap-1 text-[11px] text-slate-500" onClick={e => e.stopPropagation()}>
-          <input type="checkbox" className="accent-teal-600" checked={mergeChecked} onChange={onMergeToggle} />merge</label>}
+          <input type="checkbox" className="accent-teal-600" checked={mergeChecked} onChange={onMergeToggle} />merge
+          <InfoTip label="Merge" align="right" text="Tick this on two or more cards that are really the same food (the detector sometimes splits one food into pieces), then tap “Merge … into one” above the cards. Portions are added together." /></label>}
       </div>
 
       {(open || unknown) && pred?.candidates?.length > 0 && <div className="mt-3 rounded-xl bg-violet-50/40 ring-1 ring-violet-100 px-3 py-2.5">
@@ -130,6 +132,8 @@ function FoodCard({ f, n, meal, onChange, readOnly, selected, onSelect, mergeChe
         <button className="btn-ghost px-2 text-xs" disabled={!f.nutrition_key} onClick={() => { setG(String(f.grams)); setEditG(true) }}><Scale className="size-4" />Portion</button>
         <button className="btn-ghost px-2 text-xs text-rose-600" onClick={() => call(api(`/meals/${meal.id}/foods/${f.id}`, { method: 'DELETE' }))}><Trash2 className="size-4" />Remove</button>
       </div>}
+      {!readOnly && n === 1 && <p className="mt-1.5 text-[11px] text-slate-400 flex items-center gap-1">What do these buttons do?
+        <InfoTip label="Card actions" text={<><b>Confirm</b>: the food and portion look right. <b>Rename</b>/<b>Name it</b>: pick the correct food or create your own. <b>Portion</b>: enter the grams you ate. <b>Remove</b>: not part of this meal. Each change recalculates the totals and is remembered for next time.</>} /></p>}
       {picker && <FoodPicker title={unknown ? `What is item ${n}?` : `Rename “${f.label}”`} initial={unknown ? '' : f.nutrition_key ? '' : f.label} onClose={() => setPicker(false)}
         onPick={(ref, grams) => { setPicker(false); put({ nutrition_key: ref.key, ...(grams ? { grams } : {}) }) }} />}
     </div>
@@ -236,9 +240,21 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
   }
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2"><span className="text-xs text-slate-500">Details are one tap away on every card.</span><DetailSwitch /></div>
+      {!readOnly && <div className="sticky top-14 md:top-16 z-20 -mx-3 sm:mx-0 px-3 sm:px-4 py-2.5 bg-white/95 backdrop-blur border-b sm:border sm:rounded-2xl border-slate-200 shadow-sm">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1 overflow-x-auto no-scrollbar min-w-0" role="group" aria-label="Meal type">{['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
+            <button key={m} onClick={() => setMealType(m)} aria-pressed={mealType === m}
+              className={`chip shrink-0 px-2.5 py-1.5 capitalize border ${mealType === m ? 'bg-brand-600 text-white border-brand-600' : 'bg-white border-slate-200 text-slate-600'}`}>{m}</button>))}</div>
+          <InfoTip label="Meal type and save" align="right" text={<>Pick the meal type, then <b>Save</b> to add this meal to your history and daily totals. Every item needs a name first; you can still edit a saved meal later.</>} />
+          <button className="btn-primary ml-auto shrink-0 px-3.5 py-2" onClick={save} disabled={saving || active.length === 0}>
+            {saving ? <Spinner className="size-4 text-white" /> : <Check className="size-4" />}{meal.status === 'confirmed' ? 'Update' : 'Save meal'}</button>
+        </div>
+        {(err || nUnknown > 0) && <div className="mt-2 text-xs">{err ? <ErrorNote msg={err} /> : <span className="text-amber-700">{nUnknown} item(s) need a name before saving.</span>}</div>}
+      </div>}
+      <div className="flex items-center justify-between gap-2"><span className="text-xs text-slate-500 flex items-center gap-1">Details are one tap away on every card.
+        <InfoTip label="Simple and detailed view" text="Simple shows the essentials. Detailed opens every section and card: model guesses with raw scores, nutrients, portion ranges and sources. Your choice is remembered on this device." /></span><DetailSwitch /></div>
       <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-4 items-start">
-        <div className="space-y-3 lg:sticky lg:top-20">
+        <div className="space-y-3 lg:sticky lg:top-36">
           {meal.images.length > 0 ? <div className={`grid gap-3 ${meal.images.length > 1 ? 'grid-cols-2 lg:grid-cols-1' : ''}`}>
             {meal.images.map(im => <MealImage key={im.view} mealId={meal.id} view={im.view} items={items} selected={selected} onSelect={select} />)}</div>
             : <div className="card p-4 text-sm text-slate-500">No photo — analysed from description.</div>}
@@ -268,7 +284,8 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
           {items.map(({ f, n }) => <FoodCard key={f.id} f={f} n={n} meal={meal} onChange={onChange} readOnly={readOnly} selected={selected === f.id} onSelect={() => setSelected(f.id)}
             mergeChecked={mergeIds.includes(f.id)} onMergeToggle={() => setMergeIds(m => m.includes(f.id) ? m.filter(x => x !== f.id) : [...m, f.id])} />)}
           {!readOnly && suggestions.length > 0 && <div className="card p-4">
-            <div className="text-sm font-semibold text-slate-800">Possible additional items ({suggestions.length})</div>
+            <div className="text-sm font-semibold text-slate-800 flex items-center gap-1">Possible additional items ({suggestions.length})
+              <InfoTip label="Possible additional items" text="Small or uncertain regions the detector found. They are not counted unless you tap one to add it, then name it." /></div>
             <p className="text-[11px] text-slate-500 mb-2">Small or weak regions the detector found. Not counted unless you add them.</p>
             <div className="flex flex-wrap gap-1.5">{suggestions.map(f => (
               <button key={f.id} className="chip ring-1 ring-slate-200 bg-white px-3 py-1.5 text-sm hover:ring-teal-300" onClick={() => act(api(`/meals/${meal.id}/foods/${f.id}`, { method: 'PUT', json: { restore: true } }))}>
@@ -278,15 +295,14 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
         </div>
       </div>
       <InsightCards meal={meal} onChange={onChange} />
+      <Link to={`/advisor?meal=${meal.id}`} className="card p-4 flex items-center gap-3 hover:ring-1 hover:ring-brand-200">
+        <span className="size-9 shrink-0 rounded-xl bg-brand-50 text-brand-700 grid place-items-center"><MessageCircle className="size-5" /></span>
+        <span className="flex-1"><span className="block font-semibold text-slate-800">Ask the Meal Advisor about this meal</span>
+          <span className="block text-xs text-slate-500">“Is this OK for my goal?” · “What's a lower-carb swap?”</span></span>
+      </Link>
       <MealComposition meal={meal} items={items} colors={ITEM_COLORS} />
       <PortionSimulator meal={meal} onChange={onChange} readOnly={readOnly} />
       {(meal.totals?.calories_kcal ?? 0) > 0 && <Forecast mealId={meal.id} version={meal.insights?.generated_at ?? ''} />}
-      {!readOnly && <div className="card p-4 flex flex-col sm:flex-row gap-3 sm:items-center">
-        <div className="flex gap-1.5 flex-wrap">{['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
-          <button key={m} onClick={() => setMealType(m)} className={`chip px-3 py-1.5 capitalize border ${mealType === m ? 'bg-brand-600 text-white border-brand-600' : 'bg-white border-slate-200 text-slate-600'}`}>{m}</button>))}</div>
-        <div className="sm:ml-auto flex-1 sm:flex-none"><ErrorNote msg={err} /></div>
-        <button className="btn-primary py-3 sm:px-6" onClick={save} disabled={saving || active.length === 0}>{saving ? <Spinner className="size-4 text-white" /> : <Check className="size-4" />}{meal.status === 'confirmed' ? 'Update saved meal' : 'Confirm & save meal'}</button>
-      </div>}
       {adding && <FoodPicker title="Add missing food" onClose={() => setAdding(false)} onPick={async (ref, grams) => {
         setAdding(false)
         try { onChange(await api(`/meals/${meal.id}/foods`, { method: 'POST', json: { nutrition_key: ref.key, ...(grams ? { grams } : {}) } })) } catch (e: any) { setErr(e.message) }

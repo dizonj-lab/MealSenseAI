@@ -3,7 +3,7 @@ import { Area, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, 
 import { Check, RotateCcw, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { api, fmt } from '../lib/api'
 import type { Meal } from '../lib/types'
-import { ErrorNote, Section, Spinner, Tag } from './ui'
+import { ErrorNote, InfoTip, Section, Spinner, Tag } from './ui'
 import { markSimulatorTried } from './GettingStarted'
 
 type Reading = { id: number; measured_at: string; value_mmol: number; entered_unit: string; context: string; source: string }
@@ -57,7 +57,8 @@ export default function PortionSimulator({ meal, onChange, readOnly }: { meal: M
   return (
     <Section title="Portion simulator" icon={<SlidersHorizontal className="size-5 text-teal-600" />} tag={<Tag kind="estimate" />}
       summary={changed.length ? `${changed.length} change(s) not applied` : readings.length ? `${readings.length} reading(s) logged` : 'Try smaller portions before saving'} defaultOpen={changed.length > 0}>
-      <p className="text-xs text-slate-500 mb-3">Change portions to compare the original and a modified meal. Nothing is saved until you press <b>Apply</b>.</p>
+      <p className="text-xs text-slate-500 mb-3 flex items-start gap-1"><span>Change portions to compare the original and a modified meal. Nothing is saved until you press <b>Apply</b>.</span>
+        <InfoTip label="Portion simulator" align="right" text="Drag a slider to try a different amount of that food. The table shows the change in nutrients and glycaemic load; the curve is an educational simulation (not your glucose). Apply saves the new portions to the meal; Reset discards them." /></p>
       <div className="space-y-2.5">{foods.map(f => {
         const g = grams[f.id] ?? f.grams
         return <div key={f.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
@@ -90,7 +91,8 @@ export default function PortionSimulator({ meal, onChange, readOnly }: { meal: M
         <p className="mt-1 text-[11px] text-slate-400">{sim.disclaimer}</p>
       </>}
 
-      <h4 className="mt-5 text-sm font-semibold text-slate-700 flex items-center gap-2">Your measured readings <Tag kind="measured" /></h4>
+      <h4 className="mt-5 text-sm font-semibold text-slate-700 flex items-center gap-2">Your measured readings <Tag kind="measured" />
+        <InfoTip label="Measured readings" align="right" text="Enter values from your glucose meter or CGM (mg/dL is converted to mmol/L). They are linked to this meal and shown separately from the simulation. The app never estimates these values." /></h4>
       {pts.length ? <ResponsiveContainer width="100%" height={180}><ScatterChart margin={{ left: -18, right: 8, top: 8 }}>
         <CartesianGrid stroke="#e2e8f0" /><XAxis dataKey="min" type="number" name="Time" unit=" min" fontSize={11} domain={['dataMin - 15', 'dataMax + 15']} />
         <YAxis dataKey="value_mmol" type="number" name="Glucose" unit="" fontSize={11} domain={[0, (m: number) => Math.max(10, Math.ceil(m + 2))]} allowDecimals={false} /><ZAxis range={[60, 60]} />

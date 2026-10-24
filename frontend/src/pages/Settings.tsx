@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { Brain, FileCode2, LogOut, ShieldAlert, Trash2, Utensils } from 'lucide-react'
 import { api } from '../lib/api'
 import { useAuth } from '../lib/auth'
-import { Card } from '../components/ui'
+import { Card, InfoTip } from '../components/ui'
+import { useTheme, type ThemePref } from '../lib/theme'
 
 export default function Settings() {
   const { user, logout, setUser } = useAuth()
+  const { pref, setPref } = useTheme()
   const [mine, setMine] = useState<any[]>([])
   useEffect(() => { api<any[]>('/foods/custom').then(setMine).catch(() => {}) }, [])
   const consent = async (v: boolean) => setUser(await api('/users/me/training-consent', { method: 'PUT', json: { consent: v } }))
@@ -25,6 +27,14 @@ export default function Settings() {
       <Card title="Developer"><a className="btn-ghost" href="/docs" target="_blank" rel="noreferrer"><FileCode2 className="size-4" />OpenAPI docs</a></Card>
       <Card title="About & safety" icon={<ShieldAlert className="size-5 text-amber-500" />}>
         <p className="text-sm text-slate-600">MealSenseAI provides general, educational nutrition information estimated from photos and reference food-composition data. It does not predict your personal glucose response, set clinical targets or advise on medication. Talk to your healthcare team about your care.</p>
+      </Card>
+      <Card title="Appearance">
+        <div className="flex items-center gap-2">
+          <div className="inline-flex rounded-xl bg-slate-100 p-1 text-sm font-semibold" role="group" aria-label="Theme">
+            {([['system', 'System'], ['light', 'Light'], ['dark', 'Dark']] as [ThemePref, string][]).map(([v, l]) => <button key={v} onClick={() => setPref(v)} aria-pressed={pref === v}
+              className={`rounded-lg px-4 py-2 ${pref === v ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>{l}</button>)}</div>
+          <InfoTip label="Theme" text="System follows your phone's light/dark setting. The sun/moon icon in the header switches it too. Saved on this device." />
+        </div>
       </Card>
       <Card title="Your foods" icon={<Utensils className="size-5 text-violet-600" />}>
         {mine.length ? <ul className="divide-y divide-slate-100 text-sm">{mine.map(f => <li key={f.id} className="py-2 flex justify-between gap-2">

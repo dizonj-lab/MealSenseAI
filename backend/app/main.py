@@ -8,11 +8,12 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app import models  # noqa: F401  (register tables)
-from app.api import ai, auth, dashboard, glucose, meals, users
+from app.api import advisor, ai, auth, dashboard, glucose, meals, users
 from app.core import cache
 from app.core.config import settings
 from app.core.db import SessionLocal, engine
 from app.core.migrate import upgrade_db
+from app.version import APP_VERSION
 from app.services import custom_foods, slm, vision
 
 logging.basicConfig(level=logging.INFO)
@@ -59,13 +60,13 @@ async def lifespan(_app):
     vision.close()
 
 
-app = FastAPI(lifespan=lifespan, title="MealSenseAI API", version="0.1.0",
+app = FastAPI(lifespan=lifespan, title="MealSenseAI API", version=APP_VERSION,
               description="Meal capture, food recognition, nutrition estimation and educational insights.")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
 api = APIRouter(prefix="/api/v1")
-for r in (auth.router, users.router, meals.router, dashboard.router, ai.router, glucose.router):
+for r in (auth.router, users.router, meals.router, dashboard.router, ai.router, glucose.router, advisor.router):
     api.include_router(r)
 
 
@@ -78,7 +79,7 @@ def health():
     except Exception:
         db_ok = False
     v, s = vision.status(), slm.status()
-    return {"status": "ok" if db_ok else "degraded", "database": db_ok, "redis": cache.ping(),
+    return {"status": "ok" if db_ok else "degraded", "version": APP_VERSION, "database": db_ok, "redis": cache.ping(),
             "vision": v["available"], "slm": s["available"], "slm_model": s["selected"]}
 
 

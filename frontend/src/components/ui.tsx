@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { ChevronDown, Loader2 } from 'lucide-react'
+import { ChevronDown, Info, Loader2 } from 'lucide-react'
 
 export const Spinner = ({ className = 'size-6' }: { className?: string }) => <Loader2 className={`animate-spin text-brand-600 ${className}`} />
 
@@ -99,5 +99,26 @@ export function Section({ title, icon, summary, tag, children, defaultOpen = fal
       </button>
       {isOpen && <div className="px-4 sm:px-5 pb-4 sm:pb-5 -mt-1">{children}</div>}
     </section>
+  )
+}
+
+/** Tap-friendly "what does this do?" hint for an important control. */
+export function InfoTip({ text, label = 'More info', align = 'left' }: { text: ReactNode; label?: string; align?: 'left' | 'right' }) {
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (!open) return
+    const close = () => setOpen(false)
+    const t = setTimeout(() => document.addEventListener('click', close), 0)
+    return () => { clearTimeout(t); document.removeEventListener('click', close) }
+  }, [open])
+  return (
+    <span className="relative inline-flex align-middle">
+      <button type="button" aria-label={`About: ${label}`} aria-expanded={open} onClick={e => { e.stopPropagation(); setOpen(o => !o) }}
+        className="size-5 grid place-items-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+        <Info className="size-3.5" />
+      </button>
+      {open && <span role="tooltip" onClick={e => e.stopPropagation()}
+        style={{ background: "#1e293b", color: "#f8fafc" }} className={`absolute top-6 z-40 w-60 rounded-xl ring-1 ring-white/10 text-xs font-normal normal-case tracking-normal leading-snug p-2.5 shadow-xl ${align === 'right' ? 'right-0' : 'left-0'}`}>{text}</span>}
+    </span>
   )
 }

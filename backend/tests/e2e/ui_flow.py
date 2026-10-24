@@ -78,7 +78,7 @@ with sync_playwright() as p:
     expect(page.get_by_text("Key takeaways")).to_be_visible()
     expect(page.get_by_role("button", name="Meal composition")).to_have_attribute("aria-expanded", "false")
     shot(page, "06c_simple_view")
-    page.get_by_role("button", name="Detailed").click()
+    page.get_by_role("button", name="Detailed", exact=True).click()
     # top-3 candidates: switch to candidate 2, verify, switch back (confirm/override workflow)
     cands = page.locator("button", has_text="%").filter(has_text=". ")
     expect(cands.first).to_be_visible()
@@ -94,7 +94,7 @@ with sync_playwright() as p:
 
     # correct portion of kaya toast
     card = page.locator(".card", has=page.get_by_role("heading", name="Kaya toast with butter"))
-    card.get_by_role("button", name="Portion").click()
+    card.get_by_role("button", name="Portion", exact=True).click()
     card.locator("input[type=number]").fill("140")
     card.get_by_role("button", name="Save").click()
     expect(card.get_by_text("140 g").first).to_be_visible()
@@ -151,7 +151,7 @@ with sync_playwright() as p:
     shot(page, "07b_portion_simulator")
     sim.get_by_role("button", name="Apply 1 portion change(s)").click()
     expect(card.get_by_text("70 g").first).to_be_visible(timeout=10000)
-    page.get_by_role("button", name="Confirm & save meal").click()
+    page.get_by_role("button", name="Save meal", exact=True).click()
     expect(page.get_by_text("Meal saved to your history")).to_be_visible()
     shot(page, "08_saved_meal")
     # forecast & what-if: add a second scenario and check cautions render
@@ -176,7 +176,19 @@ with sync_playwright() as p:
     page.goto(f"{BASE}/insights")
     page.wait_for_timeout(600)
     shot(page, "12_nutrition_insights")
+    page.goto(f"{BASE}/advisor")   # grounded Meal Advisor
+    page.get_by_role("button", name="How am I doing today?").click()
+    expect(page.get_by_text("Today you've saved")).to_be_visible(timeout=60000)
+    page.get_by_label("Message").fill("How many units of insulin should I take?")
+    page.get_by_role("button", name="Send").click()
+    expect(page.get_by_text("can't help with medication")).to_be_visible(timeout=30000)
+    shot(page, "12b_advisor")
+    page.goto(f"{BASE}/about")
+    expect(page.get_by_text("Bossard").first).to_be_visible()
+    expect(page.get_by_text("arXiv:2301.03829").first).to_be_visible()
+    shot(page, "12c_about")
     page.get_by_role("button", name="Menu").click()
+    expect(page.get_by_role("link", name="v0.").first).to_be_visible()
     shot(page, "13_drawer")
     page.keyboard.press("Escape")
     if custom_named:   # same photo again: the region named earlier is recognised from memory
