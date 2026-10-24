@@ -1,12 +1,38 @@
 import { Link } from 'react-router-dom'
 import PublicShell from '../components/PublicShell'
-import { CaptureArt, ChartsArt, IdentifyArt } from '../components/LandingArt'
+import { CaptureArt, IdentifyArt } from '../components/LandingArt'
 
 const STEPS: [string, string][] = [
   ['Capture', 'Take a photo of your meal. One top view is enough.'],
   ['Understand', 'See each food on the plate with estimated portions and nutrition, and correct anything.'],
   ['Decide', 'Get clear, personal insights on how the meal may affect your glucose and energy.'],
 ]
+const SHOTS: [string, string][][] = [
+  [['/landing/capture-identify.webp', 'MealSenseAI screen: a breakfast photo with each food outlined and numbered, and the meal total']],
+  [['/landing/glucose-impact.webp', 'MealSenseAI screen: estimated glucose impact, carbohydrate, sugar, fibre and energy for the meal'],
+   ['/landing/portion-simulator.webp', 'MealSenseAI screen: portion simulator table and a simulated glucose response curve']],
+  [['/landing/exercise-whatif.webp', 'MealSenseAI screen: what-if exercise scenario comparing glucose excursion with and without a walk'],
+   ['/landing/nutrition-insights.webp', 'MealSenseAI screen: nutrition insights with daily averages and macronutrients per day']],
+]
+
+function Phone({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
+  return (
+    <div className={`w-[190px] sm:w-[170px] lg:w-[190px] rounded-[1.6rem] p-1.5 shadow-xl ring-1 ${className}`} style={{ background: '#0B1211', ['--tw-ring-color' as string]: 'var(--p-border)' }}>
+      <img src={src} alt={alt} loading="lazy" decoding="async" width={540} height={1000} className="block w-full h-auto rounded-[1.25rem]" />
+    </div>
+  )
+}
+
+function StepShots({ shots }: { shots: [string, string][] }) {
+  if (shots.length === 1) return <Phone src={shots[0][0]} alt={shots[0][1]} />
+  return (
+    <div className="relative w-[250px] sm:w-[220px] lg:w-[250px] h-full">
+      <Phone src={shots[1][0]} alt={shots[1][1]} className="absolute right-0 top-8 scale-[0.92] origin-top-right opacity-95" />
+      <Phone src={shots[0][0]} alt={shots[0][1]} className="absolute left-0 top-0" />
+    </div>
+  )
+}
+
 const BENEFITS: [string, string][] = [
   ['Identify multiple foods in a meal', 'Each item is recognised and listed separately, so you can confirm, rename or add what was missed.'],
   ['Understand nutrition and portions', 'Estimated calories, carbohydrate, sugar, protein, fat and sodium, with the uncertainty shown.'],
@@ -39,10 +65,11 @@ export default function Landing() {
       <section id="how" className="border-t scroll-mt-4" style={{ borderColor: 'var(--p-border)' }}>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 py-20">
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center">How it works</h2>
+          <p className="mt-3 text-center text-sm" style={muted}>Real screens from the app.</p>
           <ol className="mt-12 grid sm:grid-cols-3 gap-14 sm:gap-8">{STEPS.map(([t, b], i) => (
             <li key={t} className="text-center sm:text-left">
-              <div className="h-[300px] flex items-center justify-center mb-6" aria-hidden={false}>
-                {i === 0 ? <div className="scale-[0.85] origin-center"><CaptureArt /></div> : i === 1 ? <div className="w-full max-w-[260px]"><IdentifyArt /></div> : <div className="w-full max-w-[280px]"><ChartsArt /></div>}
+              <div className="h-[400px] sm:h-[370px] lg:h-[410px] flex items-start justify-center mb-6 overflow-hidden">
+                <StepShots shots={SHOTS[i]} />
               </div>
               <div className="text-sm font-medium" style={{ color: 'var(--p-primary)' }}>{String(i + 1).padStart(2, '0')}</div>
               <h3 className="mt-2 text-xl font-semibold">{t}</h3>
