@@ -6,6 +6,10 @@
     <meta name="theme-color" content="#0d9488" />
     <link rel="icon" href="/favicon.svg" />
     <title>MealSenseAI</title>
+    <script>/* apply the saved theme before first paint (no flash) */
+      try { var t = localStorage.getItem('mealsense.theme') || 'system';
+        if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark') } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

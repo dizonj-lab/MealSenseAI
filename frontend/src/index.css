@@ -20,3 +20,27 @@ body { @apply bg-slate-50 text-slate-800 antialiased; -webkit-tap-highlight-colo
 @utility label { @apply block text-sm font-medium text-slate-600 mb-1; }
 @utility chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium; }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ---------- Dark mode: remaps the palette under html.dark, so components need no per-class changes ---------- */
+@custom-variant dark (&:where(.dark, .dark *));
+.dark {
+  color-scheme: dark;
+  --surface: #121b2b;
+  --color-slate-50: #0a111d;  --color-slate-100: #1a2437; --color-slate-200: #263247; --color-slate-300: #3a475e;
+  --color-slate-400: #7f8ba1; --color-slate-500: #9aa6b9; --color-slate-600: #b6c0cf; --color-slate-700: #d0d7e1;
+  --color-slate-800: #e3e8ef; --color-slate-900: #f2f5f9;
+  --color-brand-50: #0f2a2a; --color-brand-100: #134040; --color-brand-700: #5eead4;
+  --color-emerald-50: #0f2a20; --color-emerald-100: #134030; --color-emerald-200: #1d5a42; --color-emerald-700: #6ee7b7; --color-emerald-800: #a7f3d0;
+  --color-amber-50: #2d2410;  --color-amber-100: #3d3012;  --color-amber-200: #5c4715;  --color-amber-300: #7a5d18; --color-amber-700: #fcd34d; --color-amber-800: #fde68a;
+  --color-rose-50: #2e141b;   --color-rose-100: #421822;  --color-rose-200: #5f2230;   --color-rose-600: #fb7185; --color-rose-700: #fda4af; --color-rose-800: #fecdd3;
+  --color-violet-50: #1f1838; --color-violet-100: #2c2150; --color-violet-200: #3d2d6e; --color-violet-700: #c4b5fd;
+  --color-sky-50: #0f2233;    --color-sky-100: #12304a;    --color-sky-700: #7dd3fc;
+  --color-teal-50: #0f2a2a;   --color-teal-700: #5eead4;
+}
+.dark .bg-white, .dark .card, .dark .btn-ghost, .dark .input { background-color: var(--surface); }
+.dark [class*="bg-white/"] { background-color: color-mix(in oklab, var(--surface) 88%, transparent); }
+.dark .btn-ghost:hover { background-color: var(--color-slate-100); }
+.dark .recharts-cartesian-grid line { stroke: var(--color-slate-200); }
+.dark .recharts-default-tooltip { background: var(--surface) !important; border-color: var(--color-slate-200) !important; color: var(--color-slate-800); }
+.dark .recharts-text { fill: var(--color-slate-500); }
+.dark img { filter: none; }

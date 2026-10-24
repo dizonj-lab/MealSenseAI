@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, BarChart3, Camera, ChevronsLeft, ChevronsRight, Cpu, History, LayoutDashboard, LogOut, Menu, Settings, UserRound, X } from 'lucide-react'
+import { Activity, BarChart3, Monitor, Moon, Sun, Camera, ChevronsLeft, ChevronsRight, Cpu, History, LayoutDashboard, LogOut, Menu, Settings, UserRound, X } from 'lucide-react'
 import { useAuth } from '../lib/auth'
+import { useTheme } from '../lib/theme'
 import { api } from '../lib/api'
 
 export const NAV = [
@@ -32,7 +33,7 @@ function AiStatus() {
   return (
     <span title={`Vision ${h.vision ? 'online' : 'offline'} · SLM ${h.slm ? h.slm_model : 'offline'}`}
       className={`chip ring-1 ${ok ? 'bg-emerald-50 text-emerald-700 ring-emerald-200' : 'bg-amber-50 text-amber-700 ring-amber-200'}`}>
-      <Activity className="size-3.5" /><span className="hidden sm:inline">AI</span> {ok ? (h.slm ? 'Online' : 'Vision only') : 'Degraded'}
+      <Activity className="size-3.5" aria-label={ok ? (h.slm ? 'AI online' : 'AI vision only') : 'AI degraded'} /><span className="hidden sm:inline">AI {ok ? (h.slm ? 'Online' : 'Vision only') : 'Degraded'}</span>
     </span>
   )
 }
@@ -77,6 +78,7 @@ export default function Layout() {
           <h1 className="font-semibold text-slate-800 truncate">{current}</h1>
           <div className="ml-auto flex items-center gap-2.5">
             <AiStatus />
+            <ThemeButton />
             <NavLink to="/settings" className="size-9 rounded-full bg-gradient-to-br from-brand-500 to-sky-500 text-white grid place-items-center text-sm font-semibold" title={user?.email}>
               {(user?.name || user?.email || '?')[0].toUpperCase()}
             </NavLink>
@@ -100,4 +102,10 @@ export default function Layout() {
       </nav>
     </div>
   )
+}
+
+export function ThemeButton() {
+  const { pref, cycle } = useTheme()
+  const Icon = pref === 'dark' ? Moon : pref === 'light' ? Sun : Monitor
+  return <button onClick={cycle} className="size-9 rounded-full grid place-items-center text-slate-600 hover:bg-slate-100" title={`Theme: ${pref} (tap to change)`} aria-label={`Theme: ${pref}`}><Icon className="size-[18px]" /></button>
 }
