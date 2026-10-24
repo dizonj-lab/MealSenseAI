@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import PublicShell from '../components/PublicShell'
+import { CaptureArt, ChartsArt, IdentifyArt } from '../components/LandingArt'
 
 const STEPS: [string, string][] = [
   ['Capture', 'Take a photo of your meal. One top view is enough.'],
@@ -26,11 +27,23 @@ export default function Landing() {
         </div>
       </section>
 
+      <section className="max-w-4xl mx-auto px-5 sm:px-8 -mt-6 sm:-mt-10 pb-20" aria-label="From photo to every food on the plate">
+        <div className="grid sm:grid-cols-[auto_auto_minmax(0,1fr)] items-center justify-center gap-6 sm:gap-8">
+          <CaptureArt />
+          <svg viewBox="0 0 48 24" className="w-12 mx-auto rotate-90 sm:rotate-0" aria-hidden="true"><path d="M2 12h40m-8-8 8 8-8 8" fill="none" stroke="var(--p-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <div className="w-full max-w-sm mx-auto"><IdentifyArt /></div>
+        </div>
+        <p className="mt-4 text-center text-xs" style={muted}>Illustration</p>
+      </section>
+
       <section id="how" className="border-t scroll-mt-4" style={{ borderColor: 'var(--p-border)' }}>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 py-20">
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center">How it works</h2>
-          <ol className="mt-12 grid sm:grid-cols-3 gap-10 sm:gap-8">{STEPS.map(([t, b], i) => (
+          <ol className="mt-12 grid sm:grid-cols-3 gap-14 sm:gap-8">{STEPS.map(([t, b], i) => (
             <li key={t} className="text-center sm:text-left">
+              <div className="h-[300px] flex items-center justify-center mb-6" aria-hidden={false}>
+                {i === 0 ? <div className="scale-[0.85] origin-center"><CaptureArt /></div> : i === 1 ? <div className="w-full max-w-[260px]"><IdentifyArt /></div> : <div className="w-full max-w-[280px]"><ChartsArt /></div>}
+              </div>
               <div className="text-sm font-medium" style={{ color: 'var(--p-primary)' }}>{String(i + 1).padStart(2, '0')}</div>
               <h3 className="mt-2 text-xl font-semibold">{t}</h3>
               <p className="mt-2 leading-relaxed" style={muted}>{b}</p>

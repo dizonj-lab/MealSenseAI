@@ -52,3 +52,5 @@ body { @apply bg-slate-50 text-slate-800 antialiased; -webkit-tap-highlight-colo
 .public { --p-bg: #FAFAF8; --p-primary: #147D73; --p-primary-hover: #10665E; --p-text: #172B2A; --p-muted: #667573; --p-border: #E5EBE8; --p-surface: #FFFFFF; }
 .dark .public { --p-bg: #0E1514; --p-primary: #2BA596; --p-primary-hover: #36B8A8; --p-text: #EEF3F2; --p-muted: #9DAEAB; --p-border: #23302E; --p-surface: #141D1C; }
 .public { background: var(--p-bg); color: var(--p-text); }
+.public { --p-plate: #FFFFFF; --p-plate-rim: #EDF1EF; --p-table: #EFE7DC; }
+.dark .public { --p-plate: #1C2726; --p-plate-rim: #2A3735; --p-table: #2A2620; }
