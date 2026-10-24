@@ -2,6 +2,13 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.9.0 — A friendlier Meal Advisor
+
+- Warm, witty personality that adapts its tone: playful for food chat, careful for diabetes topics, serious for urgent ones
+- “You missed my sausage!” offers a one-tap Add button; the meal updates when you tap it
+- Handles “is this too much rice?”, “can I eat pizza?”, mystery dishes and questions it cannot answer, honestly
+- Remembers the food you are talking about: “Is nasi lemak healthy?” → “What if I skip the rice?” → “What about adding an egg?”
+
 ## v0.8.0 — Minimal design, grounded conversations
 
 - New minimalist landing, sign-in and register pages; Privacy, Terms and Contact pages (drafts)

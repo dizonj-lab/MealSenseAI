@@ -156,6 +156,17 @@ with sync_playwright() as p:
     page.get_by_role("button", name="Save meal", exact=True).click()
     expect(page.get_by_text("Meal saved to your history")).to_be_visible()
     shot(page, "08_saved_meal")
+    # friendly advisor: "you missed my egg" -> Add egg action -> the meal page updates
+    page.get_by_role("button", name="Ask the Meal Advisor").click()
+    sheet = page.get_by_role("dialog", name="Meal Advisor")
+    sheet.get_by_label("Message").fill("You missed my sausage!")
+    sheet.get_by_role("button", name="Send").click()
+    expect(sheet.get_by_role("button", name=re.compile(r"^Add .*sausage"))).to_be_visible(timeout=30000)
+    sheet.get_by_role("button", name=re.compile(r"^Add .*sausage")).first.click()
+    expect(sheet.get_by_text("Got it! Added")).to_be_visible(timeout=15000)
+    shot(page, "08a_advisor_add_egg")
+    sheet.get_by_role("button", name="Close").click()
+    expect(page.locator("h3", has_text=re.compile("sausage", re.I)).first).to_be_visible(timeout=10000)
     # forecast & what-if: add a second scenario and check cautions render
     expect(page.get_by_text("Forecast & what-if", exact=True)).to_be_visible(timeout=15000)
     page.get_by_role("button", name="Run hard right after").click()

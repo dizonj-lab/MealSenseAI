@@ -22,9 +22,10 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.models import ChatMessage, ChatThread, GlucoseReading, Meal, User
-from app.services import forecast, knowledge, nutrition, slm, vision
+from app.services import forecast, knowledge, nutrition, persona, slm, vision
 
 RETENTION_DAYS = 30
+CAREFUL_INTENTS = {"glucose", "carbs", "too_much", "assessment", "advice", "can_eat", "healthy", "whatif", "cant_know", "week", "today"}
 HISTORY_TURNS = 8
 LOW_SCORE = 0.5   # below this raw score an unconfirmed model label is checked with the user
 
@@ -47,6 +48,13 @@ CARBS_Q = I(r"\b(how (many|much)) (carbs?|carbohydrates?|calories|kcal|sugar|pro
 GLUCOSE_Q = I(r"\b(glucose|blood sugar|sugar level|spike|insulin response|affect my (sugar|glucose))\b")
 IDENTIFY = I(r"\b(how (do|did) you (know|identify|recogni[sz]e|detect)|why (did you )?(classif\w*|label\w*|think)|how .* identified|is it really)\b")
 OK_Q = I(r"\b(is (it|this|this meal|my meal|that) (ok|okay|good|healthy|fine|bad|alright)|good for (me|my)|ok for my|fit my goal)\b")
+MISSED = I(r"\b(you )?(missed|forgot|didn'?t (see|catch|detect|find|get)|left out|(is|are) missing|skipped my)\b")
+MYSTERY = I(r"\b(myster\w*|what('?s| is) this( dish| thing)?|unknown|unidentified|what is that)\b")
+EXACT_GLUCOSE = I(r"\b(exact(ly)?|precise(ly)?|how (much|high|far) will|predict)\b.*\b(glucose|blood sugar|sugar)\b")
+TOO_MUCH = I(r"\b(too much|too many|a lot of|lots of|too big)\b")
+CAN_EAT = I(r"\b(can|could|may|should) i (eat|have)\b|\bis it ok(ay)? to (eat|have)\b")
+HEALTHY_Q = I(r"\b(is|are) .{0,40}\b(healthy|unhealthy|good for (me|you)|bad for (me|you))\b")
+ADD_OP = I(r"\b(add|adding|plus|extra|top(ped)? with|with an?)\b")
 CONFIDENCE = I(r"\b(how (sure|confident|certain)|confidence|accura\w*|reliable)\b")
 SOURCE = I(r"\b(where (does|did|do) .* come from|source|based on what|how (was|is) .* (estimated|calculated)|why .* (grams?|g\b))\b")
 STATUS = I(r"\b(how (am i|is my|are my|'?s my)|how('?s| is) (it|my)|going|doing|status|summary|nutrition(al)?|eating)\b")
@@ -174,7 +182,7 @@ def mentioned_foods(text: str, user_id: int, limit: int = 4) -> list[dict]:
 
 def food_fact(rec: dict, photo_keys: set[str]) -> dict:
     per, g = rec["per_100g"], rec["default_serving_g"]
-    return {"name": rec["name"], "serving": f"{rec['serving_desc']} ≈ {g} g", "category": rec.get("category"),
+    return {"key": rec["key"], "name": rec["name"], "serving": f"{rec['serving_desc']} ≈ {g} g", "category": rec.get("category"),
             "per_serving": {n: None if per.get(n) is None else round(per[n] * g / 100, 1) for n in nutrition.NUTRIENTS},
             "glycemic_index": rec.get("glycemic_index"), "level": "L1" if rec["key"] in nutrition.CUSTOM else "L3",
             "source": rec.get("source"), "verification": rec.get("verification"),
@@ -551,38 +559,146 @@ HELP_TEXT = ("I'm your Meal Advisor. I answer from your saved meals, your goals 
              "• “What could I change to make this meal healthier?”\n• “How was my week?”\n• “Why did you classify this food this way?”")
 
 
-def draft(msg: str, fx: dict, ctx: dict) -> tuple[str, list[str]]:
-    """Grounded answer and follow-up suggestions. Several intents can be answered in one reply."""
+def _food_line(f: dict, goals: dict) -> str:
+    p = f["per_serving"]
+    line = _fmt_food(f)
+    if p.get("carbs_g") is not None and goals.get("carbs_g"):
+        line += f" One serving is about {round(p['carbs_g'] / goals['carbs_g'] * 100)}% of your {round(goals['carbs_g'])} g daily carb goal."
+    return line
+
+
+def _healthy_text(f: dict, goals: dict) -> str:
+    p, notes = f["per_serving"], []
+    if p.get("sodium_mg") is not None:
+        notes.append(f"its sodium is about {round(p['sodium_mg'] / 2000 * 100)}% of the WHO daily limit (2,000 mg)")
+    if p.get("fiber_g") is not None:
+        notes.append(f"it has {p['fiber_g']} g fibre (WHO advises at least 25 g a day)")
+    if p.get("sat_fat_g") is not None:
+        notes.append(f"{p['sat_fat_g']} g saturated fat")
+    txt = _food_line(f, goals)
+    if notes:
+        txt += " Per serving, " + "; ".join(notes) + "."
+    return txt + " Whether it fits depends on the portion and the rest of your day, so no food is simply 'good' or 'bad'."
+
+
+def _food_whatif_text(fw: dict) -> str:
+    base, comp = fw["base"], fw["comp"]
+    b, c = base["per_serving"], comp["per_serving"]
+    bn, cn = _short(base["name"]), _short(comp["name"]).lower()
+    if fw["op"] == "add":
+        tot = {k: round((b.get(k) or 0) + (c.get(k) or 0), 1) for k in ("calories_kcal", "carbs_g", "protein_g")}
+        return (f"Hypothetically, {bn} ({base['serving']}) plus {cn} ({comp['serving']}) comes to about {round(tot['calories_kcal'])} kcal, "
+                f"{tot['carbs_g']} g carbs and {tot['protein_g']} g protein, versus {round(b.get('calories_kcal') or 0)} kcal, {b.get('carbs_g')} g carbs "
+                f"and {b.get('protein_g')} g protein for {bn} alone. Nothing is saved; this is just for comparison.")
+    return (f"My food table doesn't split {bn} into its parts, so I can't say exactly how much skipping the {cn} would remove. For scale: "
+            f"{bn} is about {b.get('carbs_g')} g carbs per {base['serving'].split(' ≈')[0]}, and {cn} on its own is {c.get('carbs_g')} g carbs per "
+            f"{comp['serving']}. Leaving out most of the {cn} would remove a large part of those carbs.")
+
+
+SHORT_HELP = ("I can help with things like “What is in my meal?”, “How many carbs did I have today?”, "
+              "“What's a lower-carb swap for nasi lemak?” or “How was my week?”.")
+
+
+def draft(msg: str, fx: dict, ctx: dict) -> tuple[str, list[str], dict]:
+    """Grounded answer, follow-up suggestions and info {intent, food, actions, focus_foods}.
+    Several intents can be answered in one reply; the first one sets the tone and opener."""
+    info = {"intent": None, "food": None, "actions": [], "focus_foods": [f["key"] for f in fx["foods_mentioned"]]}
+    goals = fx["profile"].get("daily_goals", {})
+
+    def put(intent, text, food=None):
+        if info["intent"] is None:
+            info["intent"], info["food"] = intent, food
+        parts.append(text)
+
     if SMALLTALK.match(msg):
-        greet = "You're welcome!" if re.match(r"\s*thank", msg, re.I) else "Hi! I'm doing well, thanks for asking."
         t = fx["today"]
-        return (f"{greet} " + (f"You've saved {_n(t['meals'], 'meal')} today ({round(t['totals']['calories_kcal']):,} kcal). " if t["meals"] else "")
-                + "What would you like to know about your meals?"), ["What is in my meal?", "How am I doing today?", "How was my week?"]
+        thanks = bool(re.match(r"\s*thank", msg, re.I))
+        info["intent"] = "thanks" if thanks else "greet"
+        body = ("I'm doing well, thanks for asking! " if re.search(r"how are you|how'?s it going", msg, re.I) else "") \
+            + (f"You've saved {_n(t['meals'], 'meal')} today ({round(t['totals']['calories_kcal']):,} kcal). " if t["meals"] else "")
+        return body + "What would you like to know about your meals?", ["What is in my meal?", "How am I doing today?", "How was my week?"], info
     ev, parts, follow, focus = fx.get("meal"), [], [], ctx.get("focus")
     if HELP.search(msg) and not (fx["foods_mentioned"] or WEEK.search(msg) or TODAY.search(msg) or ev):
-        return HELP_TEXT, ["What is in my meal?", "How am I doing today?"]
-    if fx.get("whatif"):
-        parts.append(_whatif_text(fx["whatif"]))
-        follow.append("Suggest a lower-carb version of this meal")
-    if fx.get("swaps"):
-        parts += _swap_text(fx)
-    elif fx["foods_mentioned"] and not (ev and _match_item(msg, ev["foods"])):
-        parts += [_fmt_food(f) for f in fx["foods_mentioned"]]
+        info["intent"] = "default"
+        return HELP_TEXT, ["What is in my meal?", "How am I doing today?"], info
     week, today, adv = WEEK.search(msg), TODAY.search(msg), ADVICE.search(msg)
+    in_meal = ev and _match_item(msg, ev["foods"])
+    # ---- corrections, unknowns and limits first
+    if ev and MISSED.search(msg):
+        new = [f for f in fx["foods_mentioned"] if not any(_short(f["name"]).lower() in m["name"].lower() for m in ev["foods"])]
+        if new:
+            for f in new[:2]:
+                info["actions"].append({"type": "add_food", "meal_id": ev["meal_id"], "nutrition_key": f["key"], "label": _short(f["name"])})
+            put("missed", "Let's catch it. Tap " + " or ".join(f"**Add {_short(f['name']).lower()}**" for f in new[:2])
+                + f" below and I'll add it with a typical portion ({new[0]['serving']}). You can change the grams afterwards on the meal page.",
+                _short(new[0]["name"]).lower())
+        elif fx["foods_mentioned"]:
+            have = [m["name"] for m in ev["foods"] if any(_short(f["name"]).lower() in m["name"].lower() for f in fx["foods_mentioned"])]
+            put("default", f"I can already see {' and '.join(have)} in this meal. If you had more than that, change its portion on the "
+                "meal page, or tell me what else was on the plate.")
+        else:
+            put("missed", "Tell me what it was and I'll find it in the food table, or use **Add missing food** on the meal page "
+                "(you can also create your own food there if it isn't listed).", "food")
+    if ev and MYSTERY.search(msg) and not MISSED.search(msg):
+        unnamed = [f for f in ev["foods"] if f["unnamed"]]
+        if unnamed:
+            g = unnamed[0]["identity"].get("candidates") or []
+            put("unknown_dish", f"I can't identify {_n(len(unnamed), 'item')} confidently from this photo"
+                + (f" (my weak guesses were {', '.join(g[:2])}, too unsure to use)" if g else "")
+                + ". Could you tell me what it's called? Tap **Name it** on that item, or describe it here.")
+    if EXACT_GLUCOSE.search(msg):
+        txt = ("I can't predict your exact glucose rise from a meal photo. It depends on the portion, what you ate with it, "
+               "medication, activity, sleep and your own metabolism.")
+        if ev:
+            txt += f" What I can tell you: {_meal_label(ev)} has an estimated {round(ev['totals'].get('carbs_g') or 0)} g of carbohydrate."
+        put("cant_know", txt)
+    # ---- hypotheticals and swaps
+    if fx.get("whatif"):
+        put("whatif", _whatif_text(fx["whatif"]))
+        follow.append("Suggest a lower-carb version of this meal")
+    if fx.get("food_whatif"):
+        put("whatif", _food_whatif_text(fx["food_whatif"]), _short(fx["food_whatif"]["base"]["name"]).lower())
+        info["focus_foods"] = [fx["food_whatif"]["base"]["key"]]
+        follow += ["What about adding an egg?" if fx["food_whatif"]["op"] != "add" else "What's a lower-carb swap?"]
+    if fx.get("swaps"):
+        for t in _swap_text(fx):
+            put("swap", t)
+    elif fx["foods_mentioned"] and not in_meal and not fx.get("food_whatif") and not (ev and MISSED.search(msg)):
+        f0 = fx["foods_mentioned"][0]
+        if HEALTHY_Q.search(msg):
+            put("healthy", _healthy_text(f0, goals), _short(f0["name"]).lower())
+        elif CAN_EAT.search(msg):
+            put("can_eat", _food_line(f0, goals) + " Portion size and what you pair it with matter most, especially if you're managing carbs.", _short(f0["name"]))
+        else:
+            for f in fx["foods_mentioned"]:
+                put("food", _food_line(f, goals), _short(f["name"]).lower())
+        follow += [f"What's a lower-carb swap for {_short(f0['name']).lower()}?", "What about adding an egg?"]
+    # ---- meal questions
     if ev:
         if IDENTIFY.search(msg):
-            parts.append(_identify(ev, focus))
+            put("identify", _identify(ev, focus))
         if SOURCE.search(msg):
-            parts.append(_sources(ev, focus))
+            put("identify", _sources(ev, focus))
         if CONFIDENCE.search(msg) and not IDENTIFY.search(msg):
-            parts.append(_confidence(ev))
+            put("identify", _confidence(ev))
+        if TOO_MUCH.search(msg) and in_meal:
+            it, carbs = in_meal, in_meal["nutrients"]["carbs_g"] or 0
+            total = ev["totals"].get("carbs_g") or 0
+            txt = (f"Based on your {'confirmed' if it['portion']['level'] == 'L1' else 'estimated'} portion ({it['portion']['grams']} g), "
+                   f"{_short(it['name']).lower()} contributes about {round(carbs)} g of carbohydrate"
+                   + (f", {round(carbs / total * 100)}% of this meal's carbs" if total else "") + ".")
+            if goals.get("carbs_g"):
+                txt += f" That's {round(carbs / goals['carbs_g'] * 100)}% of your {round(goals['carbs_g'])} g daily carb goal."
+            txt += " If you're watching your glucose, a smaller portion would lower it."
+            put("too_much", txt, _short(it["name"]).lower())
+            follow.append(f"What if I halve the {_short(it['name']).lower()}?")
         if OK_Q.search(msg):
-            parts.append(_assessment(ev, fx["profile"]))
-        if GLUCOSE_Q.search(msg):
-            parts.append(_glucose(ev))
+            put("assessment", _assessment(ev, fx["profile"]))
+        if GLUCOSE_Q.search(msg) and not EXACT_GLUCOSE.search(msg):
+            put("glucose", _glucose(ev))
             follow.append("Suggest a lower-carb version of this meal")
-        elif CARBS_Q.search(msg):
-            parts.append(_carbs(ev))
+        elif CARBS_Q.search(msg) and not TOO_MUCH.search(msg):
+            put("carbs", _carbs(ev))
             split = [x for x in _carb_split(ev) if x[1]]
             if split:
                 follow.append(f"What if I remove the {_short(split[0][0]).lower()}?")
@@ -590,27 +706,30 @@ def draft(msg: str, fx: dict, ctx: dict) -> tuple[str, list[str]]:
             split = [x for x in _carb_split(ev) if x[1]]
             tips = ([f"Reduce the {_short(split[0][0]).lower()} portion: it is the biggest carbohydrate source ({round(split[0][1])} g)."]
                     if split and split[0][1] >= 20 else []) + ev["recommendations"][:3]
-            parts.append("To make this meal healthier:\n" + "\n".join(f"• {t}" for t in tips[:4]) if tips else "This meal looks balanced; nothing stands out to change.")
+            put("advice", "To make this meal healthier:\n" + "\n".join(f"• {t}" for t in tips[:4]) if tips else "This meal looks balanced; nothing stands out to change.")
             if split:
                 follow.append(f"What if I halve the {_short(split[0][0]).lower()}?")
         if OVERVIEW.search(msg) or (not parts and not week and not today):
-            parts.append(_overview(ev))
+            named = [f for f in ev["foods"] if not f["unnamed"]]
+            main = max(named, key=lambda f: f["nutrients"]["calories_kcal"] or 0, default=None)
+            put("overview" if main else "overview_unknown", _overview(ev), _short(main["name"]).lower() if main else None)
     general = not parts and not week and not today
     if today or (general and STATUS.search(msg)):
-        parts.append(_today_text(fx))
+        put("today", _today_text(fx))
     if week or (general and STATUS.search(msg)):
-        parts.append(_week_text(fx))
+        put("week", _week_text(fx))
     if (adv and not ev) or week or (general and STATUS.search(msg)):
-        parts.append("Advice:\n" + "\n".join(f"• {t}" for t in advice(fx)))
-    if ev and (q := _clarify(ev)):
+        put("advice", "Advice:\n" + "\n".join(f"• {t}" for t in advice(fx)))
+    if ev and (q := _clarify(ev)) and info["intent"] not in ("unknown_dish", "missed"):
         parts.append(q)
     if not parts:
-        return ("I don't have information about that in your meals or the food table. " + HELP_TEXT), ["What is in my meal?", "How was my week?"]
+        info["intent"] = "out_of_scope"
+        return "I don't have information about that in your meals or the food table. " + SHORT_HELP, ["What is in my meal?", "How was my week?"], info
     if ev and not follow:
         follow += ["How might this affect my glucose?", "Why did you classify this food this way?"]
     elif not ev and not follow:
         follow += ["How was my week?", "Any advice?"] if today else ["How am I doing today?", "What is in my meal?"]
-    return "\n\n".join(parts), follow[:3]
+    return "\n\n".join(parts), follow[:3], info
 
 
 # ------------------------------------------------------------------ facts bundle
@@ -640,6 +759,16 @@ def facts(db: Session, user: User, msg: str, meal: Meal | None, tz_offset_min: i
         ctx["focus"] = _match_item(msg, fx["meal"]["foods"]) or names.get(ctx.get("focus_name") or "")
         if WHATIF.search(msg) and not SWAP.search(msg):
             fx["whatif"] = whatif(meal, fx["meal"], msg, user.profile)
+    focus_keys = [k for k in ctx.get("focus_foods") or [] if nutrition.get(k)]
+    if not meal and focus_keys and (WHATIF.search(msg) or ADD_OP.search(msg)) and not SWAP.search(msg):
+        base = nutrition.get(focus_keys[0])
+        comps = [r for r in foods if r["key"] != base["key"]]
+        if comps:   # "what if I skip the rice?" / "what about adding an egg?" about the food we were discussing
+            op = "add" if ADD_OP.search(msg) and not WHATIF_OPS[0][0].search(msg) else "remove"
+            fx["food_whatif"] = {"base": food_fact(base, photo_keys), "comp": food_fact(comps[0], photo_keys), "op": op}
+            fx["foods_mentioned"] = [f for f in fx["foods_mentioned"] if f["key"] == base["key"]] or [food_fact(base, photo_keys)]
+    if SWAP.search(msg) and not foods and not meal and focus_keys:
+        foods = [nutrition.get(focus_keys[0])]
     if SWAP.search(msg):
         if foods and not (meal and _match_item(msg, fx["meal"]["foods"])):
             fx["swaps"] = {r["name"]: swaps(r) for r in foods}
@@ -709,14 +838,14 @@ def validate(reply: str, draft_text: str, fx: dict) -> dict:
             "unsupported_foods": new_foods[:5], "unsafe": unsafe}
 
 
-def phrase(msg: str, draft_text: str, fx: dict, hist: list[ChatMessage]) -> tuple[str | None, dict]:
+def phrase(msg: str, draft_text: str, fx: dict, hist: list[ChatMessage], t: str = "playful") -> tuple[str | None, dict]:
     st = slm.status()
     if not st["available"]:
         return None, {"slm": "offline"}
     convo = "\n".join(f"{h.role.upper()}: {h.content[:400]}" for h in hist[-4:])
     t0 = time.perf_counter()
     stats: dict = {}
-    res = slm.chat_json("advisor", SYSTEM, f"<<FACTS>>\n{json.dumps(fx, default=str)[:6000]}\n<</FACTS>>\n<<CONVERSATION>>\n{convo}\n"
+    res = slm.chat_json("advisor", persona.PERSONA + persona.TONE_RULES.get(t, "") + " " + SYSTEM, f"<<FACTS>>\n{json.dumps(fx, default=str)[:6000]}\n<</FACTS>>\n<<CONVERSATION>>\n{convo}\n"
                         f"<</CONVERSATION>>\nUSER: {msg}\n<<DRAFT>>\n{draft_text}\n<</DRAFT>>", Reply, timeout=60, stats=stats)
     meta = {"slm": st["selected"], "slm_ms": round((time.perf_counter() - t0) * 1000), "slm_stats": stats}
     if not res or not res.reply.strip():
@@ -749,6 +878,10 @@ def answer(db: Session, user: User, msg: str, meal: Meal | None, tz_offset_min: 
         msg = last_a.meta["followups"][0]
     if last_a and (last_a.meta or {}).get("focus") and re.search(r"\b(it|that|this one|this food)\b", msg, re.I):
         ctx["focus_name"] = last_a.meta["focus"]
+    if last_a:
+        ctx["focus_foods"] = (last_a.meta or {}).get("focus_foods") or []
+    last_opener = (last_a.meta or {}).get("opener") if last_a else None
+    info, t = {"actions": []}, "serious"
     meta_slm: dict = {}
     if URGENT.search(msg) or _urgent_value(msg):
         reply, source, follow, fx = URGENT_REPLY, "safety", [], None
@@ -760,12 +893,16 @@ def answer(db: Session, user: User, msg: str, meal: Meal | None, tz_offset_min: 
         reply, source, follow, fx = DIAGNOSIS_REPLY, "safety", ["How many carbohydrates did I have?"], None
     else:
         fx = facts(db, user, msg, meal, tz_offset_min, ctx)
-        reply, follow = draft(msg, fx, ctx)
+        body, follow, info = draft(msg, fx, ctx)
+        careful = bool(fx["profile"].get("condition") or "diabetes_friendly" in fx["profile"].get("goals", [])) and info["intent"] in CAREFUL_INTENTS
+        t = persona.tone(info["intent"] or "default", careful)
+        reply, info["opener"] = persona.style(body, info["intent"] or "default", t, f"{msg}|{len(hist)}", info.get("food"), last_opener)
         source = "rules"
-        better, meta_slm = phrase(msg, reply, fx, hist)
+        better, meta_slm = phrase(msg, reply, fx, hist, t)
         if better:
             reply, source = better, f"slm:{meta_slm['slm']}"
-    meta = {"source": source, "followups": follow, "evidence": evidence_summary(fx) if fx else [],
+    meta = {"source": source, "followups": follow, "evidence": evidence_summary(fx) if fx else [], "tone": t,
+            "opener": info.get("opener"), "focus_foods": info.get("focus_foods", []), "actions": info.get("actions", []),
             "focus": (ctx.get("focus") or {}).get("name"), "hypothetical": bool(fx and fx.get("whatif")),
             "latency_ms": round((time.perf_counter() - t0) * 1000), **meta_slm}
     db.add(ChatMessage(thread_id=th.id, role="user", content=asked[:2000], meta={}))
@@ -775,5 +912,5 @@ def answer(db: Session, user: User, msg: str, meal: Meal | None, tz_offset_min: 
     return {"thread_id": th.id, "meal_id": th.meal_id, "reply": reply, "source": source, "followups": follow,
             "evidence": meta["evidence"], "grounding": [{"kind": e["level"], "label": e["label"], "detail": e["detail"]} for e in meta["evidence"]],
             "hypothetical": meta["hypothetical"], "validation": meta.get("validation"), "latency_ms": meta["latency_ms"],
-            "slm_stats": meta.get("slm_stats"),
+            "slm_stats": meta.get("slm_stats"), "tone": t, "actions": meta["actions"],
             "disclaimer": DISCLAIMER}

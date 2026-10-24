@@ -1,4 +1,7 @@
-# Deploying v0.8.0 to Buddy (not yet approved; do not run until approved)
+# Deploying v0.8.0 / v0.9.0 to Buddy (not yet approved; do not run until approved)
+
+v0.9.0 (friendly Meal Advisor personality) adds **no migration and no new environment variables** on top of v0.8.0;
+the steps below deploy both. Expect `"version":"0.9.0"` from the health check.
 
 **Scope:** minimalist landing page, server-side onboarding check, onboarding fields, and the grounded Meal Advisor with
 server-side conversations. No model, GPU, Ollama or Cloudflare changes. **No new environment variables.**
@@ -64,7 +67,7 @@ Restore the backup only if something went wrong with data:
 ## 6. Test evidence (sandbox, CPU, no Ollama, no GPU)
 | Check | Result |
 |---|---|
-| pytest | **31 passed** (incl. onboarding access matrix and 8 assistant test groups) |
+| pytest | **41 passed** (incl. onboarding access matrix, 8 assistant groups, 10 personality tests) |
 | Phone UI flow, light and dark | **PASS**, no JS errors (landing → register → onboarding → multi-food meal → advisor sheet → advisor → about) |
 | Labelled assistant evaluation (`test-results/advisor_eval.json`) | **38/38**; unsupported-claim rate 0.0; reply latency mean 13 ms, p95 18 ms (rule engine) |
 | Not measured here | SLM latency, input/output tokens, tokens/s, SLM rejection rate, GPU utilisation: run step 4 on Buddy |

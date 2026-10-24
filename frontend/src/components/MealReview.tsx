@@ -220,6 +220,11 @@ export default function MealReview(props: ReviewProps) {
 function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
   const advisor = useAdvisor()
   useEffect(() => { advisor.setContextMeal(meal.id); return () => advisor.setContextMeal(null) }, [meal.id])  // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {   // the Meal Advisor can add a missed food; keep this page in sync
+    const on = (e: Event) => { const m = (e as CustomEvent).detail; if (m?.id === meal.id) onChange(m) }
+    window.addEventListener('mealsense-meal-updated', on)
+    return () => window.removeEventListener('mealsense-meal-updated', on)
+  }, [meal.id, onChange])
   const [adding, setAdding] = useState(false)
   const [mealType, setMealType] = useState(meal.meal_type ?? guessMealType())
   const [err, setErr] = useState<string | null>(null)

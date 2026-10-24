@@ -1,7 +1,13 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.8.0'
+export const APP_VERSION = '0.9.0'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.9.0', title: 'A friendlier Meal Advisor', changes: [
+    'Warm, witty personality that adapts its tone: playful for food chat, careful for diabetes topics, serious for urgent ones',
+    '“You missed my sausage!” offers a one-tap Add button; the meal updates when you tap it',
+    'Handles “is this too much rice?”, “can I eat pizza?”, mystery dishes and questions it cannot answer, honestly',
+    'Remembers the food you are talking about: “Is nasi lemak healthy?” → “What if I skip the rice?” → “What about adding an egg?”',
+  ] },
   { version: '0.8.0', title: 'Minimal design, grounded conversations', changes: [
     'New minimalist landing, sign-in and register pages; Privacy, Terms and Contact pages (drafts)',
     'Onboarding is now enforced by the server; age range, other goals and a “why we ask” note added',

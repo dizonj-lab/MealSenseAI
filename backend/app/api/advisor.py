@@ -55,7 +55,7 @@ def thread(meal_id: int | None = None, user: User = Depends(active_user), db: Se
     return {"thread_id": th.id, "meal_id": th.meal_id, "messages": [
         {"role": m.role, "content": m.content, "created_at": m.created_at.isoformat(), "source": (m.meta or {}).get("source"),
          "evidence": (m.meta or {}).get("evidence", []), "followups": (m.meta or {}).get("followups", []),
-         "hypothetical": (m.meta or {}).get("hypothetical", False)} for m in msgs]}
+         "hypothetical": (m.meta or {}).get("hypothetical", False), "actions": (m.meta or {}).get("actions", [])} for m in msgs]}
 
 
 @router.delete("/threads/{thread_id}", status_code=204, summary="Clear a conversation")

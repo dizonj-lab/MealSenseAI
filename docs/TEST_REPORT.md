@@ -80,6 +80,13 @@ segmentation-mask quality, the uncertainty band's coverage, and any glucose accu
 | Labelled assistant set (38 cases, `ml/evaluation/advisor_eval.py`) | **38/38**, unsupported-claim rate 0.0, latency mean 13 ms / p95 18 ms (rule engine; SLM offline in sandbox) |
 | Not measured | SLM latency/tokens/throughput, SLM rejection rate, GPU utilisation (need Ollama/GPU on Buddy; see `docs/DEPLOY_v0.8.0.md`) |
 
+## v0.9.0: friendly Meal Advisor personality (24 Oct 2026)
+| Test | Result |
+|---|---|
+| pytest | **41 passed**; personality tests: greetings and opener rotation, friendly food identification naming only foods in the meal, multi-turn food conversation (nasi lemak → skip rice → add egg, arithmetic from food-table records), missed-food Add action (nothing claimed before the tap), mystery dish, crystal-ball question, unsupported request, missing nutrients not invented, careful tone for type 1 (no jokes/emoji), serious tone for emergency/medication/diagnosis, openers contain no numbers |
+| Phone UI flow, light and dark | **PASS**, no JS errors, including “You missed my sausage!” → Add → meal page updated |
+| Not measured | Language-model wording with the persona (Ollama not available here); its replies still pass the same number/food/safety validation |
+
 ## Not tested / outstanding
 1. **GPU path:** the `gpu` image (CUDA 12.8, cuDNN 9, onnxruntime-gpu) was **not built or run**: no GPU and
    insufficient disk in the test environment. CUDA auto-selection is implemented with a CPU fallback, but is unverified.

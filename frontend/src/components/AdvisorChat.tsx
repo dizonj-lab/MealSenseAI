@@ -5,7 +5,8 @@ import { api, tzOffset } from '../lib/api'
 import { Spinner } from './ui'
 
 type Ev = { level: string; label: string; detail: string }
-type Msg = { role: 'user' | 'assistant'; content: string; created_at?: string; source?: string; evidence?: Ev[]; followups?: string[]; hypothetical?: boolean }
+type Action = { type: 'add_food'; meal_id: number; nutrition_key: string; label: string }
+type Msg = { role: 'user' | 'assistant'; content: string; created_at?: string; source?: string; evidence?: Ev[]; followups?: string[]; hypothetical?: boolean; actions?: Action[]; local?: boolean }
 export const PROMPTS: Record<string, string[]> = {
   meal: ['What is in my meal?', 'How might this affect my glucose?', 'What could I change to make this meal healthier?', 'Why did you classify this food this way?'],
   today: ['How many carbohydrates did I consume today?', 'How am I doing today?', 'What is in my meal?'],
@@ -48,10 +49,22 @@ export default function AdvisorChat({ mealId, prompts, initialPrompt, compact = 
     try {
       const r = await api<any>('/advisor/chat', { method: 'POST', json: { message: m, meal_id: mealId, thread_id: thread, tz_offset_min: tzOffset() } })
       setThread(r.thread_id)
-      setMsgs(x => [...x, { role: 'assistant', content: r.reply, created_at: new Date().toISOString(), source: r.source, evidence: r.evidence, followups: r.followups, hypothetical: r.hypothetical }])
+      setMsgs(x => [...x, { role: 'assistant', content: r.reply, created_at: new Date().toISOString(), source: r.source, evidence: r.evidence, followups: r.followups, hypothetical: r.hypothetical, actions: r.actions }])
     } catch (e: any) { setMsgs(x => x.slice(0, -1)); setErr({ msg: e.message, retry: m }) } finally { setBusy(false) }
   }
   useEffect(() => { if (!loading && initialPrompt && sent.current !== initialPrompt) { sent.current = initialPrompt; send(initialPrompt) } })  // eslint-disable-line react-hooks/exhaustive-deps
+  const [done, setDone] = useState<Record<string, boolean>>({})
+  const run = async (a: Action) => {   // only reports success after the server has actually added the food
+    const k = `${a.meal_id}:${a.nutrition_key}`
+    setDone(d => ({ ...d, [k]: true }))
+    try {
+      const meal = await api<any>(`/meals/${a.meal_id}/foods`, { method: 'POST', json: { nutrition_key: a.nutrition_key } })
+      const added = [...meal.foods].reverse().find((f: any) => f.nutrition_key === a.nutrition_key && !f.removed)
+      window.dispatchEvent(new CustomEvent('mealsense-meal-updated', { detail: meal }))
+      setMsgs(x => [...x, { role: 'assistant', local: true, created_at: new Date().toISOString(),
+        content: `Got it! Added ${added?.label ?? a.label}${added ? ` (${Math.round(added.grams)} g, typical portion)` : ''} to your meal. ✅ You can adjust the grams on the meal page.` }])
+    } catch (e: any) { setDone(d => ({ ...d, [k]: false })); setErr({ msg: e.message, retry: '' }) }
+  }
   const clear = async () => { if (thread) await api(`/advisor/threads/${thread}`, { method: 'DELETE' }).catch(() => {}); setMsgs([]); setThread(null) }
   const submit = (e: FormEvent) => { e.preventDefault(); send(text) }
   const last = [...msgs].reverse().find(m => m.role === 'assistant')
@@ -71,13 +84,17 @@ export default function AdvisorChat({ mealId, prompts, initialPrompt, compact = 
           </div>) : (
           <div key={i} className="max-w-[92%]">
             {m.hypothetical && <div className="mb-1 text-[11px] font-medium text-amber-700">Hypothetical · not saved</div>}
-            <div className="text-[15px] leading-relaxed text-slate-800 whitespace-pre-line">{m.content}</div>
-            <Sources ev={m.evidence ?? []} source={m.source} />
+            <div className="text-[15px] leading-relaxed text-slate-800 whitespace-pre-line">{m.content.replace(/\*\*(.+?)\*\*/g, '$1')}</div>
+            {!!m.actions?.length && <div className="mt-2 flex flex-wrap gap-1.5">{m.actions.map(a => {
+              const k = `${a.meal_id}:${a.nutrition_key}`
+              return <button key={k} disabled={done[k]} onClick={() => run(a)} className="rounded-full bg-brand-600 text-white px-3.5 py-1.5 text-[13px] font-medium disabled:opacity-50">
+                {done[k] ? 'Added' : `Add ${a.label.toLowerCase()}`}</button> })}</div>}
+            {!m.local && <Sources ev={m.evidence ?? []} source={m.source} />}
             {m.created_at && <span className="text-[10px] text-slate-400">{time(m.created_at)}</span>}
           </div>))}
         {busy && <div className="flex items-center gap-2 text-sm text-slate-500"><Spinner className="size-4" />Checking your data…</div>}
         {err && <div className="text-sm text-rose-600 flex items-center gap-2">{err.msg}
-          <button onClick={() => send(err.retry)} className="inline-flex items-center gap-1 underline"><RotateCcw className="size-3.5" />Retry</button></div>}
+          {err.retry && <button onClick={() => send(err.retry)} className="inline-flex items-center gap-1 underline"><RotateCcw className="size-3.5" />Retry</button>}</div>}
         <div ref={end} />
       </div>
       <div className={`space-y-2 ${compact ? 'px-4 pb-4 pt-2 border-t border-slate-100' : 'pb-2'}`}>
