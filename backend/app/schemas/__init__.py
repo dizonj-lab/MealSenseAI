@@ -56,6 +56,7 @@ class UserOut(BaseModel):
     email: str
     name: str
     onboarded: bool
+    training_consent: bool = False
     created_at: datetime
     profile: ProfileOut | None = None
 

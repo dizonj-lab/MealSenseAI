@@ -9,7 +9,7 @@ import MealComposition from './MealComposition'
 import PortionSimulator from './PortionSimulator'
 import { Card, DetailProvider, DetailSwitch, ErrorNote, LevelBadge, Progress, Section, Spinner, Tag, useDetail } from './ui'
 
-const ORIGIN: Record<string, string> = { model: 'AI recognised', description: 'From description', manual: 'Added by you', slm: 'SLM suggestion' }
+const ORIGIN: Record<string, string> = { model: 'AI recognised', memory: 'Known from your earlier label', description: 'From description', manual: 'Added by you', slm: 'SLM suggestion' }
 const MAPQ: Record<string, [string, string]> = {
   exact: ['Nutrition record matched', 'bg-emerald-50 text-emerald-700'], proxy: ['Nutrition approximated by a similar food', 'bg-amber-50 text-amber-700'],
   fuzzy: ['Approximate match — please confirm', 'bg-amber-50 text-amber-700'],
@@ -66,6 +66,7 @@ function FoodCard({ f, n, meal, onChange, readOnly, selected, onSelect, mergeChe
             {!unknown && !f.confirmed && pred?.needs_review && <span className="chip bg-amber-50 text-amber-700">Needs your check</span>}
             {open && pred?.score !== undefined && pred?.kind === 'food' && <span className="chip bg-violet-50 text-violet-700" title="Raw softmax score, not a calibrated probability">model {(pred.score * 100).toFixed(0)}% (raw)</span>}
             {f.confirmed && <span className="chip bg-emerald-50 text-emerald-700"><Check className="size-3" />Confirmed</span>}
+            {pred?.memory && !f.user_corrected && <span className="chip bg-violet-50 text-violet-700" title={`Looks like the item you named “${pred.memory.label}” before (similarity ${pred.memory.similarity})`}>Known from your earlier label</span>}
             {open && f.nutrition_source?.match === 'proxy' && <span className="chip bg-amber-50 text-amber-700">≈ {f.nutrition_source.name}</span>}
             {open && f.user_corrected && <span className="chip bg-sky-50 text-sky-700">Corrected</span>}
           </div>
@@ -83,7 +84,7 @@ function FoodCard({ f, n, meal, onChange, readOnly, selected, onSelect, mergeChe
 
       {(open || unknown) && pred?.candidates?.length > 0 && <div className="mt-3 rounded-xl bg-violet-50/40 ring-1 ring-violet-100 px-3 py-2.5">
         <div className="flex items-center gap-2 text-xs text-slate-600 mb-2"><Tag kind="prediction" />
-          <span>{unknown ? 'Best guesses for this region (all weak):' : `${pred.model_name} · ${pred.instance === 'whole photo' ? 'whole photo' : 'region ' + (pred.region_id ?? '')}`}</span></div>
+          <span>{unknown ? 'Best guesses for this region (all weak):' : pred.memory ? `Matched your earlier label “${pred.memory.label}” (fingerprint similarity ${pred.memory.similarity}). The model on its own suggested:` : `${pred.model_name} · ${pred.instance === 'whole photo' ? 'whole photo' : 'region ' + (pred.region_id ?? '')}`}</span></div>
         <div className="grid gap-1.5">{pred.candidates.map((c: any, i: number) => {
           const sel = (f.taxonomy_class ?? f.label) === c.label
           return (

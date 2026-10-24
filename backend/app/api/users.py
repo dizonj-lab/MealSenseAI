@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
@@ -12,6 +13,19 @@ HEALTH_FIELDS = ("diabetes_status", "known_readings", "hba1c", "has_cgm", "clini
 
 @router.get("/me", response_model=UserOut)
 def me(user: User = Depends(current_user)):
+    return user
+
+
+class TrainingConsentIn(BaseModel):
+    consent: bool
+
+
+@router.put("/me/training-consent", response_model=UserOut)
+def training_consent(body: TrainingConsentIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Opt in/out of exporting your corrected photo regions as training data (memory works either way)."""
+    user.training_consent = body.consent
+    db.commit()
+    db.refresh(user)
     return user
 
 

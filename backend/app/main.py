@@ -11,9 +11,9 @@ from app import models  # noqa: F401  (register tables)
 from app.api import ai, auth, dashboard, glucose, meals, users
 from app.core import cache
 from app.core.config import settings
-from app.core.db import engine
+from app.core.db import SessionLocal, engine
 from app.core.migrate import upgrade_db
-from app.services import slm, vision
+from app.services import custom_foods, slm, vision
 
 logging.basicConfig(level=logging.INFO)
 
@@ -52,6 +52,8 @@ async def lifespan(_app):
     upgrade_db()
     settings.data_dir.mkdir(parents=True, exist_ok=True)
     vision.warmup()  # load models once at startup
+    with SessionLocal() as db:
+        custom_foods.load_all(db)   # user-defined foods into the nutrition lookup
     register_trained_model()
     yield
     vision.close()

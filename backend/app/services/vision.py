@@ -158,16 +158,23 @@ def score_band(score: float) -> str:
 
 # ---------------------------------------------------------------- classification
 def classify(img: Image.Image, k: int = 3) -> list[dict]:
+    return classify_fp(img, k)[0]
+
+
+def classify_fp(img: Image.Image, k: int = 3) -> tuple[list[dict], list[float]]:
+    """Top-k plus a fingerprint: sqrt of the class probabilities (unit length; cosine = Bhattacharyya
+    coefficient). Used to recognise foods the user has named before (services/memory.py)."""
     c = _state["cls"]
     logits = c["session"].run(None, {"input": to_input(img)})[0][0]
     p = np.exp(logits - logits.max())
     p /= p.sum()
+    fp = [round(float(v), 4) for v in np.sqrt(p)]
     out = []
     for i in p.argsort()[::-1][:k]:
         meta = c["map"].get(int(i), {})
         out.append({"class_id": int(i), "label": c["names"][i], "score": round(float(p[i]), 4),
                     "nutrition_key": meta.get("nutrition_key"), "match": meta.get("match", "none")})
-    return out
+    return out, fp
 
 
 # ---------------------------------------------------------------- detection (YOLO-seg)
@@ -291,7 +298,7 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
         dets = [d for d in (_segment(img) if _state["seg"] else []) if d["score"] >= DET_MIN]
         prop = propose(img)
         t1 = time.perf_counter()
-        whole = classify(full)
+        whole, whole_fp = classify_fp(full)
         regions = [{"bbox": r["bbox"], "area_frac": r["area_frac"], "source": "segmentation", "detector_label": None,
                     "detector_score": None, "has_mask": True} for r in prop["regions"]]
         inside = lambda r, box: (box["x"] <= r["bbox"]["x"] + r["bbox"]["w"] / 2 <= box["x"] + box["w"]
@@ -319,7 +326,7 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
             containers.append({"label": "dining table", "score": None, "source": "segmentation (white plate)",
                                "bbox": {"x": 0, "y": 0, "w": 1, "h": 1}, "area_frac": prop["plate_area_frac"]})
         for r in regions:
-            r["top"] = classify(_crop_full(full, r["bbox"]))
+            r["top"], r["fp"] = classify_fp(_crop_full(full, r["bbox"]))
         # merge touching fragments that the classifier agrees on (one food split into colours)
         changed = True
         while changed:
@@ -329,7 +336,7 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
                     if a["top"][0]["class_id"] == b["top"][0]["class_id"] and a["top"][0]["score"] >= UNKNOWN_MIN \
                             and b["top"][0]["score"] >= UNKNOWN_MIN and _iou(a["bbox"], b["bbox"])[1] > 0.05:
                         a["bbox"], a["area_frac"] = _union(a["bbox"], b["bbox"]), a["area_frac"] + b["area_frac"]
-                        a["top"] = max(a["top"], b["top"], key=lambda t: t[0]["score"])
+                        a["top"], a["fp"] = max((a["top"], a["fp"]), (b["top"], b["fp"]), key=lambda t: t[0][0]["score"])
                         regions.remove(b)
                         changed = True
                         break
@@ -363,7 +370,7 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
                       "match": top["match"] if kind == "food" else "none", "score": top["score"], "candidates": r["top"],
                       "bbox": r["bbox"], "area_frac": r["area_frac"], "instance": r["source"],
                       "detector_label": r["detector_label"], "detector_score": r["detector_score"],
-                      "has_mask": r["has_mask"], "view": view, "model": "classifier"})
+                      "has_mask": r["has_mask"], "view": view, "model": "classifier", "fingerprint": r["fp"]})
     wc = whole[0]
     if wc["score"] >= 0.60 and not any(i["kind"] == "food" and i["class_id"] == wc["class_id"] for i in items):
         # the photo as a whole is confidently one class that no single region captured: give it to the largest
@@ -377,7 +384,7 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
             items.insert(0, {"region_id": f"{view}-0", "kind": "food", "model_label": wc["label"], "class_id": wc["class_id"],
                              "nutrition_key": wc["nutrition_key"], "match": wc["match"], "score": wc["score"],
                              "candidates": whole, "bbox": None, "area_frac": 1.0, "instance": "whole photo",
-                             "detector_label": None, "detector_score": None, "has_mask": False, "view": view, "model": "classifier"})
+                             "detector_label": None, "detector_score": None, "has_mask": False, "view": view, "model": "classifier", "fingerprint": whole_fp})
     if whole[0]["score"] >= WHOLE_DISH and any(i["kind"] == "food" and i["class_id"] == whole[0]["class_id"] for i in items):
         for i in items:   # single-dish photo: other regions are offered as possible extra items (one tap to add)
             if i["kind"] == "unknown" or (i["kind"] == "food" and i["class_id"] != whole[0]["class_id"]):
@@ -395,7 +402,7 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
                              "class_id": whole[0]["class_id"], "nutrition_key": whole[0]["nutrition_key"],
                              "match": whole[0]["match"], "score": whole[0]["score"], "candidates": whole, "bbox": None,
                              "area_frac": 1.0, "instance": "whole photo", "detector_label": None, "detector_score": None,
-                             "has_mask": False, "view": view, "model": "classifier"})
+                             "has_mask": False, "view": view, "model": "classifier", "fingerprint": whole_fp})
     return {
         "view": view, "ok": True, "items": items, "containers": containers, "overlay_path": None,
         "instances": [{"label": i["model_label"] or "unidentified", "kind": i["kind"], "score": i["score"],

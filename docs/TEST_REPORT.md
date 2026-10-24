@@ -64,6 +64,14 @@ edges and no overlap; these are **not** real-meal results.
 Not measured: real multi-food photos (no labelled set available; the breakfast acceptance photo was not supplied),
 segmentation-mask quality, the uncertainty band's coverage, and any glucose accuracy (the simulation is illustrative).
 
+## Custom foods, food memory and training samples (24 Oct 2026)
+| Test | Result |
+|---|---|
+| pytest | **20 passed** (adds custom food → name item → same photo recognised from memory; owner-only custom foods; training consent) |
+| Phone UI flow, `multi_food_plate.jpg` | **PASS**, no JS errors: item named by creating a custom food (portion + nutrients, blanks stay unknown); re-captured photo shows "Known from your earlier label" |
+| Fingerprint threshold check | sqrt-probability fingerprints, cosine ≥ 0.70: 94/120 held-out Food-101 photos matched, **all correct** (3 classes, 3 remembered photos each; steak 24/40). Small test — precision with many foods is not measured. |
+| Export (`ml/export/export_training_samples.py`) | Ran on the test database: 1 consented sample cropped to `user_labels/<class>/`, manifest + summary listing classes not in EXP-002 |
+
 ## Not tested / outstanding
 1. **GPU path:** the `gpu` image (CUDA 12.8, cuDNN 9, onnxruntime-gpu) was **not built or run**: no GPU and
    insufficient disk in the test environment. CUDA auto-selection is implemented with a CPU fallback, but is unverified.

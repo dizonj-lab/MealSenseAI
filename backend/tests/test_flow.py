@@ -259,3 +259,34 @@ def test_progress_and_deferred_slm_explanation(client, auth, monkeypatch):
     assert p["done"] == p["total"] == 10 and p["current"] is None
     meal = client.post(f"{API}/meals/{meal['id']}/explain", headers=auth).json()
     assert meal["insights"]["explanation"]["text"] == "Mostly carbohydrate from rice." and calls == [90]
+
+
+def test_custom_food_memory_and_training_samples(client, auth):
+    def analyse():
+        r = client.post(f"{API}/meals/capture", headers=auth,
+                        files={"top": ("plate.jpg", (FIX / "multi_food_plate.jpg").read_bytes(), "image/jpeg")}).json()
+        return client.post(f"{API}/meals/analyze", json={"meal_id": r["id"]}, headers=auth).json()
+    # a food that is not in the list: create it (unknown values stay null)
+    cf = client.post(f"{API}/foods/custom", headers=auth, json={
+        "name": "Grandma's beef stew", "serving_g": 250, "serving_desc": "1 bowl", "glycemic_index": None,
+        "per_100g": {"calories_kcal": 120, "carbs_g": 8, "protein_g": 9, "fat_g": 5, "sodium_mg": 380}}).json()
+    assert cf["key"].startswith("custom_") and cf["per_100g"]["sugar_g"] is None
+    assert client.post(f"{API}/foods/custom", headers=auth, json={"name": "x", "serving_g": 10, "per_100g": {"carbs_g": 250}}).status_code == 422
+    assert client.get(f"{API}/foods/search?q=grandma", headers=auth).json()[0]["key"] == cf["key"]
+    meal = analyse()
+    unk = next(f for f in meal["foods"] if not f["removed"] and not f["nutrition_key"])
+    meal = client.put(f"{API}/meals/{meal['id']}/foods/{unk['id']}", headers=auth, json={"nutrition_key": cf["key"]}).json()
+    named = next(f for f in meal["foods"] if f["id"] == unk["id"])
+    assert named["label"] == "Grandma's beef stew" and named["grams"] == 250 and named["nutrients"]["sugar_g"] is None
+    # the same region in a new photo is recognised from the user's earlier label
+    meal2 = analyse()
+    mem = [f for f in meal2["foods"] if f["origin"] == "memory"]
+    assert mem and mem[0]["nutrition_key"] == cf["key"] and mem[0]["original_prediction"]["memory"]["similarity"] >= 0.7
+    assert "recognised from your earlier labels" in next(s for s in meal2["stages"] if s["key"] == "classify")["detail"]
+    # consent toggle; another user cannot use or see this custom food
+    assert client.put(f"{API}/users/me/training-consent", headers=auth, json={"consent": True}).json()["training_consent"] is True
+    tok = client.post(f"{API}/auth/register", json={"email": "third@test.io", "password": "secret123"}).json()["access_token"]
+    other = {"Authorization": f"Bearer {tok}"}
+    assert not any(f.get("custom") for f in client.get(f"{API}/foods/search?q=grandma", headers=other).json())
+    m3 = client.post(f"{API}/meals/capture", headers=other, data={"description": "rice"}).json()
+    assert client.post(f"{API}/meals/{m3['id']}/foods", headers=other, json={"nutrition_key": cf["key"]}).status_code == 422

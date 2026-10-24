@@ -17,6 +17,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(120), default="")
     password_hash: Mapped[str] = mapped_column(String(255))
     onboarded: Mapped[bool] = mapped_column(Boolean, default=False)
+    training_consent: Mapped[bool] = mapped_column(Boolean, default=False)  # corrected photo regions may be exported for training
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     profile: Mapped["HealthProfile"] = relationship(back_populates="user", uselist=False, cascade="all, delete-orphan")
 
@@ -72,7 +73,7 @@ class MealFood(Base):
     __tablename__ = "meal_foods"
     id: Mapped[int] = mapped_column(primary_key=True)
     meal_id: Mapped[int] = mapped_column(ForeignKey("meals.id", ondelete="CASCADE"), index=True)
-    origin: Mapped[str] = mapped_column(String(20))  # model|description|manual|slm
+    origin: Mapped[str] = mapped_column(String(20))  # model|memory|description|manual|slm
     label: Mapped[str] = mapped_column(String(200))
     taxonomy_class: Mapped[str | None] = mapped_column(String(120))  # EXP-002 class finally chosen (model or user)
     nutrition_key: Mapped[str | None] = mapped_column(String(80))
@@ -142,3 +143,42 @@ class GlucoseReading(Base):
     source: Mapped[str] = mapped_column(String(20), default="meter")   # meter | cgm
     note: Mapped[str | None] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class CustomFood(Base):
+    """A food the user defined (not in the reference table). Missing nutrient values stay null."""
+    __tablename__ = "custom_foods"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    serving_g: Mapped[float] = mapped_column(Float)
+    serving_desc: Mapped[str] = mapped_column(String(80), default="1 serving")
+    per_100g: Mapped[dict] = mapped_column(JSON)            # NUTRIENTS -> value or null
+    glycemic_index: Mapped[float | None] = mapped_column(Float)
+    aliases: Mapped[list] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class TrainingSample(Base):
+    """A photo region with a user-given or user-confirmed label: personal memory for future meals and,
+    with consent, labelled data for the next training cycle (ml/export/export_training_samples.py)."""
+    __tablename__ = "training_samples"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    meal_id: Mapped[int | None] = mapped_column(ForeignKey("meals.id", ondelete="CASCADE"), index=True)
+    food_id: Mapped[int | None] = mapped_column(Integer, unique=True)
+    view: Mapped[str] = mapped_column(String(10))
+    image_path: Mapped[str] = mapped_column(String(500))
+    bbox: Mapped[dict | None] = mapped_column(JSON)        # normalised x,y,w,h; null = whole photo
+    label: Mapped[str] = mapped_column(String(120))
+    nutrition_key: Mapped[str | None] = mapped_column(String(80))
+    taxonomy_class: Mapped[str | None] = mapped_column(String(120))   # set when the label is an EXP-002 class
+    custom_food_id: Mapped[int | None] = mapped_column(ForeignKey("custom_foods.id", ondelete="SET NULL"))
+    model_label: Mapped[str | None] = mapped_column(String(120))      # what the model said (top-1), for error analysis
+    model_score: Mapped[float | None] = mapped_column(Float)
+    fingerprint: Mapped[list] = mapped_column(JSON)       # sqrt of EXP-002 class probabilities (unit length)
+    source: Mapped[str] = mapped_column(String(20))       # named | corrected | confirmed
+    model_version: Mapped[str | None] = mapped_column(String(80))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)

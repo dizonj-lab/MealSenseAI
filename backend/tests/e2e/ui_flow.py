@@ -1,5 +1,6 @@
 """Mobile-viewport UI smoke test. Usage: python ui_flow.py <base_url> <screenshot_dir>"""
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -100,19 +101,31 @@ with sync_playwright() as p:
     # add missing food
     page.get_by_role("button", name="Add missing food").click()
     page.get_by_placeholder("Search e.g.").fill("cucumber")
-    page.get_by_role("button", name="Cucumber").first.click()
+    page.get_by_role("dialog").locator("li button", has_text=re.compile(r"^Cucumber")).first.click()
     page.get_by_role("button", name="Use Cucumber").click()
     expect(page.get_by_role("heading", name="Cucumber")).to_be_visible()
     # multi-food: numbered boxes on the photo; unidentified items must be named before saving
     boxes = page.locator("figure button[aria-label^='Item ']")
     print("boxes on photo:", boxes.count())
+    custom_named = None
     while page.locator("h3", has_text="Unidentified food").count():
         unk = page.locator(".card", has=page.locator("h3", has_text="Unidentified food")).first
         title = unk.locator("h3").inner_text()
         unk.get_by_role("button", name="Name it").click()
-        page.get_by_placeholder("Search e.g.").fill("bacon")
         dlg = page.get_by_role("dialog")
-        dlg.get_by_role("button", name="Bacon").first.click()
+        if not custom_named:   # not in the list: create a custom food with its own portion and nutrients
+            page.get_by_placeholder("Search e.g.").fill("Grandma stew")
+            dlg.get_by_role("button", name="Can't find it?").click()
+            dlg.get_by_label("Usual portion (g)").fill("250")
+            dlg.get_by_label("Calories (kcal)").fill("300")
+            dlg.get_by_label("Carbohydrate (g)").fill("20")
+            dlg.get_by_role("button", name="Save & use").click()
+            custom_named = title
+            expect(page.locator("h3", has_text="Grandma stew").first).to_be_visible(timeout=15000)
+            print("named", title, "-> custom food Grandma stew")
+            continue
+        page.get_by_placeholder("Search e.g.").fill("bacon")
+        dlg.locator("li button", has_text=re.compile(r"^Bacon")).first.click()
         dlg.get_by_role("button", name="Use Bacon").click()
         expect(page.locator("h3", has_text=title)).to_have_count(0, timeout=15000)
         print("named", title, "-> Bacon")
@@ -165,6 +178,16 @@ with sync_playwright() as p:
     shot(page, "12_nutrition_insights")
     page.get_by_role("button", name="Menu").click()
     shot(page, "13_drawer")
+    page.keyboard.press("Escape")
+    if custom_named:   # same photo again: the region named earlier is recognised from memory
+        page.goto(f"{BASE}/capture")
+        page.locator("input[type=file]:not([capture])").first.set_input_files(str(FIX))
+        page.get_by_role("button", name="ANALYZE MEAL").click()
+        expect(page.get_by_text("Key takeaways")).to_be_visible(timeout=30000)
+        expect(page.get_by_text("Known from your earlier label").first).to_be_visible()
+        expect(page.locator("h3", has_text="Grandma stew").first).to_be_visible()
+        shot(page, "13b_memory")
+        print("memory: recognised Grandma stew")
 
     dpage = b.new_page(viewport={"width": 1366, "height": 900})
     dpage.goto(f"{BASE}/login")

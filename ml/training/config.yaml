@@ -15,6 +15,10 @@ dataset:
       path: datasets/raw/own_images
       version: "0.1"
       license: "project-owned"
+    - name: user_labels   # app users' corrected photo regions (opt-in); ml/export/export_training_samples.py
+      path: datasets/raw/user_labels
+      version: "0.1"
+      license: "app users, opted in for training"
   class_map: ml/training/class_map.json   # 3. label harmonisation + nutrition keys
   min_side_px: 64                          # 2. validation
   allowed_formats: [JPEG, PNG, WEBP, MPO]

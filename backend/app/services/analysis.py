@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.models import InferenceLog, Meal, MealFood
-from app.services import insights, nutrition, portion, slm, vision
+from app.services import insights, memory, nutrition, portion, slm, vision
 
 UNKNOWN_PORTION = {"method": "unknown", "uncertainty": "unknown", "range_g": None,
                    "notes": ["No nutrition match; choose a food from the table and enter the portion."]}
@@ -157,7 +157,15 @@ def _run(db: Session, meal: Meal, profile) -> list[dict]:
     seen = {f.nutrition_key for f in meal.foods if not f.removed and f.nutrition_key}
     n_views = len(meal.images)
     n_unknown = 0
+    recall = memory.matcher(db, meal.user_id)
+    auto_accept = vision_auto_accept()
+    n_memory = 0
     for p in preds:
+        mem = recall(p.get("fingerprint")) if p["kind"] == "unknown" or (p["kind"] == "food" and p["score"] < auto_accept) else None
+        if mem:   # the user named a region like this before: use their label (still editable)
+            p = {**p, "kind": "food", "model_label": mem["label"], "nutrition_key": mem["nutrition_key"], "match": "exact",
+                 "memory": {**mem, "model_label": p["model_label"], "model_score": p["score"]}}
+            n_memory += 1
         key, quality = p["nutrition_key"], p["match"]
         ref = nutrition.get(key)
         if ref:
@@ -169,13 +177,13 @@ def _run(db: Session, meal: Meal, profile) -> list[dict]:
             grams, pinfo = 0, dict(UNKNOWN_PORTION)
         pred = {k: p.get(k) for k in ("region_id", "kind", "model_label", "class_id", "nutrition_key", "match", "score",
                                        "candidates", "bbox", "view", "views", "instance", "area_frac", "has_mask",
-                                       "instances", "detector_label", "detector_score")}
+                                       "instances", "detector_label", "detector_score", "fingerprint", "memory")}
         pred.update(model_name=cls_name, model_version=mods.get("classifier", {}).get("version"), device=device,
                     score_band=vision.score_band(p["score"]), score_type="raw softmax score (uncalibrated)",
-                    needs_review=p["score"] < vision_auto_accept())
+                    needs_review=p["score"] < auto_accept and not mem)
         if p["kind"] == "food":
-            f = MealFood(origin="model", label=p["model_label"], taxonomy_class=p["model_label"], grams=grams,
-                         portion=pinfo, original_prediction=pred)
+            f = MealFood(origin="memory" if mem else "model", label=p["model_label"], taxonomy_class=None if mem else p["model_label"],
+                         grams=grams, portion=pinfo, original_prediction=pred)
         else:  # unidentified region: shown for the user to name (suggestions start hidden, not counted)
             n_unknown += 1
             f = MealFood(origin="model", label=f"Unidentified food {n_unknown}", taxonomy_class=None, grams=0,
@@ -204,6 +212,8 @@ def _run(db: Session, meal: Meal, profile) -> list[dict]:
             apply_mapping(f, key, quality)
             meal.foods.append(f)
             seen.add(key)
+    if n_memory:
+        st.items[-1]["detail"] += f"; {n_memory} item(s) recognised from your earlier labels"
     active = [f for f in meal.foods if not f.removed]
     methods = sorted({f.portion.get("method") for f in active})
     st.add("portion", "Portion estimation", "done" if active else "skipped",

@@ -25,8 +25,13 @@ def version() -> str:
     return _db()["version"]
 
 
+CUSTOM: dict[str, dict] = {}   # user-defined foods ("custom_<id>"), loaded from the database (services/custom_foods.py)
+
+
 def get(key: str | None) -> dict | None:
-    return _db()["foods"].get(key) if key else None
+    if not key:
+        return None
+    return CUSTOM.get(key) or _db()["foods"].get(key)
 
 
 def all_foods() -> list[dict]:
@@ -78,19 +83,20 @@ def summary(f: dict) -> dict:
 def compute(key: str, grams: float) -> dict:
     """Scale per-100 g composition to the portion. Missing values stay None (never invented)."""
     ck = f"nutr2:{key}:{round(grams, 1)}"
-    hit = cache.get(ck)
+    hit = None if key in CUSTOM else cache.get(ck)   # custom foods can be edited: never served from cache
     if hit is not None:
         return hit
     f = get(key)
     per = f["per_100g"]
     out = {n: (None if per.get(n) is None else round(per[n] * grams / 100, 1)) for n in NUTRIENTS}
-    cache.set(ck, out, ttl=86400)
+    if key not in CUSTOM:
+        cache.set(ck, out, ttl=86400)
     return out
 
 
 def source_info(key: str) -> dict:
     f = get(key)
-    return {"table": f"MealSenseAI reference table {version()}", "record": f["key"], "name": f["name"],
+    return {"table": "Your custom foods" if key in CUSTOM else f"MealSenseAI reference table {version()}", "record": f["key"], "name": f["name"],
             "source": f["source"], "verification": f["verification"],
             "glycemic_index": f["glycemic_index"], "gi_source": f["gi_source"]}
 

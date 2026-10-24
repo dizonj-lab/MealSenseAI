@@ -14,7 +14,7 @@ from app.core.db import get_db
 from app.core.security import current_user
 from app.models import Correction, Meal, MealFood, User
 from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut, MergeIn, SimulateIn
-from app.services import analysis, forecast, imaging, insights, nutrition, portion, vision
+from app.services import analysis, custom_foods, forecast, imaging, insights, memory, nutrition, portion, vision
 
 router = APIRouter(prefix="/meals", tags=["meals"])
 
@@ -184,6 +184,8 @@ def confirm(body: ConfirmIn, meal: Meal = Depends(owned_meal), user: User = Depe
             db.add(Correction(user_id=user.id, meal_id=meal.id, food_id=f.id, kind="confirm",
                               after=_snapshot(f), model_name=_model_name(f),
                               before={"user_corrected": f.user_corrected, "origin": f.origin}))
+    for f in active:   # saved meal = labels accepted: remember photo regions (memory + training data)
+        memory.record(db, user, meal, f, "confirmed")
     if body.meal_type:
         meal.meal_type = body.meal_type
     if body.eaten_at:
@@ -201,6 +203,9 @@ def update_food(food_id: int, body: FoodUpdateIn, meal: Meal = Depends(owned_mea
     if not f:
         raise HTTPException(404, "Food not found")
     before = _snapshot(f)
+    if not custom_foods.owned(body.nutrition_key, user.id):
+        raise HTTPException(422, "Unknown nutrition_key")
+    was_unidentified = not f.nutrition_key
     kinds = []
     if body.restore and f.removed:
         f.removed = False
@@ -244,6 +249,8 @@ def update_food(food_id: int, body: FoodUpdateIn, meal: Meal = Depends(owned_mea
         for k in kinds:
             db.add(Correction(user_id=user.id, meal_id=meal.id, food_id=f.id, kind=k, before=before,
                               after=_snapshot(f), model_name=_model_name(f)))
+    if "edit_food" in kinds or body.confirmed:   # remember the label for this photo region (memory + training data)
+        memory.record(db, user, meal, f, "named" if was_unidentified else "corrected" if "edit_food" in kinds else "confirmed")
     analysis.recompute(meal, user.profile)
     db.commit()
     db.refresh(meal)
@@ -287,6 +294,8 @@ def merge_foods(body: MergeIn, meal: Meal = Depends(owned_meal), user: User = De
 def add_food(body: FoodAddIn, meal: Meal = Depends(owned_meal), user: User = Depends(current_user),
              db: Session = Depends(get_db)):
     tax = None
+    if not custom_foods.owned(body.nutrition_key, user.id):
+        raise HTTPException(422, "Unknown nutrition_key")
     if body.candidate_class_id is not None:
         tax = vision.taxonomy_class(body.candidate_class_id)
         if not tax:

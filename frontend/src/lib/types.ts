@@ -5,7 +5,7 @@ export type Profile = {
   glucose_unit: string; known_readings: string | null; hba1c: number | null; has_cgm: boolean | null; clinician_targets: string | null
   goals: string[]; calorie_goal: number | null; carb_goal_g: number | null; protein_goal_g: number | null
 }
-export type User = { id: number; email: string; name: string; onboarded: boolean; created_at: string; profile: Profile | null }
+export type User = { id: number; email: string; name: string; onboarded: boolean; training_consent?: boolean; created_at: string; profile: Profile | null }
 export type BBox = { x: number; y: number; w: number; h: number }
 export type Food = {
   id: number; origin: 'model' | 'description' | 'manual' | 'slm'; label: string; taxonomy_class?: string | null; nutrition_key: string | null
@@ -29,4 +29,4 @@ export type Meal = {
   totals: Nutrients & { grams: number; item_count: number; incomplete_nutrients: string[]; unmapped_items: string[] }
   insights: Insights; model_info: any; stages: Stage[]; eaten_at: string; created_at: string; foods: Food[]
 }
-export type FoodRef = { key: string; name: string; category: string; region: string; default_serving_g: number; serving_desc: string }
+export type FoodRef = { key: string; name: string; category: string; region: string; default_serving_g: number; serving_desc: string; custom?: boolean }

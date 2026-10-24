@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core import cache
 from app.core.db import get_db
 from app.core.security import current_user
-from app.models import Correction, Experiment, InferenceLog, User
-from app.services import nutrition, portion, slm, vision
+from app.models import Correction, CustomFood, Experiment, InferenceLog, User
+from app.services import custom_foods, nutrition, portion, slm, vision
 
 router = APIRouter(tags=["ai"])
 
@@ -70,12 +71,63 @@ def search_taxonomy(q: str = Query("", max_length=100), user: User = Depends(cur
 
 @router.get("/foods/search", tags=["foods"])
 def search_foods(q: str = Query("", max_length=100), user: User = Depends(current_user)):
-    return nutrition.search(q) if q.strip() else [nutrition.summary(f) for f in nutrition.all_foods()]
+    mine = custom_foods.search(user.id, q)
+    return mine + (nutrition.search(q) if q.strip() else [nutrition.summary(f) for f in nutrition.all_foods()])
+
+
+class CustomFoodIn(BaseModel):
+    name: str = Field(min_length=1, max_length=120)
+    serving_g: float = Field(gt=0, le=3000)
+    serving_desc: str = Field(default="1 serving", max_length=80)
+    per_100g: dict[str, float | None] = Field(description="nutrients per 100 g; null = unknown (never filled in)")
+    glycemic_index: float | None = Field(default=None, ge=0, le=110)
+    aliases: list[str] = Field(default_factory=list, max_length=10)
+
+
+def _custom_out(cf: CustomFood) -> dict:
+    return custom_foods.record(cf) | {"id": cf.id}
+
+
+def _validate(body: CustomFoodIn) -> dict:
+    bad = [k for k in body.per_100g if k not in nutrition.NUTRIENTS]
+    if bad:
+        raise HTTPException(422, f"Unknown nutrient(s): {bad}")
+    per = {n: body.per_100g.get(n) for n in nutrition.NUTRIENTS}
+    if any(v is not None and (v < 0 or v > (900 if n == "calories_kcal" else 40000 if n == "sodium_mg" else 100)) for n, v in per.items()):
+        raise HTTPException(422, "A nutrient value is outside the possible range per 100 g")
+    return per
+
+
+@router.get("/foods/custom", tags=["foods"])
+def list_custom(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return [_custom_out(cf) for cf in db.scalars(select(CustomFood).where(CustomFood.user_id == user.id).order_by(CustomFood.name))]
+
+
+@router.post("/foods/custom", tags=["foods"], status_code=201)
+def create_custom(body: CustomFoodIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    cf = CustomFood(user_id=user.id, name=body.name.strip(), serving_g=body.serving_g, serving_desc=body.serving_desc,
+                    per_100g=_validate(body), glycemic_index=body.glycemic_index, aliases=body.aliases)
+    db.add(cf)
+    db.commit()
+    custom_foods.register(cf)
+    return _custom_out(cf)
+
+
+@router.put("/foods/custom/{cf_id}", tags=["foods"])
+def update_custom(cf_id: int, body: CustomFoodIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    cf = db.get(CustomFood, cf_id)
+    if not cf or cf.user_id != user.id:
+        raise HTTPException(404, "Custom food not found")
+    cf.name, cf.serving_g, cf.serving_desc = body.name.strip(), body.serving_g, body.serving_desc
+    cf.per_100g, cf.glycemic_index, cf.aliases = _validate(body), body.glycemic_index, body.aliases
+    db.commit()
+    custom_foods.register(cf)   # existing meals keep their stored nutrients until edited
+    return _custom_out(cf)
 
 
 @router.get("/foods/{key}", tags=["foods"])
 def food_detail(key: str, user: User = Depends(current_user)):
-    f = nutrition.get(key)
+    f = nutrition.get(key) if custom_foods.owned(key, user.id) else None
     return f or {}
 
 
