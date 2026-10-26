@@ -1,0 +1,99 @@
+/**
+ * Element kinds, tags and styling for the MealSenseAI architecture model.
+ *
+ * Same three layers as the CEREBRO model, so the two read alike on one site:
+ *
+ *   business    — who MealSenseAI serves and the rules it keeps
+ *   application — the containers and components, named after their modules
+ *   technology  — what those run on, at home on Buddy
+ *
+ * The model describes what exists in the repository today.
+ */
+specification {
+
+  // --- business layer ------------------------------------------------------
+  element actor {
+    style {
+      shape person
+      color secondary
+    }
+  }
+
+  element capability {
+    style {
+      shape rectangle
+      color muted
+    }
+  }
+
+  element policy {
+    technology 'Product rule'
+    style {
+      shape rectangle
+      color amber
+    }
+  }
+
+  // --- application layer ---------------------------------------------------
+  element system {
+    style {
+      shape rectangle
+      color primary
+    }
+  }
+
+  element container {
+    style {
+      shape rectangle
+      color primary
+    }
+  }
+
+  element component {
+    style {
+      shape rectangle
+      color secondary
+    }
+  }
+
+  element store {
+    style {
+      shape storage
+      color secondary
+    }
+  }
+
+  element external {
+    style {
+      shape rectangle
+      color gray
+    }
+  }
+
+  // --- technology layer ----------------------------------------------------
+  element platform {
+    style {
+      shape rectangle
+      color muted
+    }
+  }
+
+  element node {
+    style {
+      shape rectangle
+      color gray
+    }
+  }
+
+  // --- tags ----------------------------------------------------------------
+  // Runs on the home server; nothing it touches goes to a cloud AI service.
+  tag local-only {
+    color green
+  }
+  // Keeps an answer grounded or an estimate labelled as one.
+  tag safety {
+    color amber
+  }
+  tag browser
+  tag optional
+}

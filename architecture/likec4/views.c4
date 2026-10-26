@@ -1,0 +1,95 @@
+/**
+ * Views: one question each. The dynamic views walk real request paths and can be checked against
+ * backend/app/api/meals.py and backend/app/services/advisor.py.
+ */
+views {
+
+  view index {
+    title 'MealSenseAI — System landscape'
+    description 'Who uses MealSenseAI, how they reach it, and what it depends on.'
+    include
+      user,
+      managing,
+      browser,
+      cloudflare,
+      mealsense,
+      ollama,
+      smtp
+  }
+
+  view business_capabilities of mealsense_business {
+    title 'Business — capabilities'
+    description 'Recognise, estimate, explain, advise.'
+    include *
+  }
+
+  view business_rules of rules {
+    title 'Business — product rules'
+    description 'What the app will not do, and how it labels what it estimates.'
+    include *, mealsense.api.advisor, mealsense.api.forecast
+  }
+
+  view application_containers of mealsense {
+    title 'Application — containers'
+    description 'nginx serves the app and proxies /api; the backend never faces the internet directly.'
+    include *, browser, cloudflare, ollama, smtp
+  }
+
+  view application_api of mealsense.api {
+    title 'Application — backend components'
+    description 'The analysis pipeline, the advisor and the stores they use.'
+    include *
+  }
+
+  view technology_buddy of buddy {
+    title 'Technology — Buddy'
+    description 'The Compose project and the GPU on the home server.'
+    include *, cloudflare
+  }
+
+  dynamic view analyse_meal {
+    title 'Flow — photo to explained nutrition'
+    description 'Each stage is shown to the user with its timing; nothing is saved until they confirm.'
+
+    user -> mealsense.web.capture 'takes a photo'
+    mealsense.web.capture -> mealsense.web.nginx 'POST /api/meals/capture, /analyze'
+    mealsense.web.nginx -> mealsense.api.meals 'proxies'
+    mealsense.api.meals -> mealsense.api.imaging 'validate and normalise'
+    mealsense.api.meals -> mealsense.uploads 'keep the original'
+    mealsense.api.meals -> mealsense.api.proposals 'candidate regions'
+    mealsense.api.meals -> mealsense.api.vision 'YOLO11n-seg + EXP-002, top-3 each'
+    mealsense.api.meals -> mealsense.api.memory 'foods the user named before'
+    mealsense.api.meals -> mealsense.api.portion 'grams with uncertainty'
+    mealsense.api.meals -> mealsense.api.nutrition 'nutrients; unknowns blank'
+    mealsense.api.meals -> mealsense.api.insights 'glycaemic load and notes'
+    mealsense.api.meals -> mealsense.postgres 'draft meal'
+    user -> mealsense.web.capture 'confirms or corrects, then saves'
+  }
+
+  dynamic view glucose_estimate {
+    title 'Flow — glucose estimate in mmol/L'
+    description 'Pre-meal reading plus an estimated rise; always labelled an estimate.'
+
+    managing -> mealsense.web.insights_ui 'opens the forecast'
+    mealsense.web.insights_ui -> mealsense.web.nginx 'POST /api/meals/{id}/forecast'
+    mealsense.web.nginx -> mealsense.api.meals 'proxies'
+    mealsense.api.meals -> mealsense.api.forecast 'simulate the meal'
+    mealsense.api.forecast -> mealsense.api.glucose 'pre-meal reading, past readings'
+    mealsense.api.glucose -> mealsense.postgres 'readings'
+    mealsense.api.forecast -> mealsense.api.meals 'curve, band, calibration'
+  }
+
+  dynamic view ask_advisor {
+    title 'Flow — ask the Meal Advisor'
+    description 'The rule engine drafts from evidence; a model may only rephrase, and a validator checks it.'
+
+    user -> mealsense.web.advisor_ui 'asks a question'
+    mealsense.web.advisor_ui -> mealsense.web.nginx 'POST /api/advisor/chat'
+    mealsense.web.nginx -> mealsense.api.advisor 'proxies'
+    mealsense.api.advisor -> mealsense.postgres 'meal, profile, thread'
+    mealsense.api.advisor -> mealsense.api.nutrition 'food facts'
+    mealsense.api.advisor -> mealsense.api.slm 'rephrase the draft'
+    mealsense.api.slm -> ollama 'generate'
+    mealsense.api.advisor -> mealsense.postgres 'save the reply'
+  }
+}

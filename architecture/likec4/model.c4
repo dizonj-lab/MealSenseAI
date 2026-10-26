@@ -1,0 +1,231 @@
+/**
+ * MealSenseAI: photo in, nutrition out, every estimate explained.
+ *
+ * Components are named after the modules that implement them — `api.vision`
+ * is backend/app/services/vision.py — so a diagram can be checked against the
+ * source rather than believed.
+ */
+model {
+
+  // --- business ------------------------------------------------------------
+  user = actor 'Meal logger' {
+    description 'Photographs meals, confirms what was recognised, and asks about the results.'
+  }
+  managing = actor 'Person managing glucose' {
+    description 'Uses the glucose estimates and logs meter or CGM readings. Never given dosing advice.'
+  }
+  browser = external 'Phone or desktop browser' {
+    #browser
+    technology 'React single-page app'
+  }
+
+  mealsense_business = capability 'MealSenseAI capabilities' {
+    recognise = capability 'Recognise' {
+      description 'Find each food on the plate and name it, with alternatives.'
+    }
+    estimate = capability 'Estimate' {
+      description 'Portions and nutrients, glycaemic load, and a glucose estimate in mmol/L.'
+    }
+    explain = capability 'Explain' {
+      description 'Show every pipeline stage, its timing, and how sure the model is.'
+    }
+    advise = capability 'Advise' {
+      description 'Answer questions from the user\'s own meals and approved guidance only.'
+    }
+  }
+
+  rules = capability 'Product rules' {
+    no_dosing = policy 'No medication or insulin advice' {
+      #safety
+      description 'The advisor declines dosing questions; glucose curves say they are estimates.'
+    }
+    grounded = policy 'Grounded answers' {
+      #safety
+      description 'Every number in a reply must come from the meal, the food table or approved guidance.'
+    }
+    estimates = policy 'Estimates are labelled' {
+      #safety
+      description 'Raw model scores are shown as scores, not probabilities; unknown nutrients stay blank.'
+    }
+    consent = policy 'Consent for health data' {
+      description 'Health profile and training use only with explicit consent.'
+    }
+  }
+
+  // --- application ---------------------------------------------------------
+  mealsense = system 'MealSenseAI' {
+    description 'Photo-based meal logging with explainable nutrition and glucose estimates.'
+
+    web = container 'Frontend' {
+      technology 'React, Vite, Tailwind, served by nginx'
+      description 'The app, and the reverse proxy for /api.'
+
+      capture = component 'Capture and review' {
+        technology 'React'
+        description 'Photo upload, food picker, portion sliders, Save.'
+      }
+      insights_ui = component 'Insights and forecast' {
+        technology 'React, Recharts'
+        description 'Nutrient cards, glucose chart in mmol/L, exercise what-ifs.'
+      }
+      advisor_ui = component 'Meal Advisor sheet' {
+        technology 'React'
+        description 'Chat reachable from every page; one-tap add actions.'
+      }
+      nginx = component 'nginx' {
+        technology 'nginx'
+        description 'Serves the built app and proxies /api to the backend.'
+      }
+    }
+
+    api = container 'Backend API' {
+      #local-only
+      technology 'FastAPI, Python'
+
+      meals = component 'Meals API' {
+        technology 'app/api/meals.py'
+        description 'Capture, analyse, correct, confirm, forecast, simulate.'
+      }
+      imaging = component 'Image validation' {
+        technology 'services/imaging.py'
+        description 'Checks and normalises photos; originals kept untouched.'
+      }
+      proposals = component 'Region proposals' {
+        technology 'services/proposals.py'
+        description 'Colour clustering splits a plate into candidate food regions.'
+      }
+      vision = component 'Detection and classification' {
+        technology 'services/vision.py, ONNX Runtime'
+        description 'YOLO11n-seg outlines items; EXP-002 classifies the photo and each crop, top-3 kept.'
+      }
+      memory = component 'Food memory' {
+        technology 'services/memory.py'
+        description 'Recognises foods the user named before from their fingerprints.'
+      }
+      portion = component 'Portion estimation' {
+        technology 'services/portion.py'
+        description 'Typical servings with honest uncertainty bands.'
+      }
+      nutrition = component 'Nutrition lookup' {
+        technology 'services/nutrition.py, custom_foods.py'
+        description 'Food table plus the user\'s own foods; unknowns stay blank.'
+      }
+      insights = component 'Insights' {
+        technology 'services/insights.py'
+        description 'Glycaemic load, personalised notes against WHO and ADA references.'
+      }
+      forecast = component 'Forecast and glucose scale' {
+        #safety
+        technology 'services/forecast.py, glucose_scale.py'
+        description 'Meal glucose model; mmol/L from a population anchor or the user\'s own readings.'
+      }
+      advisor = component 'Meal Advisor' {
+        #safety
+        technology 'services/advisor.py, persona.py, knowledge.py'
+        description 'Rule engine drafts from evidence; a local model may rephrase; a validator rejects new facts.'
+      }
+      slm = component 'Local model client' {
+        technology 'services/slm.py'
+        description 'Optional phrasing through Ollama; falls back to the draft.'
+      }
+      glucose = component 'Glucose readings' {
+        technology 'app/api/glucose.py'
+        description 'Meter and CGM readings the user enters; never generated.'
+      }
+      auth = component 'Auth and onboarding' {
+        technology 'app/api/auth.py, users.py'
+        description 'Accounts, health profile, consent; onboarding enforced by the server.'
+      }
+      contact = component 'Contact form' {
+        technology 'app/api/contact.py, services/mailer.py'
+        description 'Stores messages; emails the owner when SMTP is configured.'
+      }
+    }
+
+    postgres = store 'PostgreSQL' {
+      technology 'PostgreSQL 16'
+      description 'Users, meals, foods, corrections, readings, conversations.'
+    }
+    uploads = store 'Photo store' {
+      technology 'Docker volume'
+      description 'Original meal photos and region crops.'
+    }
+    models = store 'Model files' {
+      technology 'ONNX'
+      description 'EXP-002 classifier and YOLO11n-seg, loaded once at startup.'
+    }
+    cache = store 'Redis' {
+      #optional
+      technology 'Redis 7'
+      description 'Optional cache; in-process cache without it.'
+    }
+  }
+
+  ollama = external 'Ollama' {
+    #local-only #optional
+    technology 'Local language model on the GPU'
+    description 'Rephrases advisor drafts and explains results; never the source of a fact.'
+  }
+  smtp = external 'Mail account' {
+    #optional
+    technology 'SMTP'
+    description 'Delivers contact-form messages when configured.'
+  }
+  cloudflare = external 'Cloudflare Tunnel' {
+    technology 'cloudflared'
+    description 'Public HTTPS at mealsense.xtangent.ai without opening router ports.'
+  }
+
+  // --- relationships -------------------------------------------------------
+  user -> browser 'uses'
+  managing -> browser 'uses'
+  browser -> cloudflare 'HTTPS'
+  cloudflare -> mealsense.web.nginx 'forwards to'
+  browser -> mealsense.web 'loads the app'
+
+  mealsense.web.capture -> mealsense.web.nginx '/api requests'
+  mealsense.web.insights_ui -> mealsense.web.nginx '/api requests'
+  mealsense.web.advisor_ui -> mealsense.web.nginx '/api requests'
+  mealsense.web.nginx -> mealsense.api.meals 'proxies /api'
+  mealsense.web.nginx -> mealsense.api.advisor 'proxies /api/advisor'
+  mealsense.web.nginx -> mealsense.api.auth 'proxies /api/auth'
+
+  mealsense.api.meals -> mealsense.api.imaging 'validate photo'
+  mealsense.api.meals -> mealsense.api.proposals 'split the plate'
+  mealsense.api.meals -> mealsense.api.vision 'detect and classify'
+  mealsense.api.meals -> mealsense.api.memory 'match foods named before'
+  mealsense.api.meals -> mealsense.api.portion 'estimate grams'
+  mealsense.api.meals -> mealsense.api.nutrition 'look up nutrients'
+  mealsense.api.meals -> mealsense.api.insights 'build insights'
+  mealsense.api.meals -> mealsense.api.forecast 'forecast and simulate'
+  mealsense.api.forecast -> mealsense.api.glucose 'calibrate from readings'
+  mealsense.api.vision -> mealsense.models 'loads'
+  mealsense.api.meals -> mealsense.uploads 'stores photos'
+  mealsense.api.meals -> mealsense.postgres 'meals and foods'
+  mealsense.api.glucose -> mealsense.postgres 'readings'
+  mealsense.api.auth -> mealsense.postgres 'users and profiles'
+  mealsense.api.advisor -> mealsense.postgres 'meals and conversations'
+  mealsense.api.advisor -> mealsense.api.nutrition 'food facts'
+  mealsense.api.advisor -> mealsense.api.forecast 'what-if portions'
+  mealsense.api.advisor -> mealsense.api.slm 'optional phrasing'
+  mealsense.api.slm -> ollama 'generate, validated'
+  mealsense.api.meals -> mealsense.cache 'cache, if present'
+  mealsense.api.contact -> mealsense.postgres 'messages'
+  mealsense.api.contact -> smtp 'email, if configured'
+
+  // --- technology ----------------------------------------------------------
+  buddy = platform 'Buddy (home server)' {
+    technology 'Ubuntu, Docker Compose, NVIDIA GPU'
+    description 'Runs MealSenseAI, CEREBRO and the architecture site as separate Compose projects.'
+
+    compose = node 'mealsenseai Compose project' {
+      technology 'docker-compose.yml + home.yml + gpu.yml'
+      description 'frontend on 127.0.0.1:8080, backend, db, redis, cloudflared, optional ollama; internal network without internet egress.'
+    }
+    gpu = node 'NVIDIA GPU' {
+      technology 'CUDA'
+      description 'ONNX inference in the GPU image, and Ollama.'
+    }
+  }
+  buddy.compose -> buddy.gpu 'GPU reservation'
+}
