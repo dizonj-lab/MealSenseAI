@@ -11,4 +11,4 @@ npx likec4@1.60.0 start architecture/likec4      # live preview
 npx likec4@1.60.0 validate architecture/likec4
 ```
 
-Served on the home network by `infrastructure/architecture-site` (see its README).
+Published on the portfolio at https://folio.xtangent.ai, built from this directory by the separate [folio](https://github.com/dizonj-lab/folio) repository.
