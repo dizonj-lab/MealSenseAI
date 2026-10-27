@@ -1,0 +1,6 @@
+node_modules/
+out/
+clips/
+photos/
+parts/
+__pycache__/

@@ -1,0 +1,89 @@
+{
+  "voice_note": "About 650 words, roughly five minutes. The voice is made first (voice.py speak) and each scene lasts as long as its line. Wei Ming is fictional; the figures in 'stakes' are the ones cited in the project proposal (WHO 2022, MOH 2023, the Nutri-Grade before-and-after study).",
+  "output": "MealSenseAI-demo",
+  "pronounce": {
+    "MealSenseAI": [
+      "[MealSenseAI](/mˈil sˈɛns ˌAˈI/)",
+      "Meal Sense A.I."
+    ],
+    "Nutri-Grade": [
+      "[Nutri-Grade](/nˈutɹi ɡɹˈAd/)",
+      "Nutri Grade"
+    ],
+    "glycaemic": [
+      "[glycaemic](/ɡlIsˈimɪk/)",
+      "glycaemic"
+    ],
+    "nasi lemak": [
+      "[nasi lemak](/nˈɑsi lˈəmɑk/)",
+      "nasi lemak"
+    ]
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "title": "No label on the plate",
+      "text": "Three times a day, people living with diabetes make the same decision: what to eat, and how much. A packet of biscuits tells you its sugar. A plate of chicken rice from the hawker centre tells you nothing. There's no label and no serving size, and the carbohydrates hide in the rice, the sauce and the drink on the side."
+    },
+    {
+      "id": "pain",
+      "title": "So people guess",
+      "text": "So people guess. They guess what's on the plate, they guess the portion, and they guess what it means for their blood sugar. Mixed dishes are hard to break down. Portions change from stall to stall. And even good numbers are hard to act on. Logging every meal by hand is tedious, so most people simply stop."
+    },
+    {
+      "id": "stakes",
+      "title": "Why it matters now",
+      "text": "The stakes keep rising. The World Health Organization counts about eight hundred and thirty million people living with diabetes. In Singapore it's about one adult in twelve, and without effective prevention, as many as a million residents could be living with it by twenty fifty. Nutri-Grade showed that when nutrition is easy to see, choices change: household sugar from pre-packed drinks fell by about eighteen percent. But labels only reach what comes in a bottle or a box. The plate is where the gap is."
+    },
+    {
+      "id": "meet",
+      "title": "MealSenseAI",
+      "text": "This is MealSenseAI. Take one photo of a meal, and it identifies the food, estimates the portion and the nutrition, and explains what it may mean for your glucose, in plain language. Let's follow Wei Ming, a fictional user who lives with type two diabetes."
+    },
+    {
+      "id": "dashboard",
+      "title": "Dashboard",
+      "text": "His health profile sets the context: type two diabetes and a daily carbohydrate goal. The dashboard shows today against those goals, a week of hawker meals, and where his energy comes from. Every number traces back to a meal he logged."
+    },
+    {
+      "id": "capture",
+      "title": "Capture",
+      "text": "It's lunchtime, and he's having chicken rice. One photo from above is enough. MealSenseAI runs ten steps. It checks the image, finds each food on the plate, recognises it among three hundred and twenty foods, many of them local dishes, estimates the portion, and maps it to nutrition records. All in a moment."
+    },
+    {
+      "id": "review",
+      "title": "Review",
+      "text": "Here's the result. Each food is marked on the photo, with its portion, calories and carbohydrates, and an honest range, because a photo can't weigh food. When the model is unsure, it says so and offers its next best guesses. Wei Ming stays in control. He can confirm, rename or correct the portion, and nothing is saved until he does."
+    },
+    {
+      "id": "meaning",
+      "title": "What it means",
+      "text": "Then the part that matters: what it means. The meal's potential glucose impact and its glycaemic load, with practical tips, like a smaller portion of rice or more vegetables. The meal advisory flags where the meal goes past public health reference points, and cites its sources."
+    },
+    {
+      "id": "portion",
+      "title": "Portion simulator",
+      "text": "What if he asks for less rice? The portion simulator answers before he eats. Slide the portion down, and the carbohydrates, the glycaemic load and the estimated glucose curve all update. It's clearly labelled as an estimate, never as a measurement."
+    },
+    {
+      "id": "whatif",
+      "title": "What if I walk?",
+      "text": "And what if he takes a fifteen minute walk after lunch? The forecast compares an afternoon at his desk with the walk, and shows how much of the meal's energy it uses. The equations and the references are one tap away."
+    },
+    {
+      "id": "advisor",
+      "title": "Meal Advisor",
+      "text": "Questions come up, so there's a Meal Advisor. Wei Ming asks how his week went. The answer is built from his own meals and the food table, and each point shows where it came from. It doesn't invent numbers, and it never diagnoses."
+    },
+    {
+      "id": "insights",
+      "title": "Nutrition Insights",
+      "text": "Over time, Nutrition Insights turns meals into trends: carbohydrates, sugar, fibre and sodium, day by day, so habits become visible, and so do the small changes that work."
+    },
+    {
+      "id": "outro",
+      "title": "MealSenseAI",
+      "text": "Diabetes is managed one meal at a time, and most of those meals have no label. MealSenseAI puts the information on the plate, at the moment the choice is made. MealSenseAI. Understand your food. Make healthier choices."
+    }
+  ]
+}

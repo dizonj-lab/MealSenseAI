@@ -1,0 +1,41 @@
+# The demo's own MealSenseAI: the live stack's images, its own database and photos.
+#   docker compose -f demo/docker-compose.demo.yml up -d --wait      (run.sh does this)
+# Nothing here is shared with the live Compose project "mealsenseai": not a container, network or volume.
+name: mealsense-demo
+
+services:
+  frontend:
+    image: ${MEALSENSE_FRONTEND_IMAGE:-mealsenseai/frontend:local}
+    ports: ["127.0.0.1:${DEMO_WEB_PORT:-8380}:80"]
+    depends_on: { backend: { condition: service_healthy } }
+
+  backend:
+    image: ${MEALSENSE_BACKEND_IMAGE:-mealsenseai/backend:local}
+    environment:
+      DATABASE_URL: postgresql+psycopg://mealsense:mealsense-demo@db:5432/mealsenseai
+      JWT_SECRET: demo-only-not-a-secret-${COMPOSE_PROJECT_NAME:-mealsense-demo}-0123456789
+      REDIS_URL: ""
+      # The Meal Advisor words its answers with a local SLM when one answers here, and falls back to its
+      # rule engine otherwise. Off by default so every take reads the same; DEMO_OLLAMA_URL turns it on.
+      OLLAMA_URL: ${DEMO_OLLAMA_URL:-http://127.0.0.1:9}
+      OLLAMA_MODEL: ${DEMO_OLLAMA_MODEL:-}
+      INFERENCE_DEVICE: auto
+      SMTP_HOST: ""
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes: ["uploads:/data"]
+    depends_on: { db: { condition: service_healthy }, init-perms: { condition: service_completed_successfully } }
+
+  init-perms:
+    image: ${MEALSENSE_BACKEND_IMAGE:-mealsenseai/backend:local}
+    user: root
+    entrypoint: ["sh", "-c", "chown -R 10001:10001 /data"]
+    volumes: ["uploads:/data"]
+    restart: "no"
+
+  db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: mealsense, POSTGRES_PASSWORD: mealsense-demo, POSTGRES_DB: mealsenseai }
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U mealsense -d mealsenseai"], interval: 3s, retries: 30 }
+
+volumes: { pgdata: {}, uploads: {} }
