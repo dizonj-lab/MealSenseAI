@@ -2,6 +2,11 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.12.0 — Watch the demo
+
+- A four-minute narrated tour, from the landing page (beside Get Started and in the top bar) and from About MealSenseAI
+- Plays in a window over the page, with subtitles; Escape or a click outside closes it
+
 ## v0.11.0 — Contact form and creator links
 
 - Contact page now has a form; messages are saved and emailed to the creator

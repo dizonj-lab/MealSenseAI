@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import PublicShell from '../components/PublicShell'
+import { DEMO, PlayIcon, openDemo } from '../components/DemoVideo'
 
 const STEPS: [string, string][] = [
   ['Capture', 'Take a photo of your meal. One top view is enough.'],
@@ -46,6 +47,12 @@ export default function Landing() {
       <section className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 sm:pt-28 pb-12 sm:pb-16 text-center">
         <h1 className="text-[38px] sm:text-6xl font-semibold tracking-tight leading-[1.08]">Understand your food.<br className="hidden sm:block" /> Make healthier choices.</h1>
         <p className="mt-6 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto" style={muted}>MealSenseAI helps you identify what's on your plate, estimate nutrition, and understand how your meals may affect your glucose and energy.</p>
+        <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link to="/register" className="w-full sm:w-auto rounded-xl px-7 py-3.5 text-base font-medium text-white" style={{ background: 'var(--p-primary)' }}>Get Started</Link>
+          <button type="button" onClick={openDemo} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border px-6 py-3.5 text-base font-medium"
+            style={{ borderColor: 'var(--p-border)', background: 'var(--p-surface)', color: 'var(--p-text)' }}>
+            <PlayIcon />Watch the demo <span style={muted}>· {DEMO.length}</span></button>
+        </div>
       </section>
 
       <section id="how" className="scroll-mt-4">

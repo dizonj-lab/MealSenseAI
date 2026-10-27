@@ -5,6 +5,7 @@ import { useApi } from '../lib/hooks'
 import { APP_VERSION, CHANGELOG } from '../lib/version'
 import { Card } from '../components/ui'
 import CreatorProfile from '../components/CreatorProfile'
+import { DEMO, DemoDialog, PlayIcon, openDemo } from '../components/DemoVideo'
 
 const Row = ({ k, v }: { k: string; v: React.ReactNode }) => (
   <div className="grid grid-cols-[8.5rem_minmax(0,1fr)] gap-3 py-1.5 border-b border-slate-100 last:border-0 text-sm"><dt className="text-slate-500">{k}</dt><dd className="text-slate-800">{v}</dd></div>)
@@ -20,6 +21,14 @@ export default function About() {
         <p className="text-sm text-slate-600">MealSenseAI recognises the foods in a meal photo, estimates portions and nutrition, and explains what the meal may mean for your energy and glucose, with every step open to correction. It is an educational tool, not a medical device.</p>
         <dl className="mt-3"><Row k="App version" v={`v${APP_VERSION}`} /><Row k="Server" v={h ? `v${h.version ?? '?'} · vision ${h.vision ? 'online' : 'offline'} · text SLM ${h.slm ? h.slm_model : 'offline'}` : '…'} /></dl>
       </Card>
+
+      <section id="demo" className="scroll-mt-20"><button type="button" onClick={openDemo}
+        className="card w-full p-4 flex items-center gap-4 text-left hover:ring-2 hover:ring-brand-500/40 transition">
+        <span className="size-12 shrink-0 rounded-2xl bg-brand-600 text-white grid place-items-center"><PlayIcon className="size-5" /></span>
+        <span className="min-w-0"><span className="block font-semibold text-slate-800">Watch the {DEMO.length} tour</span>
+          <span className="block text-sm text-slate-500">One hawker lunch from photo to portions, glucose impact, a portion and walking what-if, and the Meal Advisor.</span></span>
+      </button></section>
+      <DemoDialog />
 
       <section id="creator" className="scroll-mt-20"><Card title="About the creator" icon={<UserRound className="size-5 text-brand-600" />}>
         <CreatorProfile />

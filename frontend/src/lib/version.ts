@@ -1,7 +1,11 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.11.0'
+export const APP_VERSION = '0.12.0'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.12.0', title: 'Watch the demo', changes: [
+    'A four-minute narrated tour, from the landing page (beside Get Started and in the top bar) and from About MealSenseAI',
+    'Plays in a window over the page, with subtitles; Escape or a click outside closes it',
+  ] },
   { version: '0.11.0', title: 'Contact form and creator links', changes: [
     'Contact page now has a form; messages are saved and emailed to the creator',
     'Removed the draft notices from the Privacy, Terms and Contact pages',
