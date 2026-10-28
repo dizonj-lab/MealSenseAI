@@ -146,3 +146,41 @@ def test_validation_rejects_unsupported_numbers_foods_and_unsafe_text(client, au
     assert good["source"] == "slm:fake" and good["validation"]["ok"]
     v = advisor.validate("You have diabetes, take 4 units.", "draft", {"x": 1})
     assert v["unsafe"] and not v["ok"]
+
+
+def test_advisor_offers_choices_for_unidentified_items(client, auth):
+    """Asking about the unidentified items gives buttons: the region's own guesses, regions the app found, mark on photo."""
+    meal = plate(client, auth)
+    unnamed = [f for f in active(meal) if not f["nutrition_key"]]
+    assert unnamed, "the test plate has weak regions"
+    r = ask(client, auth, "Can I choose what the unidentified items are?", meal_id=meal["id"])
+    acts = r["actions"]
+    names = [a for a in acts if a["type"] == "name_food"]
+    assert names and all(a["food_id"] in {f["id"] for f in unnamed} for a in names)
+    cands = {c["label"] for f in unnamed for c in f["original_prediction"]["candidates"]}
+    assert all(a["label"].split(" is ", 1)[1] in cands for a in names)          # only the model's own guesses, nothing invented
+    assert any(a["type"] == "mark_photo" and a["meal_id"] == meal["id"] for a in acts)
+    # the button's request names the item
+    a = names[0]
+    m = client.put(f"{API}/meals/{a['meal_id']}/foods/{a['food_id']}", headers=auth, json={"nutrition_key": a["nutrition_key"]}).json()
+    assert next(f for f in m["foods"] if f["id"] == a["food_id"])["nutrition_key"] == a["nutrition_key"]
+    # "you missed something" with no food named offers the photo too
+    r = ask(client, auth, "You missed something on my plate", meal_id=meal["id"])
+    assert any(x["type"] == "mark_photo" for x in r["actions"]) and "Mark it on the photo" in r["reply"]
+
+
+def test_advisor_offers_regions_the_app_found(client, auth):
+    meal = plate(client, auth)
+    from app.core.db import SessionLocal
+    from app.models import MealFood
+    f = active(meal)[-1]
+    with SessionLocal() as db:   # a region the detector found but did not list
+        row = db.get(MealFood, f["id"])
+        row.removed = True
+        row.original_prediction = {**row.original_prediction, "kind": "suggestion"}
+        db.commit()
+    r = ask(client, auth, "What are the unknown things on my plate?", meal_id=meal["id"])
+    add = [a for a in r["actions"] if a["type"] == "add_region"]
+    assert add and add[0]["food_id"] == f["id"]
+    m = client.put(f"{API}/meals/{meal['id']}/foods/{f['id']}", headers=auth, json={"restore": True}).json()
+    assert not next(x for x in m["foods"] if x["id"] == f["id"])["removed"]

@@ -49,7 +49,7 @@ GLUCOSE_Q = I(r"\b(glucose|blood sugar|sugar level|spike|insulin response|affect
 IDENTIFY = I(r"\b(how (do|did) you (know|identify|recogni[sz]e|detect)|why (did you )?(classif\w*|label\w*|think)|how .* identified|is it really)\b")
 OK_Q = I(r"\b(is (it|this|this meal|my meal|that) (ok|okay|good|healthy|fine|bad|alright)|good for (me|my)|ok for my|fit my goal)\b")
 MISSED = I(r"\b(you )?(missed|forgot|didn'?t (see|catch|detect|find|get)|left out|(is|are) missing|skipped my)\b")
-MYSTERY = I(r"\b(myster\w*|what('?s| is) this( dish| thing)?|unknown|unidentified|what is that)\b")
+MYSTERY = I(r"\b(myster\w*|what('?s| is) this( dish| thing)?|unknown|unidentified|unnamed|not (recogni[sz]ed|identified)|what is that)\b")
 EXACT_GLUCOSE = I(r"\b(exact(ly)?|precise(ly)?|how (much|high|far) will|predict)\b.*\b(glucose|blood sugar|sugar)\b")
 TOO_MUCH = I(r"\b(too much|too many|a lot of|lots of|too big)\b")
 CAN_EAT = I(r"\b(can|could|may|should) i (eat|have)\b|\bis it ok(ay)? to (eat|have)\b")
@@ -145,16 +145,23 @@ def _food_evidence(f) -> dict:
             "nutrition_source": {"level": "L1" if src.get("verification") == "user_entered" else "L3", "record": src.get("name"),
                                  "source": src.get("source"), "verification": src.get("verification"), "match": src.get("match")} if src else None,
             "needs_check": (not f.confirmed and not f.user_corrected and f.origin == "model" and (pred.get("score") or 0) < LOW_SCORE),
-            "unnamed": not f.nutrition_key, "nutrition_key": f.nutrition_key, "range_g": por.get("range_g")}
+            "unnamed": not f.nutrition_key, "nutrition_key": f.nutrition_key, "range_g": por.get("range_g"),
+            # the region's own guesses that have a food-table record: what the user can pick to name it
+            "choices": [{"label": c["label"], "key": c["nutrition_key"]} for c in (pred.get("candidates") or [])[:3]
+                        if c.get("nutrition_key") and nutrition.get(c["nutrition_key"])] if not f.nutrition_key else []}
 
 
 def meal_evidence(db: Session, meal: Meal, unit: str = "mmol/L") -> dict:
     foods = [_food_evidence(f) for f in meal.foods if not f.removed]
+    found = [f for f in meal.foods if f.removed and not f.user_corrected and (f.original_prediction or {}).get("kind") == "suggestion"]
     t, ins = meal.totals or {}, meal.insights or {}
     readings = db.scalars(select(GlucoseReading).where(GlucoseReading.meal_id == meal.id).order_by(GlucoseReading.measured_at)).all()
     fmt_g = (lambda v: f"{round(v * 18.016)} mg/dL") if unit == "mg/dL" else (lambda v: f"{v:.1f} mmol/L")
     return {"meal_id": meal.id, "type": meal.meal_type, "status": meal.status, "when": meal.eaten_at.isoformat(timespec="minutes"),
-            "foods": foods,
+            "foods": foods, "has_photo": bool(meal.images),
+            # regions the detector found but did not list (too small or weak); the user may add one
+            "found_regions": [{"id": f.id, "region": f.original_prediction.get("region_id"),
+                               "maybe": ((f.original_prediction.get("candidates") or [{}])[0]).get("label")} for f in found],
             "totals": {k: t.get(k) for k in ("calories_kcal", "carbs_g", "fiber_g", "sugar_g", "protein_g", "fat_g", "sodium_mg")},
             "incomplete_nutrients": t.get("incomplete_nutrients", []), "not_counted": t.get("unmapped_items", []),
             "glucose_assessment": {"level": (ins.get("glucose") or {}).get("level"), "glycemic_load": (ins.get("glucose") or {}).get("glycemic_load"),
@@ -595,6 +602,19 @@ def _food_whatif_text(fw: dict) -> str:
             f"{comp['serving']}. Leaving out most of the {cn} would remove a large part of those carbs.")
 
 
+def _pick_actions(ev: dict, info: dict, unnamed: list[dict], regions: int = 3) -> None:
+    """Buttons to choose what the unidentified items are, add a region the app found, or mark one on the photo."""
+    for f in unnamed[:2]:
+        for c in f.get("choices", [])[:3]:
+            info["actions"].append({"type": "name_food", "meal_id": ev["meal_id"], "food_id": f["id"], "nutrition_key": c["key"],
+                                    "label": f"{f['name']} is {c['label']}"})
+    for r in ev.get("found_regions", [])[:regions]:
+        info["actions"].append({"type": "add_region", "meal_id": ev["meal_id"], "food_id": r["id"],
+                                "label": f"Add region {r['region']}" + (f" (maybe {r['maybe']})" if r.get("maybe") else "")})
+    if ev.get("has_photo"):
+        info["actions"].append({"type": "mark_photo", "meal_id": ev["meal_id"], "label": "Mark it on the photo"})
+
+
 SHORT_HELP = ("I can help with things like “What is in my meal?”, “How many carbs did I have today?”, "
               "“What's a lower-carb swap for nasi lemak?” or “How was my week?”.")
 
@@ -637,15 +657,27 @@ def draft(msg: str, fx: dict, ctx: dict) -> tuple[str, list[str], dict]:
             put("default", f"I can already see {' and '.join(have)} in this meal. If you had more than that, change its portion on the "
                 "meal page, or tell me what else was on the plate.")
         else:
-            put("missed", "Tell me what it was and I'll find it in the food table, or use **Add missing food** on the meal page "
-                "(you can also create your own food there if it isn't listed).", "food")
+            n_found = len(ev.get("found_regions", []))
+            put("missed", "Tell me what it was and I'll find it in the food table"
+                + (f", add one of the {_n(n_found, 'region')} I spotted but wasn't sure about" if n_found else "")
+                + (", or **Mark it on the photo**: drag a box around it and I'll look at just that part." if ev.get("has_photo")
+                   else ", or use **Add missing food** on the meal page.")
+                + " You can also create your own food if it isn't listed.", "food")
+            _pick_actions(ev, info, [])
     if ev and MYSTERY.search(msg) and not MISSED.search(msg):
         unnamed = [f for f in ev["foods"] if f["unnamed"]]
         if unnamed:
-            g = unnamed[0]["identity"].get("candidates") or []
+            guesses = [f"{f['name']}: maybe {', '.join(f['identity']['candidates'][:3])}" for f in unnamed[:2] if f["identity"].get("candidates")]
+            pick = any(f.get("choices") for f in unnamed[:2])
             put("unknown_dish", f"I can't identify {_n(len(unnamed), 'item')} confidently from this photo"
-                + (f" (my weak guesses were {', '.join(g[:2])}, too unsure to use)" if g else "")
-                + ". Could you tell me what it's called? Tap **Name it** on that item, or describe it here.")
+                + (". My weak guesses, too unsure to use on their own:\n" + "\n".join(f"- {x}" for x in guesses) + "\n" if guesses else ". ")
+                + ("If one of them is right, choose it below; otherwise tap **Name it** on that item, or describe it here."
+                   if pick else "Tap **Name it** on that item, or describe it here."))
+            _pick_actions(ev, info, unnamed, regions=2)
+        elif ev.get("found_regions"):
+            put("unknown_dish", f"Every listed item has a name. I also spotted {_n(len(ev['found_regions']), 'region')} I wasn't sure "
+                "were food, so I left them out. If one of them is part of your meal, add it below and name it.")
+            _pick_actions(ev, info, [])
     if EXACT_GLUCOSE.search(msg):
         txt = ("I can't predict your exact glucose rise from a meal photo. It depends on the portion, what you ate with it, "
                "medication, activity, sleep and your own metabolism.")

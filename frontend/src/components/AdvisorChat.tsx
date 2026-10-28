@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowUp, RotateCcw, Trash2 } from 'lucide-react'
 import { api, tzOffset } from '../lib/api'
 import { Spinner } from './ui'
+import { useAdvisor } from '../lib/advisor'
 
 type Ev = { level: string; label: string; detail: string }
-type Action = { type: 'add_food'; meal_id: number; nutrition_key: string; label: string }
+type Action = { type: 'add_food' | 'name_food' | 'add_region' | 'mark_photo'; meal_id: number; nutrition_key?: string; food_id?: number; label: string }
+const actionKey = (a: Action) => `${a.type}:${a.meal_id}:${a.food_id ?? ''}:${a.nutrition_key ?? ''}`
 type Msg = { role: 'user' | 'assistant'; content: string; created_at?: string; source?: string; evidence?: Ev[]; followups?: string[]; hypothetical?: boolean; actions?: Action[]; local?: boolean }
 export const PROMPTS: Record<string, string[]> = {
   meal: ['What is in my meal?', 'How might this affect my glucose?', 'What could I change to make this meal healthier?', 'Why did you classify this food this way?'],
@@ -54,15 +56,27 @@ export default function AdvisorChat({ mealId, prompts, initialPrompt, compact = 
   }
   useEffect(() => { if (!loading && initialPrompt && sent.current !== initialPrompt) { sent.current = initialPrompt; send(initialPrompt) } })  // eslint-disable-line react-hooks/exhaustive-deps
   const [done, setDone] = useState<Record<string, boolean>>({})
-  const run = async (a: Action) => {   // only reports success after the server has actually added the food
-    const k = `${a.meal_id}:${a.nutrition_key}`
+  const navigate = useNavigate()
+  const sheet = useAdvisor()
+  const say = (content: string) => setMsgs(x => [...x, { role: 'assistant', local: true, created_at: new Date().toISOString(), content }])
+  const run = async (a: Action) => {   // only reports success after the server has actually changed the meal
+    if (a.type === 'mark_photo') { sheet.close(); navigate(`/meals/${a.meal_id}?mark=1`); window.dispatchEvent(new CustomEvent('mealsense-mark-photo', { detail: a.meal_id })); return }
+    const k = actionKey(a)
     setDone(d => ({ ...d, [k]: true }))
     try {
-      const meal = await api<any>(`/meals/${a.meal_id}/foods`, { method: 'POST', json: { nutrition_key: a.nutrition_key } })
-      const added = [...meal.foods].reverse().find((f: any) => f.nutrition_key === a.nutrition_key && !f.removed)
+      const meal = a.type === 'add_food'
+        ? await api<any>(`/meals/${a.meal_id}/foods`, { method: 'POST', json: { nutrition_key: a.nutrition_key } })
+        : await api<any>(`/meals/${a.meal_id}/foods/${a.food_id}`, { method: 'PUT', json: a.type === 'name_food' ? { nutrition_key: a.nutrition_key } : { restore: true } })
       window.dispatchEvent(new CustomEvent('mealsense-meal-updated', { detail: meal }))
-      setMsgs(x => [...x, { role: 'assistant', local: true, created_at: new Date().toISOString(),
-        content: `Got it! Added ${added?.label ?? a.label}${added ? ` (${Math.round(added.grams)} g, typical portion)` : ''} to your meal. ✅ You can adjust the grams on the meal page.` }])
+      if (a.type === 'add_food') {
+        const added = [...meal.foods].reverse().find((f: any) => f.nutrition_key === a.nutrition_key && !f.removed)
+        say(`Got it! Added ${added?.label ?? a.label}${added ? ` (${Math.round(added.grams)} g, typical portion)` : ''} to your meal. ✅ You can adjust the grams on the meal page.`)
+      } else if (a.type === 'name_food') {
+        const f = meal.foods.find((x: any) => x.id === a.food_id)
+        say(`Done! It's now ${f?.label ?? a.label.split(' is ').pop()}${f?.grams ? ` (${Math.round(f.grams)} g, estimated from the photo)` : ''}. ✅ I'll remember it for next time; you can change the portion on the meal page.`)
+      } else {
+        say('Added that region to your meal. ✅ It needs a name before saving: ask me about the unidentified items, or tap **Name it** on the meal page.')
+      }
     } catch (e: any) { setDone(d => ({ ...d, [k]: false })); setErr({ msg: e.message, retry: '' }) }
   }
   const clear = async () => { if (thread) await api(`/advisor/threads/${thread}`, { method: 'DELETE' }).catch(() => {}); setMsgs([]); setThread(null) }
@@ -86,9 +100,11 @@ export default function AdvisorChat({ mealId, prompts, initialPrompt, compact = 
             {m.hypothetical && <div className="mb-1 text-[11px] font-medium text-amber-700">Hypothetical · not saved</div>}
             <div className="text-[15px] leading-relaxed text-slate-800 whitespace-pre-line">{m.content.replace(/\*\*(.+?)\*\*/g, '$1')}</div>
             {!!m.actions?.length && <div className="mt-2 flex flex-wrap gap-1.5">{m.actions.map(a => {
-              const k = `${a.meal_id}:${a.nutrition_key}`
-              return <button key={k} disabled={done[k]} onClick={() => run(a)} className="rounded-full bg-brand-600 text-white px-3.5 py-1.5 text-[13px] font-medium disabled:opacity-50">
-                {done[k] ? 'Added' : `Add ${a.label.toLowerCase()}`}</button> })}</div>}
+              const k = actionKey(a)
+              const text = a.type === 'add_food' ? `Add ${a.label.toLowerCase()}` : a.label
+              return <button key={k} disabled={done[k]} onClick={() => run(a)} className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium disabled:opacity-50 ${a.type === 'mark_photo' || a.type === 'add_region'
+                ? 'border border-brand-600 text-brand-700 bg-white' : 'bg-brand-600 text-white'}`}>
+                {done[k] ? (a.type === 'name_food' ? 'Named' : 'Added') : text}</button> })}</div>}
             {!m.local && <Sources ev={m.evidence ?? []} source={m.source} />}
             {m.created_at && <span className="text-[10px] text-slate-400">{time(m.created_at)}</span>}
           </div>))}

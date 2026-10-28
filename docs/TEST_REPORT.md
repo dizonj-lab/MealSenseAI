@@ -152,3 +152,10 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | Test | Result |
 |---|---|
 | Marking hint (Playwright, iPhone 13, light and dark) | **PASS**: dark text on light grey in light mode, light text on dark navy in dark mode, brand outline in both |
+
+## v0.13.7: choose unidentified foods in the Meal Advisor (28 Oct 2026)
+
+| Test | Result |
+|---|---|
+| pytest | **62 passed** (adds 2): name buttons only for the unidentified items and only with the region's own guesses; the button's request names the item; "you missed something" offers Mark it on the photo; a found-but-unlisted region is offered and restored |
+| Advisor flow (Playwright, desktop and iPhone 13) | **PASS**: "What are the unidentified items?" → six name buttons for two items; tapping one names the item; "You missed something" → Mark it on the photo closes the advisor and opens marking mode; no JS errors, no horizontal overflow |

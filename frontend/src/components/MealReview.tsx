@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { AlertTriangle, Check, Crosshair, MessageCircle, Droplet, Flame, Info, Lightbulb, Merge, Pencil, Plus, RotateCcw, Scale, Search, Sparkles, Trash2, X } from 'lucide-react'
 import { api, fmt } from '../lib/api'
 import { useAdvisor } from '../lib/advisor'
@@ -272,6 +273,7 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
   // draw mode: a new food (food = null) or where an existing food is; the hint is shown over the photo
   const [drawing, setDrawing] = useState<{ food: number | null; hint: string } | null>(null)
   const [marking, setMarking] = useState(false)
+  const [params, setParams] = useSearchParams()
   const [mealType, setMealType] = useState(meal.meal_type ?? guessMealType())
   const [err, setErr] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -303,6 +305,13 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
     setDrawing({ food, hint: food ? `Drag a box around ${label} on the photo` : 'Drag a box around the food the app missed' })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+  useEffect(() => {   // the Meal Advisor's "Mark it on the photo" opens marking mode here (?mark=1)
+    const start = () => { if (!readOnly && meal.images.length) startDraw() }
+    if (params.get('mark')) { start(); setParams(p => { p.delete('mark'); return p }, { replace: true }) }
+    const on = (e: Event) => { if ((e as CustomEvent).detail === meal.id) start() }
+    window.addEventListener('mealsense-mark-photo', on)
+    return () => window.removeEventListener('mealsense-mark-photo', on)
+  }, [params, meal.id])  // eslint-disable-line react-hooks/exhaustive-deps
   const merge = () => act(api<Meal>(`/meals/${meal.id}/foods/merge`, { method: 'POST', json: { food_ids: mergeIds } })).then(() => setMergeIds([]))
   const nUnknown = active.filter(f => !f.nutrition_key).length
   const cls = meal.stages.find(st => st.key === 'classify')

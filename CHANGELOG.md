@@ -2,6 +2,14 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.7 — Name unidentified foods from the Meal Advisor
+
+- Asking about the unidentified (unknown, unnamed) items lists each item's own top guesses and offers buttons:
+  **"Unidentified food 1 is pizza"** names it (only guesses with a food-table record; nothing invented),
+  **Add region …** adds a region the detector found but did not list, and **Mark it on the photo** opens marking mode
+  on the meal page (`/meals/{id}?mark=1`). "You missed something" without a named food offers the photo as well.
+- Naming from the advisor is the same request as on the meal page, so it feeds personal memory in the same way.
+
 ## v0.13.6 — Readable marking hint
 
 - The marking hint uses theme tokens (`slate-100` / `slate-800`, brand outline), so it is readable in light and dark

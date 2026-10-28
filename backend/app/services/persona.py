@@ -42,7 +42,7 @@ CLOSERS = {
     "can_eat": ["Want to compare a couple of options?"],
     "healthy": ["Want to see what changes if you tweak it?"],
     "cant_know": ["Want to explore the carbs and what affects your response?"],
-    "unknown_dish": ["Could you tell me what it's called?"],
+    "unknown_dish": ["Pick one below, or just tell me what it is."],
     "out_of_scope": ["Want to ask me about a meal or a food instead?"],
     "default": ["Anything else you'd like to know?", "What else can I dig into for you?"],
 }

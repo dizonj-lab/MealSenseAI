@@ -1,7 +1,12 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.6'
+export const APP_VERSION = '0.13.7'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.7', title: 'Name unidentified foods from the Meal Advisor', changes: [
+    'Ask the Meal Advisor about the unidentified items: it lists its guesses for each, and one tap names the item',
+    'It also offers regions it spotted but was unsure about, and Mark it on the photo, which opens marking mode on the meal page',
+    '"You missed something" now offers Mark it on the photo as well',
+  ] },
   { version: '0.13.6', title: 'Readable marking hint', changes: [
     'The "Drag a box around the food" hint is readable in light and dark mode, and sits above the photo instead of over it',
   ] },
