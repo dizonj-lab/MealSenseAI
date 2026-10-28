@@ -96,7 +96,7 @@ export default function Forecast({ mealId, version }: { mealId: number; version:
   const eqText = (e: string) => e.replace(/\s*\[([^\]]+)\]/, (_m, ks) => ` [${ks.split(',').map((k: string) => num(k.trim())).join(',')}]`)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2.5">
       <Section title="Meal advisory" icon={<ShieldAlert className="size-5 text-amber-500" />} summary={<span className={`chip ring-1 ${rCls}`}>{rLabel}</span>}>
         {adv.flags.length === 0 ? <p className="text-sm text-slate-600">No public-health reference points exceeded for this meal.</p> :
           <ul className="space-y-2">{adv.flags.map((f: any, i: number) => (

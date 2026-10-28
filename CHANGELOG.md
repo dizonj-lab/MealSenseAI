@@ -2,6 +2,12 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.4 — A calmer meal page
+
+- Key takeaways and Ask the Meal Advisor are collapsible like the other insights; all are grouped under **Insights**
+  and closed in Simple view, each showing its key point on one line (glucose impact and first tip; kcal and carbs; advisory status)
+- Allergy warnings are never collapsed; Detailed view opens every section as before
+
 ## v0.13.3 — Safer side-by-side installs
 
 - Docker images are named after the Compose project (`${COMPOSE_PROJECT_NAME:-mealsenseai}/backend:local`), so a

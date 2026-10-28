@@ -1,7 +1,12 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.3'
+export const APP_VERSION = '0.13.4'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.4', title: 'A calmer meal page', changes: [
+    'Every insight, including Key takeaways and Ask the Meal Advisor, is now a one-line row under Insights; tap to open',
+    'Each row still shows its key point, such as the glucose impact, kcal and carbs, or whether the meal needs attention',
+    'Allergy warnings stay open. Detailed view still opens everything',
+  ] },
   { version: '0.13.3', title: 'Safer side-by-side installs', changes: [
     'A second copy of the app on the same server (for example a test run) no longer replaces the images the live app uses',
   ] },

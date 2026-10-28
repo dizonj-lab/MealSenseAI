@@ -131,3 +131,10 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 |---|---|
 | `docker compose config` | Not run here (no Docker in this environment). Checked by reading: the default project resolves to the unchanged `mealsenseai/…:local` names; `COMPOSE_PROJECT_NAME=mealsense-acceptance` resolves to `mealsense-acceptance/…:local` |
 | Fresh-database startup (v0.13.2 code) | **PASS**: all 7 migrations applied to an empty PostgreSQL 16 database and the API started |
+
+## v0.13.4: insights collapsed by default (28 Oct 2026)
+
+| Test | Result |
+|---|---|
+| Meal page (Playwright, desktop 1280 px and iPhone 13) | **PASS**, no JS errors, no horizontal overflow: eight insight rows closed under **Insights**, each with its one-line summary |
+| Type check and build | **PASS** (no backend change) |
