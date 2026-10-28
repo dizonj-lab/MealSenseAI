@@ -57,16 +57,24 @@ data for future evaluation.
 
 ```
 backend/app/
-  api/        auth, users (profile), meals (capture/analyze/edit/confirm/forecast/history), dashboard, ai (models, taxonomy)
-  core/       config, db, migrate (Alembic runner), security (JWT/bcrypt), cache
-  models/     SQLAlchemy tables: users, health_profiles, meals, meal_foods, corrections, inference_logs, experiments
-  services/   preprocess (exact EXP-002 transform), vision (classifier + detector), portion, nutrition,
-              insights (glucose/energy/recommendations), forecast (activity what-if), analysis (orchestrator), slm
-backend/migrations/   0001 initial schema, 0002 taxonomy_class
-frontend/src/         pages (Dashboard, Capture, History, Insights, Profile, AI Model Insights, Settings), components
+  api/        auth (incl. email verification), users (profile, training consent and summary), meals
+              (capture/analyze/edit/confirm/forecast/history), dashboard, ai (models, taxonomy), glucose, advisor,
+              contact, admin (review, contributors, dataset versions, model gate, settings, prompts, audit)
+  core/       config, db, migrate (Alembic runner), security (JWT/bcrypt, admin guard, verification tokens), cache
+  models/     SQLAlchemy tables (see Data model)
+  services/   preprocess (exact EXP-002 transform), vision (classifier + detector; promoted and shadow models),
+              portion, nutrition, insights, forecast, analysis (orchestrator), slm, advisor, persona, memory,
+              tuning (admin settings and versioned prompts), screening (training-data checks), datasets (frozen
+              versions), gate (model gate, packages, shadow mode), audit
+  tools/      admin (grant/revoke the admin role), export_dataset (export a frozen version for training)
+backend/migrations/   0001 initial schema … 0007 training-data governance, settings and prompts
+frontend/src/         pages (Dashboard, Capture, History, Insights, Advisor, Profile, AI Model Insights, Settings,
+                      About, admin/*), components
 ml/models/exp002/     best_model.pth (source of truth), model.onnx, class_mapping.json, preprocessing.py,
                       nutrition_map.json, model_card.json, evidence/
-ml/export/            export_exp002.py (ONNX + parity evidence), build_nutrition_map.py, build_model_card.py
+ml/export/            export_exp002.py (ONNX + parity evidence), build_nutrition_map.py, build_model_card.py,
+                      export_training_samples.py (wrapper of app.tools.export_dataset)
+ml/evaluation/        evaluate.py, multifood_eval.py, advisor_eval.py, gate_report.py + safety_classes.json (model gate)
 ```
 
 ## Data model (PostgreSQL)
@@ -74,4 +82,11 @@ ml/export/            export_exp002.py (ONNX + parity evidence), build_nutrition
 `users` 1–1 `health_profiles` (health fields stored only with consent) · `users` 1–n `meals` 1–n `meal_foods`
 (label, taxonomy class, nutrition key, match type, grams, portion method and uncertainty, nutrients, source, original
 prediction) · `corrections` (before/after of every user edit) · `inference_logs` (model, device, latency) ·
-`experiments` (reported metrics and parity evidence). The full DDL is in `database/schema.sql`.
+`experiments` (reported metrics and parity evidence) · `glucose_readings` · `custom_foods` · `chat_threads` /
+`chat_messages` · `contact_messages`.
+
+Training-data governance (0.13): `training_samples` (a labelled photo region: personal memory, and training data when
+shared; consent and withdrawal time, screening status and reasons, perceptual hash, review) · `audit_log` ·
+`dataset_versions` (frozen manifests) · `model_candidates` (gate report, checks, shadow agreement, decision) ·
+`app_settings` (admin overrides of tunable settings) · `prompt_versions`. `users` gains `is_admin`,
+`email_verified_at` and `contributor_status`. See [ADMIN.md](ADMIN.md). The full DDL is in `database/schema.sql`.

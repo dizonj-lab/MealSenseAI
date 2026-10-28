@@ -1,7 +1,12 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.0'
+export const APP_VERSION = '0.13.1'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.1', title: 'Clearer meal composition', changes: [
+    'Meal composition redesigned: the meal at a glance, where its energy comes from, and each nutrient against your day',
+    'Amber shows when one meal alone goes past its share of a limit (carbohydrate goal, the WHO sodium limit, saturated fat)',
+    'Food-by-food comparison by carbs, kcal or sodium for meals with several foods; missing values are shown as missing',
+  ] },
   { version: '0.13.0', title: 'Safer learning from your photos', changes: [
     'Sharing corrected photos for training is now tracked per photo; switching it off withdraws everything you shared from future training',
     'Settings shows what you shared, what was accepted and what is in review',

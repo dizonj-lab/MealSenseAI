@@ -87,6 +87,19 @@ segmentation-mask quality, the uncertainty band's coverage, and any glucose accu
 | Phone UI flow, light and dark | **PASS**, no JS errors, including “You missed my sausage!” → Add → meal page updated |
 | Not measured | Language-model wording with the persona (Ollama not available here); its replies still pass the same number/food/safety validation |
 
+## v0.13.0–0.13.1: training-data governance, admin area, meal composition (28 Oct 2026)
+Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the backend, Playwright Chromium). Docker
+images were **not** rebuilt here (no Docker daemon in this environment; no new dependencies were added).
+
+| Test | Result |
+|---|---|
+| pytest | **56 passed** (adds 9 governance tests): admin routes 401/403 for others, revoking takes effect with the same token; verification link (bound to the address, not usable as a session); consent per sample and withdrawal; an implausible pizza→salad-style relabel flagged for implausibility and carbohydrate safety; own duplicate rejected, self-confirmation noted, new-account flag; freeze → exclude contributor (new version supersedes) → export honouring a later withdrawal; settings validation and reset; prompt versions and rollback; model gate: safety regression fails, broken package refused, shadow agreement 100% (same model), promotion blocked until enough shadow data, promoted package serves recognition, rollback, different test set fails |
+| Migration 0007 | Applied to a fresh database and to the populated local demo database (meals kept). Carrying consent over for samples shared before 0.13 is in the migration but was not exercised: that database had none |
+| `ml/evaluation/gate_report.py` | Ran on a 150-image, 3-class sample: report written with test-set SHA-256 and per-group accuracy. The real gate test set (all safety groups) is **not built yet** |
+| Admin UI (Playwright, desktop 1440 px and phone 390 px) | **PASS**, no JS errors, no horizontal overflow on any of the 7 tabs; a plain account sees no Admin menu and is redirected from `/admin` |
+| Meal composition (Playwright, light, dark and phone) | **PASS**, no JS errors: single dish and a multi-food meal; food-by-food rows only for several foods; amber when a meal passes its share of a limit; saturated fat shown as missing when a food lacks it |
+| Not re-run for 0.13.x | `./scripts/acceptance.sh` (Docker acceptance, incl. restart persistence and `--offline`), the containerised pytest and the Playwright e2e flow in `backend/tests/e2e`. **Run these on the submission machine before submitting.** |
+
 ## Not tested / outstanding
 1. **GPU path:** the `gpu` image (CUDA 12.8, cuDNN 9, onnxruntime-gpu) was **not built or run**: no GPU and
    insufficient disk in the test environment. CUDA auto-selection is implemented with a CPU fallback, but is unverified.
@@ -97,5 +110,7 @@ segmentation-mask quality, the uncertainty band's coverage, and any glucose accu
 4. **Nutrition values** are transcribed or approximate (unverified); 7 classes have no record.
 5. **Optional components** (Redis cache profile, Ollama SLM profile) were not exercised in this run; the app ran
    with both absent.
-6. **Development home-server hosting** (Cloudflare Tunnel, host hardening) is in the repository only. It was
+6. **Verification emails** need SMTP; sending was not exercised (links were verified directly in tests).
+7. **Training on user data** has not happened yet: no real dataset version has been exported, trained or gated.
+8. **Development home-server hosting** (Cloudflare Tunnel, host hardening) is in the repository only. It was
    partly tested earlier (hardened stack, rate limits, backup/restore), not against real Cloudflare or Tailscale accounts.

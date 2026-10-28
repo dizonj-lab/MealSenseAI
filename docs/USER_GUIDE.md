@@ -37,6 +37,9 @@ Each food card shows:
 - **Potential Glucose Impact:** carbohydrate, sugar and fibre, glycaemic load when supported, and a
   LOW/MODERATE/HIGH/UNCERTAIN level. Based on food composition; not your personal glucose response.
 - **Energy & Nutrition:** calories, macronutrient split, and share of your daily goals.
+- **Meal composition:** the meal's calories and nutrients, where its energy comes from, each nutrient against your
+  day (your goals, the WHO sodium limit, a fibre guideline; amber when the meal alone passes its share of a limit),
+  what its carbohydrate is made of, and, for meals with several foods, which food contributes what.
 - **Practical Recommendations** and **Meal advisory** (tagged *Unvalidated guidance*).
 - **Forecast & what-if:** see how a walk, cycling, running or rowing session at a chosen time after the meal changes
   the relative glucose curve and energy use. Includes safety cautions and references.
@@ -48,6 +51,19 @@ Each food card shows:
 - **Nutrition Insights:** 7- and 30-day trends.
 - **AI Model Insights:** which models are active (CPU or GPU), reported accuracy and its source, runtime parity
   evidence, and how often you corrected the model.
+
+## 6. Helping improve food recognition (optional)
+- When you name or correct a food, MealSenseAI remembers it for your account. In **Settings → Learning from your
+  corrections** you can also share those corrected photo crops to train the next model: only the food region, never
+  the whole photo, and without your name or email.
+- Settings shows how many you shared, how many were accepted and how many are in review. Every shared crop is checked
+  automatically and may be reviewed by a person before any model learns from it.
+- Confirm your email (Settings → **Send the link**) so your shared photos can be used.
+- Switching sharing off withdraws everything you shared from all future training sets.
+
+## 7. For administrators
+The **Admin** menu (admins only) holds training-data review, contributors, dataset versions, the model gate and model
+updates, model settings, prompts and the audit log. See [ADMIN.md](ADMIN.md).
 
 ## Important
 MealSenseAI gives **educational estimates**. It does not diagnose, predict your blood glucose, or replace advice from

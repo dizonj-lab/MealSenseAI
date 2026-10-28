@@ -2,6 +2,14 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.1 — Clearer meal composition
+
+- Meal composition redesigned in one teal palette: the meal at a glance, where its energy comes from, and each
+  nutrient against your day (your goals, the WHO sodium limit, a fibre guideline, saturated fat under 10% of energy)
+- Amber only when one meal alone goes past its share of a limit; missing nutrient values are shown as missing
+- Inside the carbohydrate (sugar, starch, fibre) with glycaemic load; food-by-food comparison by carbs, kcal or sodium
+- Documentation and database schema brought up to date for the submission
+
 ## v0.13.0 — Safer learning from your photos
 
 - Sharing corrected photos for training is now tracked per photo; switching it off withdraws everything shared from future training
