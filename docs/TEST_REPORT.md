@@ -114,3 +114,13 @@ images were **not** rebuilt here (no Docker daemon in this environment; no new d
 7. **Training on user data** has not happened yet: no real dataset version has been exported, trained or gated.
 8. **Development home-server hosting** (Cloudflare Tunnel, host hardening) is in the repository only. It was
    partly tested earlier (hardened stack, rate limits, backup/restore), not against real Cloudflare or Tailscale accounts.
+
+## v0.13.2: mark a food on the photo (28 Oct 2026)
+Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the backend, Playwright Chromium).
+
+| Test | Result |
+|---|---|
+| pytest | **59 passed** (adds 3 region tests): a box drawn over the pizza on the test plate becomes a drawn item whose top three include pizza, and survives re-analysis; an item added by description gets a box and keeps its name; too-small, out-of-range and missing-view boxes refused (422); another user's meal 404 |
+| Draw a box, desktop mouse (1280 px) | **PASS**: Add missing food → Mark it on the photo → drag → new item 4 *pizza* (107 g), selected; no JS errors, no horizontal overflow |
+| Draw a box, phone touch (iPhone 13 profile, pointer events) | **PASS**: touch drag → new item *pizza*, scrolled into view and selected; no JS errors, no horizontal overflow |
+| Meal composition (v0.13.1 chart) | Renders in the review page under **Meal composition** (collapsed in Simple view) |

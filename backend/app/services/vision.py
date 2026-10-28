@@ -481,6 +481,20 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
     }
 
 
+def classify_region(path: str, original_path: str | None, bbox: dict) -> tuple[list[dict], list[float], str | None]:
+    """Top-3, fingerprint and shadow label for a region the user drew on the photo (normalised x, y, w, h of the
+    orientation-corrected photo, the same frame the detector's boxes use)."""
+    with _lock:
+        _load()
+        if not _state["cls"]:
+            raise RuntimeError(status()["error"] or "Food classifier unavailable")
+        full = (ImageOps.exif_transpose(Image.open(original_path)).convert("RGB")
+                if original_path and Path(original_path).exists() else Image.open(path).convert("RGB"))
+        piece = _crop_full(full, bbox)
+        top, fp = classify_fp(piece)
+        return top, fp, _shadow_top1(piece)
+
+
 def merge(results: list[dict]) -> list[dict]:
     """Items are itemised from the first photo that yields food; other views only add foods not already present."""
     out, seen = [], set()

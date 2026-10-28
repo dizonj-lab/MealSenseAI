@@ -92,6 +92,18 @@ class FoodAddIn(BaseModel):
     servings: float = Field(default=1.0, gt=0, le=20)
 
 
+class BoxIn(BaseModel):
+    x: float = Field(ge=0, le=1)
+    y: float = Field(ge=0, le=1)
+    w: float = Field(ge=0.02, le=1, description="At least 2% of the photo's width")
+    h: float = Field(ge=0.02, le=1, description="At least 2% of the photo's height")
+
+
+class RegionIn(BaseModel):
+    view: Literal["top", "side"] = "top"
+    bbox: BoxIn
+
+
 class ConfirmIn(BaseModel):
     meal_type: Literal["breakfast", "lunch", "dinner", "snack"] | None = None
     eaten_at: datetime | None = None

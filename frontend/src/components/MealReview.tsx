@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { AlertTriangle, Check, MessageCircle, Droplet, Flame, Info, Lightbulb, Merge, Pencil, Plus, RotateCcw, Scale, Sparkles, Trash2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { AlertTriangle, Check, Crosshair, MessageCircle, Droplet, Flame, Info, Lightbulb, Merge, Pencil, Plus, RotateCcw, Scale, Search, Sparkles, Trash2, X } from 'lucide-react'
 import { api, fmt } from '../lib/api'
 import { useAdvisor } from '../lib/advisor'
 import { useAuthImage } from '../lib/hooks'
@@ -10,7 +10,7 @@ import MealComposition from './MealComposition'
 import PortionSimulator from './PortionSimulator'
 import { Card, DetailProvider, DetailSwitch, ErrorNote, InfoTip, LevelBadge, Progress, Section, Spinner, Tag, useDetail } from './ui'
 
-const ORIGIN: Record<string, string> = { model: 'AI recognised', memory: 'Known from your earlier label', description: 'From description', manual: 'Added by you', slm: 'SLM suggestion' }
+const ORIGIN: Record<string, string> = { model: 'AI recognised', drawn: 'Marked by you, AI recognised', memory: 'Known from your earlier label', description: 'From description', manual: 'Added by you', slm: 'SLM suggestion' }
 const MAPQ: Record<string, [string, string]> = {
   exact: ['Nutrition record matched', 'bg-emerald-50 text-emerald-700'], proxy: ['Nutrition approximated by a similar food', 'bg-amber-50 text-amber-700'],
   fuzzy: ['Approximate match — please confirm', 'bg-amber-50 text-amber-700'],
@@ -20,26 +20,56 @@ const UNC: Record<string, string> = { low: 'text-emerald-700', medium: 'text-amb
 
 export const ITEM_COLORS = ['#0d9488', '#6366f1', '#f59e0b', '#e11d48', '#0284c7', '#16a34a', '#9333ea', '#ea580c', '#0891b2', '#65a30d', '#db2777', '#4f46e5']
 
-function MealImage({ mealId, view, items, selected, onSelect }: { mealId: number; view: string; items: { f: Food; n: number }[]; selected: number | null; onSelect: (id: number) => void }) {
+type Box = { x: number; y: number; w: number; h: number }
+const MIN_BOX = 0.03   // smaller drags are treated as a tap, not a box
+
+/** The meal photo with numbered boxes. In draw mode the user drags a box over a food (mouse, finger or pen: pointer
+ *  events, with touch-action none so the drag does not scroll the page). Coordinates are fractions of the photo. */
+function MealImage({ mealId, view, items, selected, onSelect, drawing, onDraw, onDrawn, onCancel }: { mealId: number; view: string; items: { f: Food; n: number }[]
+  selected: number | null; onSelect: (id: number) => void; drawing: string | null; onDraw?: () => void; onDrawn: (view: string, box: Box) => void; onCancel: () => void }) {
   const [boxes, setBoxes] = useState(true)
+  const [drag, setDrag] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null)
+  const area = useRef<HTMLDivElement>(null)
   const url = useAuthImage(`/api/v1/meals/${mealId}/images/${view}`)
   const mine = items.filter(({ f }) => f.original_prediction?.bbox && f.original_prediction?.view === view)
+  const at = (e: React.PointerEvent) => {
+    const r = area.current!.getBoundingClientRect()
+    return { x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)) }
+  }
+  const rect = drag && { x: Math.min(drag.x0, drag.x1), y: Math.min(drag.y0, drag.y1), w: Math.abs(drag.x1 - drag.x0), h: Math.abs(drag.y1 - drag.y0) }
+  const finish = () => {
+    if (rect && rect.w >= MIN_BOX && rect.h >= MIN_BOX) onDrawn(view, { x: +rect.x.toFixed(4), y: +rect.y.toFixed(4), w: +rect.w.toFixed(4), h: +rect.h.toFixed(4) })
+    setDrag(null)
+  }
   return (
-    <figure className="relative rounded-xl overflow-hidden bg-slate-100">
-      {url ? <img src={url} className="w-full h-auto block" alt={`${view} view`} /> : <div className="aspect-[4/3] grid place-items-center"><Spinner /></div>}
-      {url && boxes && mine.map(({ f, n }) => { const b = f.original_prediction.bbox; const col = ITEM_COLORS[(n - 1) % ITEM_COLORS.length]; const sel = selected === f.id; return (
-        <button key={f.id} onClick={() => onSelect(f.id)} aria-label={`Item ${n}: ${f.label}`}
+    <figure ref={area} className={`relative rounded-xl overflow-hidden bg-slate-100 select-none ${drawing ? 'ring-4 ring-brand-500' : ''}`}>
+      {url ? <img src={url} className="w-full h-auto block pointer-events-none" alt={`${view} view`} draggable={false} /> : <div className="aspect-[4/3] grid place-items-center"><Spinner /></div>}
+      {url && (boxes || drawing) && mine.map(({ f, n }) => { const b = f.original_prediction.bbox; const col = ITEM_COLORS[(n - 1) % ITEM_COLORS.length]; const sel = selected === f.id; return (
+        <button key={f.id} onClick={() => onSelect(f.id)} aria-label={`Item ${n}: ${f.label}`} tabIndex={drawing ? -1 : 0}
           className="absolute rounded-md transition" style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%`,
-            border: `${sel ? 3 : 2}px ${f.nutrition_key ? 'solid' : 'dashed'} ${col}`, background: sel ? `${col}22` : 'transparent' }}>
+            border: `${sel ? 3 : 2}px ${f.nutrition_key ? 'solid' : 'dashed'} ${col}`, background: sel ? `${col}22` : 'transparent', opacity: drawing ? 0.5 : 1 }}>
           <span className="absolute -top-px -left-px rounded-br-md px-1.5 text-[11px] font-bold text-white" style={{ background: col }}>{n}</span>
         </button>) })}
-      <figcaption className="absolute bottom-2 left-2 chip bg-black/50 text-white capitalize">{view === 'top' ? 'Top view' : 'Side view'}</figcaption>
-      {mine.length > 0 && <button onClick={() => setBoxes(v => !v)} className="absolute bottom-2 right-2 chip bg-white/90 text-slate-700 shadow">{boxes ? 'Hide' : 'Show'} boxes</button>}
+      {url && drawing && <div data-testid="draw-area" className="absolute inset-0 cursor-crosshair" style={{ touchAction: 'none' }}
+        onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); const p = at(e); setDrag({ x0: p.x, y0: p.y, x1: p.x, y1: p.y }) }}
+        onPointerMove={e => { if (drag) { const p = at(e); setDrag({ ...drag, x1: p.x, y1: p.y }) } }}
+        onPointerUp={finish} onPointerCancel={() => setDrag(null)}>
+        {rect && <div className="absolute rounded-md border-2 border-dashed border-white bg-white/15 shadow-[0_0_0_9999px_rgba(15,23,42,0.35)]"
+          style={{ left: `${rect.x * 100}%`, top: `${rect.y * 100}%`, width: `${rect.w * 100}%`, height: `${rect.h * 100}%` }} />}
+        {!drag && <div className="absolute inset-x-2 top-2 flex items-center gap-2 rounded-xl bg-slate-900/80 text-white text-sm px-3 py-2 pointer-events-none">
+          <Crosshair className="size-4 shrink-0" /><span className="flex-1">{drawing}</span></div>}
+      </div>}
+      <figcaption className="absolute bottom-2 left-2 chip bg-black/50 text-white capitalize pointer-events-none">{view === 'top' ? 'Top view' : 'Side view'}</figcaption>
+      <div className="absolute bottom-2 right-2 flex gap-1.5">
+        {drawing ? <button onClick={onCancel} className="chip bg-white/95 text-slate-700 shadow"><X className="size-3.5" />Cancel</button> : <>
+          {onDraw && url && <button onClick={onDraw} className="chip bg-white/95 text-brand-700 shadow"><Crosshair className="size-3.5" />Mark a food</button>}
+          {mine.length > 0 && <button onClick={() => setBoxes(v => !v)} className="chip bg-white/90 text-slate-700 shadow">{boxes ? 'Hide' : 'Show'} boxes</button>}</>}
+      </div>
     </figure>
   )
 }
 
-function FoodCard({ f, n, meal, onChange, readOnly, selected, onSelect, mergeChecked, onMergeToggle }: { f: Food; n: number; meal: Meal; onChange: (m: Meal) => void; readOnly: boolean; selected: boolean; onSelect: () => void; mergeChecked: boolean; onMergeToggle: () => void }) {
+function FoodCard({ f, n, meal, onChange, readOnly, selected, onSelect, mergeChecked, onMergeToggle, onMark }: { f: Food; n: number; meal: Meal; onChange: (m: Meal) => void; readOnly: boolean; selected: boolean; onSelect: () => void; mergeChecked: boolean; onMergeToggle: () => void; onMark?: () => void }) {
   const [picker, setPicker] = useState(false)
   const [editG, setEditG] = useState(false)
   const [g, setG] = useState(String(f.grams))
@@ -132,6 +162,8 @@ function FoodCard({ f, n, meal, onChange, readOnly, selected, onSelect, mergeChe
         <button className="btn-ghost px-2 text-xs" disabled={!f.nutrition_key} onClick={() => { setG(String(f.grams)); setEditG(true) }}><Scale className="size-4" />Portion</button>
         <button className="btn-ghost px-2 text-xs text-rose-600" onClick={() => call(api(`/meals/${meal.id}/foods/${f.id}`, { method: 'DELETE' }))}><Trash2 className="size-4" />Remove</button>
       </div>}
+      {!readOnly && onMark && !pred?.bbox && <button className="mt-2 w-full btn-ghost py-2 text-xs text-brand-700" onClick={e => { e.stopPropagation(); onMark() }}>
+        <Crosshair className="size-4" />Show where it is on the photo</button>}
       {!readOnly && n === 1 && <p className="mt-1.5 text-[11px] text-slate-400 flex items-center gap-1">What do these buttons do?
         <InfoTip label="Card actions" text={<><b>Confirm</b>: the food and portion look right. <b>Rename</b>/<b>Name it</b>: pick the correct food or create your own. <b>Portion</b>: enter the grams you ate. <b>Remove</b>: not part of this meal. Each change recalculates the totals and is remembered for next time.</>} /></p>}
       {picker && <FoodPicker title={unknown ? `What is item ${n}?` : `Rename “${f.label}”`} initial={unknown ? '' : f.nutrition_key ? '' : f.label} onClose={() => setPicker(false)}
@@ -226,6 +258,9 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
     return () => window.removeEventListener('mealsense-meal-updated', on)
   }, [meal.id, onChange])
   const [adding, setAdding] = useState(false)
+  // draw mode: a new food (food = null) or where an existing food is; the hint is shown over the photo
+  const [drawing, setDrawing] = useState<{ food: number | null; hint: string } | null>(null)
+  const [marking, setMarking] = useState(false)
   const [mealType, setMealType] = useState(meal.meal_type ?? guessMealType())
   const [err, setErr] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -236,6 +271,22 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
   const suggestions = meal.foods.filter(f => f.removed && f.original_prediction?.kind === 'suggestion' && !f.user_corrected)
   const select = (id: number) => { setSelected(id); document.getElementById(`food-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }) }
   const act = async (p: Promise<Meal>) => { setErr(null); try { onChange(await p) } catch (e: any) { setErr(e.message) } }
+  const drawn = async (view: string, bbox: Box) => {
+    const target = drawing
+    setDrawing(null); setMarking(true); setErr(null)
+    try {
+      const before = new Set(meal.foods.map(f => f.id))
+      const m = await api<Meal>(target?.food ? `/meals/${meal.id}/foods/${target.food}/region` : `/meals/${meal.id}/regions`,
+        { method: target?.food ? 'PUT' : 'POST', json: { view, bbox } })
+      onChange(m)
+      const id = target?.food ?? m.foods.find(f => !before.has(f.id))?.id
+      if (id) setTimeout(() => select(id), 50)
+    } catch (e: any) { setErr(e.message) } finally { setMarking(false) }
+  }
+  const startDraw = (food: number | null = null, label?: string) => {
+    setDrawing({ food, hint: food ? `Drag a box around ${label} on the photo` : 'Drag a box around the food the app missed' })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
   const merge = () => act(api<Meal>(`/meals/${meal.id}/foods/merge`, { method: 'POST', json: { food_ids: mergeIds } })).then(() => setMergeIds([]))
   const nUnknown = active.filter(f => !f.nutrition_key).length
   const cls = meal.stages.find(st => st.key === 'classify')
@@ -263,7 +314,8 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
       <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-4 items-start">
         <div className="space-y-3 lg:sticky lg:top-36">
           {meal.images.length > 0 ? <div className={`grid gap-3 ${meal.images.length > 1 ? 'grid-cols-2 lg:grid-cols-1' : ''}`}>
-            {meal.images.map(im => <MealImage key={im.view} mealId={meal.id} view={im.view} items={items} selected={selected} onSelect={select} />)}</div>
+            {meal.images.map(im => <MealImage key={im.view} mealId={meal.id} view={im.view} items={items} selected={selected} onSelect={select}
+              drawing={drawing?.hint ?? null} onDraw={readOnly ? undefined : () => startDraw()} onDrawn={drawn} onCancel={() => setDrawing(null)} />)}</div>
             : <div className="card p-4 text-sm text-slate-500">No photo — analysed from description.</div>}
           <div className="card p-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Meal total · {t.item_count} item(s) · ~{fmt(t.grams)} g</div>
@@ -289,7 +341,8 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
             {!readOnly && mergeIds.length >= 2 && <button className="btn-ghost ml-auto px-3 py-1.5 text-xs" onClick={merge}><Merge className="size-4" />Merge {mergeIds.length} items into one</button>}
           </div>}
           {items.map(({ f, n }) => <FoodCard key={f.id} f={f} n={n} meal={meal} onChange={onChange} readOnly={readOnly} selected={selected === f.id} onSelect={() => setSelected(f.id)}
-            mergeChecked={mergeIds.includes(f.id)} onMergeToggle={() => setMergeIds(m => m.includes(f.id) ? m.filter(x => x !== f.id) : [...m, f.id])} />)}
+            mergeChecked={mergeIds.includes(f.id)} onMergeToggle={() => setMergeIds(m => m.includes(f.id) ? m.filter(x => x !== f.id) : [...m, f.id])}
+            onMark={meal.images.length > 0 ? () => startDraw(f.id, f.label) : undefined} />)}
           {!readOnly && suggestions.length > 0 && <div className="card p-4">
             <div className="text-sm font-semibold text-slate-800 flex items-center gap-1">Possible additional items ({suggestions.length})
               <InfoTip label="Possible additional items" text="Small or uncertain regions the detector found. They are not counted unless you tap one to add it, then name it." /></div>
@@ -298,7 +351,13 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
               <button key={f.id} className="chip ring-1 ring-slate-200 bg-white px-3 py-1.5 text-sm hover:ring-teal-300" onClick={() => act(api(`/meals/${meal.id}/foods/${f.id}`, { method: 'PUT', json: { restore: true } }))}>
                 <RotateCcw className="size-3.5" />Add region {f.original_prediction.region_id}{f.original_prediction.candidates?.[0] && <span className="text-slate-400"> (maybe {f.original_prediction.candidates[0].label})</span>}</button>))}</div>
           </div>}
-          {!readOnly && <button className="btn-ghost w-full border-dashed py-3" onClick={() => setAdding(true)}><Plus className="size-4" />Add missing food</button>}
+          {!readOnly && (meal.images.length > 0 ? <div className="card p-3 border border-dashed border-slate-300">
+            <div className="text-sm font-semibold text-slate-700 flex items-center gap-1.5 mb-2"><Plus className="size-4" />Add missing food
+              <InfoTip label="Add missing food" text="Mark it on the photo: drag a box around the food (mouse, finger or pen). The model names what is inside the box and estimates the portion from its size; you can correct both. Or search the food list if it is not in the photo." /></div>
+            <div className="grid sm:grid-cols-2 gap-2">
+              <button className="btn-primary py-2.5" disabled={marking} onClick={() => startDraw()}>{marking ? <Spinner className="size-4 text-white" /> : <Crosshair className="size-4" />}Mark it on the photo</button>
+              <button className="btn-ghost py-2.5" onClick={() => setAdding(true)}><Search className="size-4" />Search the food list</button></div></div>
+            : <button className="btn-ghost w-full border-dashed py-3" onClick={() => setAdding(true)}><Plus className="size-4" />Add missing food</button>)}
         </div>
       </div>
       <InsightCards meal={meal} onChange={onChange} />

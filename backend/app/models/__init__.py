@@ -78,7 +78,7 @@ class MealFood(Base):
     __tablename__ = "meal_foods"
     id: Mapped[int] = mapped_column(primary_key=True)
     meal_id: Mapped[int] = mapped_column(ForeignKey("meals.id", ondelete="CASCADE"), index=True)
-    origin: Mapped[str] = mapped_column(String(20))  # model|memory|description|manual|slm
+    origin: Mapped[str] = mapped_column(String(20))  # model|memory|description|manual|slm|drawn (a region the user drew)
     label: Mapped[str] = mapped_column(String(200))
     taxonomy_class: Mapped[str | None] = mapped_column(String(120))  # EXP-002 class finally chosen (model or user)
     nutrition_key: Mapped[str | None] = mapped_column(String(80))

@@ -2,6 +2,13 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.2 — Mark a food on the photo
+
+- Add missing food → **Mark it on the photo**: drag a box around the food (mouse, finger or pen). The model classifies
+  only that box and estimates the portion from its size; a weak guess becomes an unidentified item with its top three
+- Items added by name or description can be given a box (**Show where it is on the photo**); the name is kept
+- Drawn items survive re-analysis; new endpoints `POST /meals/{id}/regions` and `PUT /meals/{id}/foods/{fid}/region`
+
 ## v0.13.1 — Clearer meal composition
 
 - Meal composition redesigned in one teal palette: the meal at a glance, where its energy comes from, and each

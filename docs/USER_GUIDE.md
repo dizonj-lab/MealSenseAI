@@ -30,7 +30,9 @@ Each food card shows:
 - **Food:** search the nutrition table if the right food is not among the candidates.
 - **Portion:** enter grams if you know them. The value is then tagged **Your input**, otherwise **Estimate**, and
   the uncertainty band shrinks.
-- **Remove** deletes a wrong item. **Add missing food** adds what the model missed.
+- **Remove** deletes a wrong item. **Add missing food** adds what the model missed: **Mark it on the photo** (drag a box
+  around the food with a mouse, finger or pen; the model names what is inside) or **Search the food list**. An item
+  without a box has **Show where it is on the photo**.
 - "≈ *food name*" means the nutrition comes from the **closest available food** (a proxy). Correct it if you know better.
 
 ## 4. Nutrition and diabetes-aware insights

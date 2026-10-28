@@ -13,8 +13,8 @@ from app.core.config import settings
 from app.core.db import get_db
 from app.core.security import active_user
 from app.models import Correction, Meal, MealFood, User
-from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut, MergeIn, SimulateIn
-from app.services import analysis, custom_foods, forecast, glucose_scale, imaging, insights, memory, nutrition, portion, vision
+from app.schemas import AnalyzeIn, ConfirmIn, FoodAddIn, FoodUpdateIn, ForecastIn, HistoryOut, MealOut, MergeIn, RegionIn, SimulateIn
+from app.services import analysis, custom_foods, forecast, glucose_scale, imaging, insights, memory, nutrition, portion, tuning, vision
 
 router = APIRouter(prefix="/meals", tags=["meals"])
 
@@ -329,6 +329,98 @@ def add_food(body: FoodAddIn, meal: Meal = Depends(owned_meal), user: User = Dep
     analysis.recompute(meal, user.profile)
     if meal.status == "captured":
         meal.status = "analyzed"
+    db.commit()
+    db.refresh(meal)
+    return meal
+
+
+def _region(meal: Meal, body: RegionIn) -> tuple[dict, dict, list[dict], list[float], str | None]:
+    """The photo, the clipped box, and the classifier's view of the region the user drew."""
+    im = next((i for i in meal.images if i["view"] == body.view), None)
+    if not im:
+        raise HTTPException(422, f"This meal has no {body.view} photo")
+    b = body.bbox
+    box = {"x": round(b.x, 4), "y": round(b.y, 4), "w": round(min(b.w, 1 - b.x), 4), "h": round(min(b.h, 1 - b.y), 4)}
+    if box["w"] < 0.02 or box["h"] < 0.02:
+        raise HTTPException(422, "The box is too small: drag over the whole food")
+    try:
+        top, fp, shadow = vision.classify_region(im["path"], im.get("original_path"), box)
+    except RuntimeError as e:
+        raise HTTPException(503, str(e))
+    return im, box, top, fp, shadow
+
+
+def _drawn_prediction(meal: Meal, view: str, box: dict, top: list[dict], fp: list[float], shadow: str | None, kind: str) -> dict:
+    n = 1 + sum(1 for f in meal.foods if (f.original_prediction or {}).get("drawn"))
+    cls = vision.models().get("classifier") or {}
+    t1 = top[0]
+    return {"region_id": f"{view}-d{n}", "kind": kind, "model_label": t1["label"] if kind == "food" else None,
+            "class_id": t1["class_id"] if kind == "food" else None, "nutrition_key": t1["nutrition_key"] if kind == "food" else None,
+            "match": t1["match"] if kind == "food" else "none", "score": t1["score"], "candidates": top, "bbox": box,
+            "view": view, "views": [view], "instance": "marked by you", "area_frac": round(box["w"] * box["h"], 4),
+            "has_mask": False, "instances": 1, "fingerprint": fp, "shadow_label": shadow, "drawn": True,
+            "model_name": cls.get("name"), "model_version": cls.get("version"), "score_band": vision.score_band(t1["score"]),
+            "score_type": "raw softmax score (uncalibrated)", "needs_review": True}
+
+
+def _portion_for(meal: Meal, ref: dict, box: dict) -> tuple[float, dict]:
+    return portion.estimate(ref, bbox=box, area_frac=box["w"] * box["h"], reference_object=meal.reference_object,
+                            n_views=len(meal.images), note=meal.serving_note)
+
+
+@router.post("/{meal_id}/regions", response_model=MealOut, status_code=201,
+             summary="Add a food the detector missed, from a box the user drew on the photo")
+def add_region(body: RegionIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user), db: Session = Depends(get_db)):
+    im, box, top, fp, shadow = _region(meal, body)
+    t1 = top[0]
+    ref = nutrition.get(t1["nutrition_key"]) if t1["score"] >= tuning.get("vision.unknown_min") else None
+    if ref:
+        grams, pinfo = _portion_for(meal, ref, box)
+        f = MealFood(origin="drawn", label=t1["label"], taxonomy_class=t1["label"], grams=grams, portion=pinfo,
+                     original_prediction=_drawn_prediction(meal, body.view, box, top, fp, shadow, "food"))
+        analysis.apply_mapping(f, ref["key"], t1["match"])
+    else:   # not sure: the user names it from the region's own top-3 or the food list
+        n = 1 + sum(1 for x in meal.foods if not x.removed and x.label.startswith("Unidentified food"))
+        f = MealFood(origin="drawn", label=f"Unidentified food {n}", taxonomy_class=None, grams=0,
+                     portion=dict(analysis.UNKNOWN_PORTION), original_prediction=_drawn_prediction(meal, body.view, box, top, fp, shadow, "unknown"))
+        analysis.apply_mapping(f, None, "none")
+    meal.foods.append(f)
+    db.flush()
+    db.add(Correction(user_id=user.id, meal_id=meal.id, food_id=f.id, kind="add_region", after=_snapshot(f),
+                      model_name=_model_name(f)))
+    analysis.recompute(meal, user.profile)
+    if meal.status == "captured":
+        meal.status = "analyzed"
+    db.commit()
+    db.refresh(meal)
+    return meal
+
+
+@router.put("/{meal_id}/foods/{food_id}/region", response_model=MealOut,
+            summary="Mark or move where a food is on the photo (its name stays; the portion follows the box)")
+def set_region(food_id: int, body: RegionIn, meal: Meal = Depends(owned_meal), user: User = Depends(active_user),
+               db: Session = Depends(get_db)):
+    f = next((x for x in meal.foods if x.id == food_id and not x.removed), None)
+    if not f:
+        raise HTTPException(404, "Food not found")
+    before = _snapshot(f)
+    im, box, top, fp, shadow = _region(meal, body)
+    pred = dict(f.original_prediction or {})
+    pred.update(bbox=box, view=body.view, views=[body.view], area_frac=round(box["w"] * box["h"], 4), fingerprint=fp,
+                candidates=top, instance="marked by you", drawn=True, has_mask=False, shadow_label=shadow)
+    pred.setdefault("kind", "food" if f.nutrition_key else "unknown")
+    pred.setdefault("region_id", f"{body.view}-d{1 + sum(1 for x in meal.foods if (x.original_prediction or {}).get('drawn'))}")
+    pred.setdefault("score", top[0]["score"])
+    f.original_prediction = pred
+    ref = nutrition.get(f.nutrition_key)
+    if ref and (f.portion or {}).get("method") != "user_entered":   # the user's own grams always stand
+        f.grams, f.portion = _portion_for(meal, ref, box)
+        analysis.apply_mapping(f, f.nutrition_key, f.mapping_quality)
+    db.add(Correction(user_id=user.id, meal_id=meal.id, food_id=f.id, kind="edit_region", before=before, after=_snapshot(f),
+                      model_name=_model_name(f)))
+    if f.confirmed or f.user_corrected:   # the remembered example now uses the marked region
+        memory.record(db, user, meal, f, "corrected" if f.user_corrected else "confirmed")
+    analysis.recompute(meal, user.profile)
     db.commit()
     db.refresh(meal)
     return meal
