@@ -2,6 +2,13 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.5 — Pick or remember missed foods
+
+- In **Mark it on the photo**, regions the detector found but did not list (the "Possible additional items") are shown
+  as dotted outlines; **+ Add** adds one. Only the tag takes taps, so a box can still be dragged anywhere.
+- A drawn box is checked against the user's personal memory when the model is unsure (same threshold and margin as
+  analysis); a match is shown as "Known from your earlier label", with the model's own guess kept for reference.
+
 ## v0.13.4 — A calmer meal page
 
 - Key takeaways and Ask the Meal Advisor are collapsible like the other insights; all are grouped under **Insights**

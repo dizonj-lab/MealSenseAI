@@ -138,3 +138,11 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 |---|---|
 | Meal page (Playwright, desktop 1280 px and iPhone 13) | **PASS**, no JS errors, no horizontal overflow: eight insight rows closed under **Insights**, each with its one-line summary |
 | Type check and build | **PASS** (no backend change) |
+
+## v0.13.5: pick found regions; memory for drawn boxes (28 Oct 2026)
+
+| Test | Result |
+|---|---|
+| pytest | **60 passed** (adds 1): a box drawn over a weak region, named as a custom food, is recognised from memory when the same box is drawn on a new photo of the plate (origin memory, similarity ≥ 0.7, model guess kept) |
+| Pick a found region (Playwright, desktop and iPhone 13; a sushi photo with 9 hidden regions) | **PASS**: 9 and 8 dotted outlines shown; + Add adds the region as an item; no JS errors, no horizontal overflow |
+| Draw a box (regression) | **PASS** on desktop mouse and phone touch |

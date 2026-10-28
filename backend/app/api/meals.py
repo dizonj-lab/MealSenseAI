@@ -374,7 +374,17 @@ def add_region(body: RegionIn, meal: Meal = Depends(owned_meal), user: User = De
     im, box, top, fp, shadow = _region(meal, body)
     t1 = top[0]
     ref = nutrition.get(t1["nutrition_key"]) if t1["score"] >= tuning.get("vision.unknown_min") else None
-    if ref:
+    # the user's own earlier label for a region like this, under the same rule as analysis: only when the model is unsure
+    mem = memory.matcher(db, user.id)(fp) if not ref or t1["score"] < analysis.vision_auto_accept() else None
+    mref = nutrition.get(mem["nutrition_key"]) if mem else None
+    if mref:
+        grams, pinfo = _portion_for(meal, mref, box)
+        pred = _drawn_prediction(meal, body.view, box, top, fp, shadow, "food")
+        pred.update(model_label=mem["label"], nutrition_key=mref["key"], match="exact", needs_review=False,
+                    memory={**mem, "model_label": t1["label"], "model_score": t1["score"]})
+        f = MealFood(origin="memory", label=mem["label"], taxonomy_class=None, grams=grams, portion=pinfo, original_prediction=pred)
+        analysis.apply_mapping(f, mref["key"], "exact")
+    elif ref:
         grams, pinfo = _portion_for(meal, ref, box)
         f = MealFood(origin="drawn", label=t1["label"], taxonomy_class=t1["label"], grams=grams, portion=pinfo,
                      original_prediction=_drawn_prediction(meal, body.view, box, top, fp, shadow, "food"))

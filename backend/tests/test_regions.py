@@ -57,3 +57,23 @@ def test_region_validation_and_ownership(client, auth):
     other = {"Authorization": f"Bearer {r.json()['access_token']}"}
     client.put(f"{API}/users/health-profile", json={}, headers=other)
     assert client.post(url, headers=other, json={"view": "top", "bbox": PIZZA}).status_code == 404
+
+
+def test_a_drawn_box_is_recognised_from_the_users_earlier_label(client, auth):
+    """Drawing over a food the user named before brings back their label, as analysis does for regions it finds."""
+    cf = client.post(f"{API}/foods/custom", headers=auth, json={
+        "name": "Auntie's sambal sotong", "serving_g": 150, "per_100g": {"calories_kcal": 140, "carbs_g": 6, "protein_g": 14}}).json()
+    meal = plate(client, auth)
+    weak = next(f for f in meal["foods"] if not f["removed"] and not f["nutrition_key"])   # a region the model is unsure of
+    box = weak["original_prediction"]["bbox"]
+    first = client.post(f"{API}/meals/{meal['id']}/regions", headers=auth, json={"view": "top", "bbox": box}).json()
+    drawn = next(f for f in first["foods"] if f["original_prediction"].get("drawn") and f["id"] != weak["id"])
+    assert drawn["origin"] == "drawn" and drawn["label"] != cf["name"]                      # nothing remembered yet
+    client.put(f"{API}/meals/{meal['id']}/foods/{drawn['id']}", headers=auth, json={"nutrition_key": cf["key"]})
+    again = plate(client, auth)
+    before = {f["id"] for f in again["foods"]}
+    r = client.post(f"{API}/meals/{again['id']}/regions", headers=auth, json={"view": "top", "bbox": box}).json()
+    f = next(x for x in r["foods"] if x["id"] not in before)
+    assert f["origin"] == "memory" and f["label"] == cf["name"] and f["nutrition_key"] == cf["key"] and f["grams"] > 0
+    pred = f["original_prediction"]
+    assert pred["drawn"] and pred["memory"]["similarity"] >= 0.7 and pred["memory"]["model_label"]   # the model's own guess is kept

@@ -25,13 +25,15 @@ const MIN_BOX = 0.03   // smaller drags are treated as a tap, not a box
 
 /** The meal photo with numbered boxes. In draw mode the user drags a box over a food (mouse, finger or pen: pointer
  *  events, with touch-action none so the drag does not scroll the page). Coordinates are fractions of the photo. */
-function MealImage({ mealId, view, items, selected, onSelect, drawing, onDraw, onDrawn, onCancel }: { mealId: number; view: string; items: { f: Food; n: number }[]
+function MealImage({ mealId, view, items, selected, onSelect, drawing, onDraw, onDrawn, onCancel, options = [], onPick }: { mealId: number; view: string; items: { f: Food; n: number }[]
+  options?: Food[]; onPick?: (id: number) => void
   selected: number | null; onSelect: (id: number) => void; drawing: string | null; onDraw?: () => void; onDrawn: (view: string, box: Box) => void; onCancel: () => void }) {
   const [boxes, setBoxes] = useState(true)
   const [drag, setDrag] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null)
   const area = useRef<HTMLDivElement>(null)
   const url = useAuthImage(`/api/v1/meals/${mealId}/images/${view}`)
   const mine = items.filter(({ f }) => f.original_prediction?.bbox && f.original_prediction?.view === view)
+  const found = options.filter(f => f.original_prediction?.bbox && f.original_prediction?.view === view)   // regions found but not listed
   const at = (e: React.PointerEvent) => {
     const r = area.current!.getBoundingClientRect()
     return { x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)) }
@@ -41,7 +43,9 @@ function MealImage({ mealId, view, items, selected, onSelect, drawing, onDraw, o
     if (rect && rect.w >= MIN_BOX && rect.h >= MIN_BOX) onDrawn(view, { x: +rect.x.toFixed(4), y: +rect.y.toFixed(4), w: +rect.w.toFixed(4), h: +rect.h.toFixed(4) })
     setDrag(null)
   }
-  return (
+  return (<div>
+    {drawing && <p className="mb-2 flex items-center gap-2 rounded-xl bg-slate-900 text-white text-sm px-3 py-2">
+      <Crosshair className="size-4 shrink-0" /><span className="flex-1">{drawing}{found.length > 0 && onPick ? ', or tap + Add on a dotted outline the app found' : ''}</span></p>}
     <figure ref={area} className={`relative rounded-xl overflow-hidden bg-slate-100 select-none ${drawing ? 'ring-4 ring-brand-500' : ''}`}>
       {url ? <img src={url} className="w-full h-auto block pointer-events-none" alt={`${view} view`} draggable={false} /> : <div className="aspect-[4/3] grid place-items-center"><Spinner /></div>}
       {url && (boxes || drawing) && mine.map(({ f, n }) => { const b = f.original_prediction.bbox; const col = ITEM_COLORS[(n - 1) % ITEM_COLORS.length]; const sel = selected === f.id; return (
@@ -56,16 +60,22 @@ function MealImage({ mealId, view, items, selected, onSelect, drawing, onDraw, o
         onPointerUp={finish} onPointerCancel={() => setDrag(null)}>
         {rect && <div className="absolute rounded-md border-2 border-dashed border-white bg-white/15 shadow-[0_0_0_9999px_rgba(15,23,42,0.35)]"
           style={{ left: `${rect.x * 100}%`, top: `${rect.y * 100}%`, width: `${rect.w * 100}%`, height: `${rect.h * 100}%` }} />}
-        {!drag && <div className="absolute inset-x-2 top-2 flex items-center gap-2 rounded-xl bg-slate-900/80 text-white text-sm px-3 py-2 pointer-events-none">
-          <Crosshair className="size-4 shrink-0" /><span className="flex-1">{drawing}</span></div>}
       </div>}
+      {url && drawing && onPick && !drag && [...found].sort((p, q) => q.original_prediction.bbox.w * q.original_prediction.bbox.h - p.original_prediction.bbox.w * p.original_prediction.bbox.h)
+        .map(f => { const b = f.original_prediction.bbox; const c = f.original_prediction.candidates?.[0]; return (
+        // only the tag takes taps, so a drag can still start anywhere on the photo, even over an outline
+        <div key={f.id} className="absolute rounded-md border-2 border-dotted border-white shadow-[0_0_0_1px_rgba(15,23,42,0.5)] pointer-events-none"
+          style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }}>
+          <button onClick={() => onPick(f.id)} aria-label={`Add the region the app found${c ? `, maybe ${c.label}` : ''}`}
+            className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full shadow bg-white/95 hover:bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700 flex items-center gap-0.5"><Plus className="size-3" />Add</button>
+        </div>) })}
       <figcaption className="absolute bottom-2 left-2 chip bg-black/50 text-white capitalize pointer-events-none">{view === 'top' ? 'Top view' : 'Side view'}</figcaption>
-      <div className="absolute bottom-2 right-2 flex gap-1.5">
+      <div className="absolute bottom-2 right-2 z-20 flex gap-1.5">
         {drawing ? <button onClick={onCancel} className="chip bg-white/95 text-slate-700 shadow"><X className="size-3.5" />Cancel</button> : <>
           {onDraw && url && <button onClick={onDraw} className="chip bg-white/95 text-brand-700 shadow"><Crosshair className="size-3.5" />Mark a food</button>}
           {mine.length > 0 && <button onClick={() => setBoxes(v => !v)} className="chip bg-white/90 text-slate-700 shadow">{boxes ? 'Hide' : 'Show'} boxes</button>}</>}
       </div>
-    </figure>
+    </figure></div>
   )
 }
 
@@ -284,6 +294,11 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
       if (id) setTimeout(() => select(id), 50)
     } catch (e: any) { setErr(e.message) } finally { setMarking(false) }
   }
+  const pick = (id: number) => {   // a region the detector found but did not list: add it, then name it
+    setDrawing(null)
+    act(api(`/meals/${meal.id}/foods/${id}`, { method: 'PUT', json: { restore: true } }))
+    setTimeout(() => select(id), 300)
+  }
   const startDraw = (food: number | null = null, label?: string) => {
     setDrawing({ food, hint: food ? `Drag a box around ${label} on the photo` : 'Drag a box around the food the app missed' })
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -316,7 +331,8 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
         <div className="space-y-3 lg:sticky lg:top-36">
           {meal.images.length > 0 ? <div className={`grid gap-3 ${meal.images.length > 1 ? 'grid-cols-2 lg:grid-cols-1' : ''}`}>
             {meal.images.map(im => <MealImage key={im.view} mealId={meal.id} view={im.view} items={items} selected={selected} onSelect={select}
-              drawing={drawing?.hint ?? null} onDraw={readOnly ? undefined : () => startDraw()} onDrawn={drawn} onCancel={() => setDrawing(null)} />)}</div>
+              drawing={drawing?.hint ?? null} onDraw={readOnly ? undefined : () => startDraw()} onDrawn={drawn} onCancel={() => setDrawing(null)}
+              options={suggestions} onPick={drawing?.food ? undefined : pick} />)}</div>
             : <div className="card p-4 text-sm text-slate-500">No photo — analysed from description.</div>}
           <div className="card p-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Meal total · {t.item_count} item(s) · ~{fmt(t.grams)} g</div>
@@ -346,7 +362,7 @@ function Review({ meal, onChange, onSaved, readOnly = false }: ReviewProps) {
             onMark={meal.images.length > 0 ? () => startDraw(f.id, f.label) : undefined} />)}
           {!readOnly && suggestions.length > 0 && <div className="card p-4">
             <div className="text-sm font-semibold text-slate-800 flex items-center gap-1">Possible additional items ({suggestions.length})
-              <InfoTip label="Possible additional items" text="Small or uncertain regions the detector found. They are not counted unless you tap one to add it, then name it." /></div>
+              <InfoTip label="Possible additional items" text="Small or uncertain regions the detector found. They are not counted unless you tap one to add it, then name it. Mark it on the photo shows them as dotted outlines you can tap." /></div>
             <p className="text-[11px] text-slate-500 mb-2">Small or weak regions the detector found. Not counted unless you add them.</p>
             <div className="flex flex-wrap gap-1.5">{suggestions.map(f => (
               <button key={f.id} className="chip ring-1 ring-slate-200 bg-white px-3 py-1.5 text-sm hover:ring-teal-300" onClick={() => act(api(`/meals/${meal.id}/foods/${f.id}`, { method: 'PUT', json: { restore: true } }))}>

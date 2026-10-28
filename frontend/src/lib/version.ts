@@ -1,7 +1,11 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.4'
+export const APP_VERSION = '0.13.5'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.5', title: 'Pick or remember missed foods', changes: [
+    'Mark it on the photo also shows the regions the app found but did not list, as dotted outlines: tap + Add to add one, then name it',
+    'A box you draw is recognised from your own earlier labels, the same way the app recognises regions it finds itself',
+  ] },
   { version: '0.13.4', title: 'A calmer meal page', changes: [
     'Every insight, including Key takeaways and Ask the Meal Advisor, is now a one-line row under Insights; tap to open',
     'Each row still shows its key point, such as the glucose impact, kcal and carbs, or whether the meal needs attention',
