@@ -96,8 +96,7 @@ def _meal_inputs(foods: list[dict], totals: dict) -> dict:
     for f in foods:
         n = f["nutrients"] or {}
         avail = max((n.get("carbs_g") or 0) - (n.get("fiber_g") or 0), 0)
-        ref = nutrition.get(f.get("nutrition_key"))
-        gi = ref["glycemic_index"] if ref and ref.get("glycemic_index") is not None else None
+        gi = (nutrition.gi_info(f.get("nutrition_key")) or {}).get("value")
         if gi is None and avail >= 5:
             gi_assumed.append(f["label"])
         glyc_carbs += avail * (gi if gi is not None else DEFAULT_GI) / 100
@@ -298,11 +297,11 @@ WHATIF_NUTRIENTS = ("calories_kcal", "carbs_g", "sugar_g", "protein_g", "fat_g",
 
 
 def _gl(nutrients: dict, key: str | None) -> float | None:
-    ref = nutrition.get(key)
-    if not ref or ref.get("glycemic_index") is None:
+    gi = nutrition.gi_info(key)
+    if not gi:
         return None
     avail = max((nutrients.get("carbs_g") or 0) - (nutrients.get("fiber_g") or 0), 0)
-    return round(ref["glycemic_index"] * avail / 100, 1)
+    return round(gi["value"] * avail / 100, 1)
 
 
 def _diff(a, b):

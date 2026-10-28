@@ -45,6 +45,11 @@ def apply_mapping(f: MealFood, key: str | None, quality: str):
 
 
 def recompute(meal: Meal, profile, use_slm: bool = True):
+    for f in meal.foods:   # keep the GI shown with each food in step with the table and its borrowing rules
+        if f.nutrition_source and f.nutrition_key and nutrition.get(f.nutrition_key):
+            gi = nutrition.gi_info(f.nutrition_key) or {}
+            f.nutrition_source = {**f.nutrition_source, "glycemic_index": gi.get("value"), "gi_source": gi.get("source"),
+                                  "gi_borrowed_from": gi.get("borrowed_from")}
     active = [food_dict(f) for f in meal.foods if not f.removed]
     meal.totals, meal.insights = insights.build(active, profile, use_slm=use_slm)
 

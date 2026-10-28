@@ -67,8 +67,11 @@ def test_unhealthy_meal_advisory():
     foods, t, ins = meal(("char_kway_teow", 384), ("bubble_tea", 500))
     adv = forecast.meal_advisory(t, ins, foods)
     assert adv["rating"] == "unhealthy" and adv["tips"]
-    foods, t, ins = meal(("kaya_toast", 70), ("boiled_egg", 100), ("kopi", 230))
+    foods, t, ins = meal(("kaya_toast", 70), ("boiled_egg", 100))
     assert forecast.meal_advisory(t, ins, foods)["rating"] == "needs_attention"
+    # with sweetened kopi the borrowed GIs (white bread, sugar-sweetened drink) put the load past 20: a second major flag
+    foods, t, ins = meal(("kaya_toast", 70), ("boiled_egg", 100), ("kopi", 230))
+    assert ins["glucose"]["glycemic_load"] >= 20 and forecast.meal_advisory(t, ins, foods)["rating"] == "unhealthy"
     foods, t, ins = meal(("green_salad", 150), ("broccoli", 150), ("chicken_breast", 120), ("brown_rice", 100))
     assert forecast.meal_advisory(t, ins, foods)["rating"] == "balanced"
 

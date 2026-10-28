@@ -159,3 +159,10 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 |---|---|
 | pytest | **62 passed** (adds 2): name buttons only for the unidentified items and only with the region's own guesses; the button's request names the item; "you missed something" offers Mark it on the photo; a found-but-unlisted region is offered and restored |
 | Advisor flow (Playwright, desktop and iPhone 13) | **PASS**: "What are the unidentified items?" → six name buttons for two items; tapping one names the item; "You missed something" → Mark it on the photo closes the advisor and opens marking mode; no JS errors, no horizontal overflow |
+
+## v0.13.8: borrowed GI for dishes without a published value (28 Oct 2026)
+
+| Test | Result |
+|---|---|
+| pytest | **64 passed** (adds 2): the rules pick the staple (chicken rice → white rice, char kway teow → noodles, roti prata → white bread, teh tarik → sweetened drink) and leave "no noodles", cereal prawns, water, black coffee and plain chicken alone; a published GI is never replaced; a chicken rice meal gets GL = 73 × available carbs / 100, a level, and a labelled reason. One expectation changed on purpose: kaya toast + egg + kopi is now rated unhealthy (borrowed GL 34.4 ≥ 20) |
+| Meal page (Playwright, iPhone 13) | **PASS**: chicken rice + teh tarik shows HIGH, "glycaemic load ≈66.3" with an info tip, and per-food "≈53.3 (GI borrowed from white rice)"; no JS errors, no horizontal overflow |

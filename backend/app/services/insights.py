@@ -30,15 +30,17 @@ def totals(foods: list[dict]) -> dict:
 
 def glucose(foods: list[dict], t: dict) -> dict:
     carbs, fiber, sugar = t["carbs_g"] or 0, t["fiber_g"] or 0, t["sugar_g"]
-    gl, covered, carb_mass, reasons = 0.0, 0.0, 0.0, []
+    gl, covered, carb_mass, reasons, borrowed = 0.0, 0.0, 0.0, [], []
     for f in foods:
-        ref = nutrition.get(f.get("nutrition_key"))
+        gi = nutrition.gi_info(f.get("nutrition_key"))
         c = f["nutrients"].get("carbs_g") or 0
         avail = max(c - (f["nutrients"].get("fiber_g") or 0), 0)
         carb_mass += avail
-        if ref and ref["glycemic_index"] is not None:
-            gl += ref["glycemic_index"] * avail / 100
+        if gi:
+            gl += gi["value"] * avail / 100
             covered += avail
+            if gi["borrowed_from"] and avail >= 5:
+                borrowed.append({"food": f["label"], "from": gi["borrowed_from"], "gi": gi["value"]})
         elif avail < 5:
             covered += avail  # negligible available carbohydrate contributes ~0 GL
     coverage = covered / carb_mass if carb_mass else 1.0
@@ -56,6 +58,9 @@ def glucose(foods: list[dict], t: dict) -> dict:
     if gl_val is not None:
         reasons.append(f"Estimated glycemic load ≈ {gl_val} using published GI values for "
                        f"{coverage:.0%} of the carbohydrate (GL <10 low, 10–19 moderate, ≥20 high).")
+        if borrowed:
+            reasons.append("No published GI for " + "; ".join(f"{b['food']}: GI {b['gi']:g} borrowed from {b['from']}" for b in borrowed)
+                           + " (its main carbohydrate), so the glycaemic load is a rougher estimate.")
     else:
         reasons.append("Glycemic load not estimated: reference GI values cover only "
                        f"{coverage:.0%} of the carbohydrate in this meal.")
@@ -74,7 +79,7 @@ def glucose(foods: list[dict], t: dict) -> dict:
     if t["unmapped_items"]:
         reasons.append("Some items have no nutrition match, so this assessment is incomplete.")
     return {"level": level, "carbs_g": carbs, "available_carbs_g": avail_total, "sugar_g": sugar,
-            "fiber_g": fiber, "glycemic_load": gl_val, "gi_coverage": round(coverage, 2),
+            "fiber_g": fiber, "glycemic_load": gl_val, "gi_coverage": round(coverage, 2), "gi_borrowed": borrowed,
             "reasoning": reasons, "disclaimer": DISCLAIMER}
 
 

@@ -54,7 +54,7 @@ export default function MealComposition({ meal, items, colors }: { meal: Meal; i
   const rows = mapped.map(({ f, n }) => {
     const c = f.nutrients.carbs_g ?? 0, fb = f.nutrients.fiber_g ?? 0, gi = f.nutrition_source?.glycemic_index ?? null
     return { n, label: f.label, carbs: c, kcal: f.nutrients.calories_kcal ?? 0, sodium: f.nutrients.sodium_mg ?? null,
-      gl: gi == null ? null : Math.round(gi * (c - fb) / 10) / 10 }
+      gl: gi == null ? null : Math.round(gi * (c - fb) / 10) / 10, borrowed: f.nutrition_source?.gi_borrowed_from as string | undefined }
   })
   const gl = rows.filter(r => r.gl != null)
   const calGoal = g?.calorie_goal ?? null
@@ -106,7 +106,7 @@ export default function MealComposition({ meal, items, colors }: { meal: Meal; i
         <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
           {[['Sugar', sugar, TEAL[300]], ['Starch', starch, TEAL[700]], ['Fibre', fibre, FIBRE]].map(([l, v, c]) => <span key={l as string}>
             <i className="inline-block size-2.5 rounded-full mr-1.5 align-[-1px]" style={{ background: c as string }} />{l} {fmt(v as number, 1)} g</span>)}
-          <span className="text-slate-400">· Glycaemic load {gl.length ? gl.map(r => `${r.label} ${r.gl}`).join(', ') : `not available (no GI value in the table for ${rows.map(r => r.label).join(', ')})`}</span></div>
+          <span className="text-slate-400">· Glycaemic load {gl.length ? gl.map(r => r.borrowed ? `${r.label} ≈${r.gl} (GI borrowed from ${r.borrowed.split(',')[0].toLowerCase()})` : `${r.label} ${r.gl}`).join(', ') : `not available (no GI value in the table for ${rows.map(r => r.label).join(', ')})`}</span></div>
       </>}
 
       {rows.length > 1 && <>

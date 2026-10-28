@@ -199,7 +199,8 @@ export function InsightCards({ meal, onChange }: { meal: Meal; onChange?: (m: Me
       <Section title="Key takeaways" icon={<Sparkles className="size-5 text-brand-600" />} tag={<Tag kind="estimate" />}
         summary={<span className="inline-flex items-center gap-1.5">Glucose impact <LevelBadge level={g.level} />{ins.recommendations[0] && <span className="hidden sm:inline">· {ins.recommendations[0].title}</span>}</span>}>
         <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700"><Droplet className="size-4 text-sky-600" />Potential glucose impact <LevelBadge level={g.level} />
-          {g.glycemic_load != null && <span className="text-slate-500">· glycaemic load {g.glycemic_load}</span>}</div>
+          {g.glycemic_load != null && <span className="text-slate-500">· glycaemic load {g.gi_borrowed?.length ? '≈' : ''}{g.glycemic_load}
+            {!!g.gi_borrowed?.length && <InfoTip label="Borrowed GI" text={`No published GI for ${g.gi_borrowed.map(b => `${b.food} (GI ${b.gi} borrowed from ${b.from})`).join('; ')}. The GI of its main carbohydrate is used instead, chosen by fixed rules, so this is a rougher estimate.`} />}</span>}</div>
         <ul className="mt-3 space-y-1.5">{ins.recommendations.slice(0, 2).map(r => <li key={r.tag} className="flex gap-2 text-sm text-slate-700"><Check className="size-4 mt-0.5 shrink-0 text-emerald-600" />{r.title}</li>)}
           {ins.personalised?.[0] && <li className="flex gap-2 text-sm text-slate-700"><Lightbulb className="size-4 mt-0.5 shrink-0 text-violet-600" /><span><b className="font-semibold">{ins.personalised[0].audience}:</b> {ins.personalised[0].title}</span></li>}</ul>
         <div className="mt-3 border-t border-slate-100 pt-3 text-sm">

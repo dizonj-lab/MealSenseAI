@@ -2,6 +2,18 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.8 — Glycaemic load for more local dishes
+
+- 229 of 286 foods have no published GI, so most meals showed "Glycaemic load not estimated". A food without one now
+  borrows the GI of its main carbohydrate by fixed rules in `services/nutrition.py` (`GI_RULES`): rice dishes → white
+  rice, noodle dishes → udon, breads and roti → white bread, sweetened drinks → sugar-sweetened soft drink, and so on.
+  78 foods are covered; the rest (meat, vegetables, most kueh and fruit) stay unestimated.
+- Where a choice exists the higher-GI staple is used, so a borrowed value errs towards a higher glycaemic load.
+  "No noodles" in a name, and drinks under 4 g carbohydrate per 100 g (water, black coffee, wine, beer), never borrow.
+- Shown as "glycaemic load ≈…" with the food it was borrowed from (Key takeaways, Meal composition, the reasoning).
+  The same GI feeds the forecast. A published GI is never replaced. No language model is involved.
+- A meal's rating can change: kaya toast with sweetened kopi now has a high glycaemic load and is rated unhealthy.
+
 ## v0.13.7 — Name unidentified foods from the Meal Advisor
 
 - Asking about the unidentified (unknown, unnamed) items lists each item's own top guesses and offers buttons:

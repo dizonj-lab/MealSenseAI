@@ -94,11 +94,56 @@ def compute(key: str, grams: float) -> dict:
     return out
 
 
+# A food with no published GI borrows the GI of its main carbohydrate when the name says what that is unambiguously.
+# Fixed rules, checked in order (noodles before rice, so "rice noodles" are noodles); no rule means no estimate.
+# Where a choice exists the higher-GI staple is used, so a borrowed value errs towards a higher glycaemic load.
+GI_RULES: list[tuple[str, str, str | None]] = [   # (pattern on name, aliases and key; reference food; only in this category)
+    (r"porridge|congee|\bjook\b|bubur", "porridge", None),
+    (r"\b(pau|bao|mantou|steamed bun)", "steamed_bun", None),
+    (r"noodle|\bmee\b|\bmee[ _-]|\bmian\b|\bmein\b|kway teow|kuey teow|koay teow|bee hoon|beehoon|vermicelli|hor fun|\bpho\b|ramen|soba|laksa|pad thai|kway chap",
+     "udon", None),
+    (r"spaghetti|pasta|lasagn|macaroni|penne|fettuccine|linguine|carbonara|bolognese|gnocchi", "pasta", None),
+    (r"rice|\bnasi\b|biryani|briyani|lontong|ketupat|risotto|paella|onigiri|bibimbap|donburi", "white_rice", None),
+    (r"\bbread\b|toast|\broti\b|prata|naan|chapat+i|paratha|sandwich|burger|\bbun\b|croissant|murtabak|\bpita\b|\bwrap\b|tortilla|hot ?dog",
+     "white_bread", None),
+    (r"potato|fries|hash ?brown|wedges", "french_fries", None),
+    (r"doughnut|donut|you ?tiao|you char kway|churro", "donut", None),
+    (r"pancake|waffle|\bapam\b|appam|dosa|thosai|crepe", "pancake", None),
+    (r"ice cream|gelato", "ice_cream", None),
+    (r"granola|breakfast cereal", "muesli", None),
+    (r"juice", "fruit_juice", "beverage"),
+    (r".", "cola", "beverage"),   # any other drink with carbohydrate (see SWEET_DRINK_CARBS) is treated as sugar-sweetened
+]
+SWEET_DRINK_CARBS = 4.0   # g/100 g: water, black coffee, wine and beer stay without a GI
+NOT_A_STAPLE = re.compile(r"\bno (noodles?|rice|bread)\b")
+
+
+def gi_info(key: str | None) -> dict | None:
+    """The GI used for a food: its own published value, or one borrowed from a reference food by GI_RULES."""
+    f = get(key)
+    if not f:
+        return None
+    if f.get("glycemic_index") is not None:
+        return {"value": f["glycemic_index"], "source": f.get("gi_source"), "borrowed_from": None}
+    text = " ".join([f["name"], *(f.get("aliases") or []), f["key"].replace("_", " ")]).lower()
+    if NOT_A_STAPLE.search(text):
+        return None
+    for pattern, ref_key, category in GI_RULES:
+        ref = _db()["foods"].get(ref_key)
+        if category == "beverage" and ((f.get("per_100g") or {}).get("carbs_g") or 0) < SWEET_DRINK_CARBS:
+            continue
+        if ref and (category is None or f.get("category") == category) and re.search(pattern, text):
+            return {"value": ref["glycemic_index"], "source": f"borrowed from {ref['name']} ({ref.get('gi_source')})",
+                    "borrowed_from": ref["name"]}
+    return None
+
+
 def source_info(key: str) -> dict:
     f = get(key)
+    gi = gi_info(key) or {}
     return {"table": "Your custom foods" if key in CUSTOM else f"MealSenseAI reference table {version()}", "record": f["key"], "name": f["name"],
             "source": f["source"], "verification": f["verification"],
-            "glycemic_index": f["glycemic_index"], "gi_source": f["gi_source"]}
+            "glycemic_index": gi.get("value"), "gi_source": gi.get("source"), "gi_borrowed_from": gi.get("borrowed_from")}
 
 
 def empty_nutrients() -> dict:

@@ -1,7 +1,12 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.7'
+export const APP_VERSION = '0.13.8'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.8', title: 'Glycaemic load for more local dishes', changes: [
+    'A dish with no published GI, such as chicken rice, char kway teow, roti prata or teh tarik, now borrows the GI of its main carbohydrate',
+    'Shown with ≈ and the food it was borrowed from; foods with no clear staple still say "not estimated"',
+    'The borrowing follows fixed rules, never the language model',
+  ] },
   { version: '0.13.7', title: 'Name unidentified foods from the Meal Advisor', changes: [
     'Ask the Meal Advisor about the unidentified items: it lists its guesses for each, and one tap names the item',
     'It also offers regions it spotted but was unsure about, and Mark it on the photo, which opens marking mode on the meal page',

@@ -15,7 +15,7 @@ export type Food = {
 }
 export type Stage = { key: string; name: string; status: string; detail: string; latency_ms: number; per_view?: any[] }
 export type Insights = {
-  glucose: { level: string; carbs_g: number; available_carbs_g: number; sugar_g: number | null; fiber_g: number; glycemic_load: number | null; gi_coverage: number; reasoning: string[]; disclaimer: string }
+  glucose: { level: string; carbs_g: number; available_carbs_g: number; sugar_g: number | null; fiber_g: number; glycemic_load: number | null; gi_coverage: number; gi_borrowed?: { food: string; from: string; gi: number }[]; reasoning: string[]; disclaimer: string }
   energy: { calories_kcal: number; carbs_g: number | null; protein_g: number | null; fat_g: number | null; fiber_g: number | null; sugar_g: number | null; sodium_mg: number | null; macro_energy_pct: Record<string, number>; goal_progress: { label: string; value: number; goal: number; unit: string; pct: number }[]; notes: string[] }
   recommendations: { tag: string; title: string; detail: string }[]
   allergy_warnings: string[]
