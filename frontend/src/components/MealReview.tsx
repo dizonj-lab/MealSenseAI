@@ -44,8 +44,8 @@ function MealImage({ mealId, view, items, selected, onSelect, drawing, onDraw, o
     setDrag(null)
   }
   return (<div>
-    {drawing && <p className="mb-2 flex items-center gap-2 rounded-xl bg-slate-900 text-white text-sm px-3 py-2">
-      <Crosshair className="size-4 shrink-0" /><span className="flex-1">{drawing}{found.length > 0 && onPick ? ', or tap + Add on a dotted outline the app found' : ''}</span></p>}
+    {drawing && <p role="status" className="mb-2 flex items-center gap-2 rounded-xl bg-slate-100 text-slate-800 ring-1 ring-brand-500 text-sm font-medium px-3 py-2">
+      <Crosshair className="size-4 shrink-0 text-brand-600" /><span className="flex-1">{drawing}{found.length > 0 && onPick ? ', or tap + Add on a dotted outline the app found' : ''}</span></p>}
     <figure ref={area} className={`relative rounded-xl overflow-hidden bg-slate-100 select-none ${drawing ? 'ring-4 ring-brand-500' : ''}`}>
       {url ? <img src={url} className="w-full h-auto block pointer-events-none" alt={`${view} view`} draggable={false} /> : <div className="aspect-[4/3] grid place-items-center"><Spinner /></div>}
       {url && (boxes || drawing) && mine.map(({ f, n }) => { const b = f.original_prediction.bbox; const col = ITEM_COLORS[(n - 1) % ITEM_COLORS.length]; const sel = selected === f.id; return (

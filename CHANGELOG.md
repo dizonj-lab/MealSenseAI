@@ -2,6 +2,11 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.6 — Readable marking hint
+
+- The marking hint uses theme tokens (`slate-100` / `slate-800`, brand outline), so it is readable in light and dark
+  mode; it sits above the photo so it never covers a found region's **+ Add**
+
 ## v0.13.5 — Pick or remember missed foods
 
 - In **Mark it on the photo**, regions the detector found but did not list (the "Possible additional items") are shown

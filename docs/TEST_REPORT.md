@@ -146,3 +146,9 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | pytest | **60 passed** (adds 1): a box drawn over a weak region, named as a custom food, is recognised from memory when the same box is drawn on a new photo of the plate (origin memory, similarity ≥ 0.7, model guess kept) |
 | Pick a found region (Playwright, desktop and iPhone 13; a sushi photo with 9 hidden regions) | **PASS**: 9 and 8 dotted outlines shown; + Add adds the region as an item; no JS errors, no horizontal overflow |
 | Draw a box (regression) | **PASS** on desktop mouse and phone touch |
+
+## v0.13.6: marking hint in both themes (28 Oct 2026)
+
+| Test | Result |
+|---|---|
+| Marking hint (Playwright, iPhone 13, light and dark) | **PASS**: dark text on light grey in light mode, light text on dark navy in dark mode, brand outline in both |
