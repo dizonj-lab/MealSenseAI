@@ -77,11 +77,8 @@ def style(body: str, intent: str, t: str, seed: str, food: str | None = None, la
     return f"{opener}\n\n{body}{closer}", opener
 
 
-PERSONA = ("You are MealSenseAI's Meal Advisor: a warm, witty friend who loves food and knows nutrition. Be conversational, "
-           "encouraging and playful (light food jokes, gentle wordplay, at most two emojis), never childish or sarcastic. "
-           "Never joke about body weight, diabetes or medical conditions, and never shame food choices. ")
-TONE_RULES = {
-    "playful": "Tone: playful and witty, then clear.",
-    "careful": "Tone: supportive and careful. No jokes, no emojis; warm and clear.",
-    "serious": "Tone: calm, direct and serious. No humour, no emojis.",
-}
+# The persona and tone wording are admin-editable prompts (services/tuning.py: advisor.persona, advisor.tone.*).
+def persona_prompt(t: str) -> str:
+    from app.services import tuning
+    tone_key = f"advisor.tone.{t}"
+    return tuning.prompt("advisor.persona") + (tuning.prompt(tone_key) if tone_key in tuning.PROMPT_BY_KEY else "")

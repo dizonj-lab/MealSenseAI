@@ -28,6 +28,7 @@ The UI labels each value as a *model prediction*, *your input*, an *estimate* or
 | [docs/INSTALL_AND_TROUBLESHOOTING.md](docs/INSTALL_AND_TROUBLESHOOTING.md) | Prerequisites, install, configuration, troubleshooting |
 | [docs/MODEL_AND_LIMITATIONS.md](docs/MODEL_AND_LIMITATIONS.md) | EXP-002 model card, metric provenance, nutrition provenance, limitations |
 | [docs/TEST_REPORT.md](docs/TEST_REPORT.md) | Actual test results and outstanding issues |
+| [docs/ADMIN.md](docs/ADMIN.md) | Admin area: training-data review, dataset versions, model gate and updates, settings, prompts |
 | [database/schema.sql](database/schema.sql) | Database schema (created by Alembic migrations in `backend/migrations/`) |
 | [08-Deployment/HOME-SERVER.md](08-Deployment/HOME-SERVER.md) | Development hosting on the Ubuntu GPU server (Cloudflare Tunnel, hardening, backups) |
 

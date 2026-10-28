@@ -18,13 +18,15 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.models import InferenceLog, Meal, MealFood
-from app.services import insights, memory, nutrition, portion, slm, vision
+from app.services import gate, insights, memory, nutrition, portion, slm, tuning, vision
 
 UNKNOWN_PORTION = {"method": "unknown", "uncertainty": "unknown", "range_g": None,
                    "notes": ["No nutrition match; choose a food from the table and enter the portion."]}
 
 
 def vision_auto_accept() -> float:
+    if (v := tuning.get("vision.auto_accept")) is not None:   # an admin's override
+        return float(v)
     card = (vision.models().get("classifier") or {})
     return 0.5 if not card else float(vision._state["cls"]["card"].get("auto_accept_min_score", 0.5))
 
@@ -214,6 +216,7 @@ def _run(db: Session, meal: Meal, profile) -> list[dict]:
             seen.add(key)
     if n_memory:
         st.items[-1]["detail"] += f"; {n_memory} item(s) recognised from your earlier labels"
+    gate.record_shadow(db, preds)   # a candidate in shadow mode: count agreement, never shown to the user
     active = [f for f in meal.foods if not f.removed]
     methods = sorted({f.portion.get("method") for f in active})
     st.add("portion", "Portion estimation", "done" if active else "skipped",

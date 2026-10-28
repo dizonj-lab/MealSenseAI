@@ -60,6 +60,9 @@ class UserOut(BaseModel):
     name: str
     onboarded: bool
     training_consent: bool = False
+    is_admin: bool = False
+    email_verified_at: datetime | None = None
+    contributor_status: str = "active"
     created_at: datetime
     profile: ProfileOut | None = None
 

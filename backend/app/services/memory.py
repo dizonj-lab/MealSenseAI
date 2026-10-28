@@ -9,14 +9,16 @@ Threshold: on held-out Food-101 photos (3 classes, 3 remembered photos per class
 gave 94/120 matches, all correct; 0.60 gave 101/120, all correct. 0.70 plus a 0.05 margin over the best
 sample with a different label is used to stay conservative with more foods.
 """
+from datetime import datetime, timezone
+
 import numpy as np
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Meal, MealFood, TrainingSample, User
-from app.services import nutrition
+from app.services import nutrition, screening, tuning
 
-MATCH_MIN = 0.70
+MATCH_MIN = 0.70   # default; the live value is the admin setting memory.match_min
 MARGIN = 0.05
 MAX_SAMPLES = 2000
 
@@ -32,6 +34,10 @@ def record(db: Session, user: User, meal: Meal, f: MealFood, source: str) -> Tra
         return None
     ref = nutrition.get(f.nutrition_key) or {}
     s = db.scalar(select(TrainingSample).where(TrainingSample.food_id == f.id)) or TrainingSample(food_id=f.id, user_id=user.id)
+    if s.id is not None and s.label != f.label:   # a new label is a new claim: an earlier review no longer applies
+        s.reviewed_at = s.reviewed_by = s.review_note = None
+    if s.id is None and user.training_consent:    # shared from the moment it is made, while consent is on
+        s.consent_at = datetime.now(timezone.utc)
     s.meal_id, s.view = meal.id, image["view"]
     s.image_path = image.get("original_path") or image["path"]
     s.bbox, s.fingerprint = pred.get("bbox"), fp
@@ -41,9 +47,12 @@ def record(db: Session, user: User, meal: Meal, f: MealFood, source: str) -> Tra
     said = pred.get("memory") or pred   # for memory-labelled items keep what the model itself said
     s.model_label, s.model_score = said.get("model_label"), said.get("model_score", pred.get("score"))
     s.model_version = pred.get("model_version")
+    s.model_candidates = [{"label": c.get("label"), "nutrition_key": c.get("nutrition_key"), "score": c.get("score")}
+                          for c in (pred.get("candidates") or [])[:3]]
     if s.id is None or source != "confirmed":   # confirming later does not downgrade a "named"/"corrected" sample
         s.source = source
     db.add(s)
+    screening.screen_one(db, s, user)
     return s
 
 
@@ -54,18 +63,27 @@ def matcher(db: Session, user_id: int):
     rows = [r for r in rows if r.nutrition_key and nutrition.get(r.nutrition_key)]
     if not rows:
         return lambda fp: None
-    M = np.array([r.fingerprint for r in rows], dtype=np.float32)
-    M /= np.linalg.norm(M, axis=1, keepdims=True) + 1e-9
+    by_size: dict[int, tuple[list, np.ndarray]] = {}   # a new model has a different number of classes
+
+    def matrix(n: int):
+        if n not in by_size:
+            rs = [r for r in rows if len(r.fingerprint or []) == n]
+            M = np.array([r.fingerprint for r in rs], dtype=np.float32).reshape(len(rs), n)
+            by_size[n] = (rs, M / (np.linalg.norm(M, axis=1, keepdims=True) + 1e-9))
+        return by_size[n]
 
     def match(fp):
         if not fp:
             return None
+        rows_n, M = matrix(len(fp))
+        if not rows_n:
+            return None
         v = np.asarray(fp, dtype=np.float32)
         sims = M @ (v / (np.linalg.norm(v) + 1e-9))
         i = int(sims.argmax())
-        best = rows[i]
-        other = max((float(s) for s, r in zip(sims, rows) if r.nutrition_key != best.nutrition_key), default=0.0)
-        if sims[i] < MATCH_MIN or sims[i] - other < MARGIN:
+        best = rows_n[i]
+        other = max((float(s) for s, r in zip(sims, rows_n) if r.nutrition_key != best.nutrition_key), default=0.0)
+        if sims[i] < tuning.get("memory.match_min") or sims[i] - other < MARGIN:
             return None
         return {"sample_id": best.id, "label": best.label, "nutrition_key": best.nutrition_key,
                 "similarity": round(float(sims[i]), 3), "next_best_other": round(other, 3)}

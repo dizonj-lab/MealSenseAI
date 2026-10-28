@@ -2,6 +2,15 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.0 — Safer learning from your photos
+
+- Sharing corrected photos for training is now tracked per photo; switching it off withdraws everything shared from future training
+- Settings shows what you shared, what was accepted and what is in review; confirm your email to let shared photos be used
+- Every shared photo is screened automatically (duplicates, implausible or carbohydrate-lowering relabels, repeated patterns,
+  contributor caps, outliers); flagged ones and a random audit sample are reviewed by a person
+- Admin area: review queue, contributors, frozen dataset versions, a model gate with shadow mode, model package uploads,
+  model settings and versioned prompts, and an audit log (see docs/ADMIN.md)
+
 ## v0.12.0 — Watch the demo
 
 - A four-minute narrated tour, from the landing page (beside Get Started and in the top bar) and from About MealSenseAI

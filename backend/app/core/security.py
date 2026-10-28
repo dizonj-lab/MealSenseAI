@@ -25,13 +25,36 @@ def create_token(user_id: int) -> str:
     return jwt.encode({"sub": str(user_id), "exp": exp}, settings.jwt_secret, algorithm="HS256")
 
 
+VERIFY_HOURS = 48
+
+
+def create_verify_token(user_id: int, email: str) -> str:
+    """A link token that proves the person can read this inbox. Bound to the address, so changing it voids the link."""
+    exp = datetime.now(timezone.utc) + timedelta(hours=VERIFY_HOURS)
+    return jwt.encode({"sub": str(user_id), "email": email, "purpose": "verify_email", "exp": exp},
+                      settings.jwt_secret, algorithm="HS256")
+
+
+def read_verify_token(token: str) -> tuple[int, str] | None:
+    try:
+        claims = jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])
+        if claims.get("purpose") != "verify_email":
+            return None
+        return int(claims["sub"]), claims["email"]
+    except (JWTError, KeyError, ValueError):
+        return None
+
+
 def current_user(token: str = Depends(oauth2), db: Session = Depends(get_db)):
     from app.models import User
 
     err = HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid or expired token",
                         headers={"WWW-Authenticate": "Bearer"})
     try:
-        uid = int(jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])["sub"])
+        claims = jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])
+        if claims.get("purpose"):   # a verification link is not a session
+            raise err
+        uid = int(claims["sub"])
     except (JWTError, KeyError, ValueError):
         raise err
     user = db.get(User, uid)
@@ -45,4 +68,12 @@ def active_user(user=Depends(current_user)):
     endpoints accept an account that has not finished onboarding (enforced server-side, not just in the UI)."""
     if not user.onboarded:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "onboarding_required")
+    return user
+
+
+def admin_user(user=Depends(current_user)):
+    """Admins only. The role is read from the database on every request, so revoking it takes effect at once.
+    Granted on the server with `python -m app.tools.admin grant <email>`, never through the API."""
+    if not user.is_admin:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "admin_only")
     return user

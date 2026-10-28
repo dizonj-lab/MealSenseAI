@@ -1,7 +1,13 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.12.0'
+export const APP_VERSION = '0.13.0'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.0', title: 'Safer learning from your photos', changes: [
+    'Sharing corrected photos for training is now tracked per photo; switching it off withdraws everything you shared from future training',
+    'Settings shows what you shared, what was accepted and what is in review',
+    'Confirm your email to let your shared photos be used',
+    'Every shared photo is checked automatically, and suspicious ones are reviewed by a person before any model learns from them',
+  ] },
   { version: '0.12.0', title: 'Watch the demo', changes: [
     'A four-minute narrated tour, from the landing page (beside Get Started and in the top bar) and from About MealSenseAI',
     'Plays in a window over the page, with subtitles; Escape or a click outside closes it',

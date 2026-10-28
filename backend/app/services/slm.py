@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field, ValidationError
 from app.core import cache
 from app.core.config import settings
 from app.core.db import SessionLocal
+from app.services import tuning
 
 log = logging.getLogger(__name__)
 PREFERRED = ["qwen2.5", "qwen3", "llama3.2", "llama3.1", "phi3", "phi4", "gemma2", "gemma3", "mistral"]
@@ -20,6 +21,9 @@ BACKOFF_S = 300  # after a timeout or error, skip the SLM for 5 minutes (rule-ba
 
 
 def status(force: bool = False) -> dict:
+    if not tuning.get("slm.enabled"):
+        return {"available": False, "url": settings.ollama_url, "models": [], "selected": None,
+                "error": "Turned off by an admin; using the rule engine"}
     if time.time() < _status.get("down_until", 0) and not force:
         return {"available": False, "url": settings.ollama_url, "models": [], "selected": None,
                 "error": "SLM paused after a timeout/error; using rule-based fallback"}
@@ -31,7 +35,8 @@ def status(force: bool = False) -> dict:
         r.raise_for_status()
         names = [m["name"] for m in r.json().get("models", [])]
         text = [n for n in names if not any(v in n for v in ("embed", "llava", "vision", "clip"))]
-        sel = settings.ollama_model if settings.ollama_model in names else next(
+        wanted = tuning.get("slm.model")
+        sel = wanted if wanted in names else next(
             (n for p in PREFERRED for n in text if n.startswith(p)), text[0] if text else None)
         data.update(available=bool(sel), models=names, selected=sel,
                     error=None if sel else "No text model installed in Ollama")
@@ -58,9 +63,9 @@ def chat_json(task: str, system: str, prompt: str, schema: type[BaseModel], time
         return schema.model_validate(hit)
     t0 = time.perf_counter()
     try:
-        r = httpx.post(f"{settings.ollama_url}/api/chat", timeout=timeout or settings.ollama_timeout_s, json={
+        r = httpx.post(f"{settings.ollama_url}/api/chat", timeout=timeout or tuning.get("slm.timeout_s"), json={
             "model": st["selected"], "stream": False, "format": schema.model_json_schema(),
-            "options": {"temperature": 0.1},
+            "options": {"temperature": tuning.get("slm.temperature")},
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]})
         r.raise_for_status()
         body = r.json()
@@ -100,23 +105,13 @@ class Explanation(BaseModel):
 
 
 def parse_description(text: str):
-    return chat_json("normalize_description",
-                     "Extract the foods and drinks mentioned in a meal description. Normalise local names "
-                     "(e.g. Singapore hawker dishes) to common names. Do not invent foods.",
-                     text, Mentions)
+    return chat_json("normalize_description", tuning.prompt("meal.parse_description"), text, Mentions)
 
 
 def suggest_match(label: str, catalog: list[dict]):
     cat = "\n".join(f"{f['key']}: {f['name']}" for f in catalog)
-    return chat_json("provisional_match",
-                     "Pick the catalog entry that best matches the food. Return null if nothing is a "
-                     "reasonable match. Only return keys from the catalog.",
-                     f"Food: {label}\nCatalog:\n{cat}", Match)
+    return chat_json("provisional_match", tuning.prompt("meal.provisional_match"), f"Food: {label}\nCatalog:\n{cat}", Match)
 
 
 def explain(facts: dict, timeout: float | None = None):
-    return chat_json("insight_explanation",
-                     "You explain meal nutrition facts for general education. Use ONLY the numbers given. "
-                     "Do not predict the person's blood glucose, give medical advice, mention medication, "
-                     "or cite studies. Mention uncertainty when stated.",
-                     json.dumps(facts), Explanation, timeout=timeout)
+    return chat_json("insight_explanation", tuning.prompt("meal.explanation"), json.dumps(facts), Explanation, timeout=timeout)

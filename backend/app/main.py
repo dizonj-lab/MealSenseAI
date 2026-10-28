@@ -8,13 +8,13 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app import models  # noqa: F401  (register tables)
-from app.api import advisor, ai, auth, contact, dashboard, glucose, meals, users
+from app.api import admin, advisor, ai, auth, contact, dashboard, glucose, meals, users
 from app.core import cache
 from app.core.config import settings
 from app.core.db import SessionLocal, engine
 from app.core.migrate import upgrade_db
 from app.version import APP_VERSION
-from app.services import custom_foods, slm, vision
+from app.services import custom_foods, gate, slm, vision
 
 logging.basicConfig(level=logging.INFO)
 
@@ -52,6 +52,8 @@ def register_trained_model():
 async def lifespan(_app):
     upgrade_db()
     settings.data_dir.mkdir(parents=True, exist_ok=True)
+    with SessionLocal() as db:
+        gate.apply_from_db(db)   # a model promoted at the gate is the live one; a shadow candidate runs beside it
     vision.warmup()  # load models once at startup
     with SessionLocal() as db:
         custom_foods.load_all(db)   # user-defined foods into the nutrition lookup
@@ -66,7 +68,8 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allo
                    allow_methods=["*"], allow_headers=["*"])
 
 api = APIRouter(prefix="/api/v1")
-for r in (auth.router, users.router, meals.router, dashboard.router, ai.router, glucose.router, advisor.router, contact.router):
+for r in (auth.router, users.router, meals.router, dashboard.router, ai.router, glucose.router, advisor.router, contact.router,
+          admin.router):
     api.include_router(r)
 
 

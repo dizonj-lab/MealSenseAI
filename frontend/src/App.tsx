@@ -15,6 +15,8 @@ import ModelInsights from './pages/ModelInsights'
 import Settings from './pages/Settings'
 import Advisor from './pages/Advisor'
 import About from './pages/About'
+import Verify from './pages/Verify'
+import AdminShell from './pages/admin/AdminShell'
 import { Spinner } from './components/ui'
 
 function Protected({ children }: { children: JSX.Element }) {
@@ -35,6 +37,7 @@ export default function App() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/creator" element={<Creator />} />
       <Route path="/register" element={<AuthPage mode="register" />} />
+      <Route path="/verify" element={<Verify />} />
       <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
       <Route element={<Protected><Layout /></Protected>}>
         <Route path="/" element={<Dashboard />} />
@@ -47,6 +50,7 @@ export default function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/advisor" element={<Advisor />} />
         <Route path="/about" element={<About />} />
+        <Route path="/admin/*" element={<AdminShell />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

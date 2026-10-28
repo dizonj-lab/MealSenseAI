@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, BarChart3, Info, MessageCircle, Monitor, Moon, Sun, Camera, ChevronsLeft, ChevronsRight, Cpu, History, LayoutDashboard, LogOut, Menu, Settings, UserRound, X } from 'lucide-react'
+import { Activity, BarChart3, Info, MessageCircle, Monitor, Moon, Sun, Camera, ChevronsLeft, ChevronsRight, Cpu, History, LayoutDashboard, LogOut, Menu, Settings, ShieldCheck, UserRound, X } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { useTheme } from '../lib/theme'
 import { APP_VERSION } from '../lib/version'
@@ -20,6 +20,7 @@ export const NAV = [
   { to: '/about', label: 'About MealSenseAI', short: 'About', icon: Info },
 ]
 const BOTTOM = [NAV[0], NAV[2], NAV[1], NAV[4], NAV[3]]
+const ADMIN_NAV = { to: '/admin', label: 'Admin', short: 'Admin', icon: ShieldCheck }
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -51,9 +52,11 @@ export default function Layout() {
   const loc = useLocation()
   const nav = useNavigate()
   useEffect(() => setDrawer(false), [loc.pathname])
-  const current = NAV.find(n => (n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)))?.label ?? (loc.pathname.startsWith('/meals') ? 'Meal Details' : '')
+  // Admin appears only for admins; every admin route is also checked on the server
+  const items = user?.is_admin ? [...NAV, ADMIN_NAV] : NAV
+  const current = items.find(n => (n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)))?.label ?? (loc.pathname.startsWith('/meals') ? 'Meal Details' : '')
 
-  const links = (compact: boolean) => NAV.map(({ to, label, icon: I }) => (
+  const links = (compact: boolean) => items.map(({ to, label, icon: I }) => (
     <NavLink key={to} to={to} end={to === '/'} title={label}
       className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100'} ${compact ? 'justify-center' : ''}`}>
       <I className="size-5 shrink-0" />{!compact && label}

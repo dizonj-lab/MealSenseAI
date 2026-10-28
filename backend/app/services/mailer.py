@@ -9,6 +9,10 @@ from app.core.config import settings
 log = logging.getLogger(__name__)
 
 
+def configured_smtp() -> bool:
+    return bool(settings.smtp_host)
+
+
 def configured() -> bool:
     return bool(settings.smtp_host and settings.contact_to)
 
@@ -31,6 +35,28 @@ def send_contact(name: str, email: str, topic: str, message: str) -> str:
         return "sent"
     except Exception as e:   # the message is already stored, so a mail failure never loses it
         log.warning("contact email failed: %s", e)
+        return "failed"
+
+
+def send_verification(to: str, name: str, link: str) -> str:
+    """The email-verification link. Without SMTP the link cannot be sent; an admin can then verify the address."""
+    if not settings.smtp_host:
+        return "not_configured"
+    m = EmailMessage()
+    m["Subject"] = "Confirm your email for MealSenseAI"
+    m["From"] = settings.smtp_from or settings.smtp_user
+    m["To"] = to
+    m.set_content(f"Hi {name or 'there'},\n\nPlease confirm this is your email address:\n\n{link}\n\n"
+                  "The link works for 48 hours. If you did not sign up for MealSenseAI, ignore this message.\n")
+    try:
+        with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=20) as s:
+            s.starttls()
+            if settings.smtp_user:
+                s.login(settings.smtp_user, settings.smtp_password)
+            s.send_message(m)
+        return "sent"
+    except Exception as e:
+        log.warning("verification email failed: %s", e)
         return "failed"
 
 

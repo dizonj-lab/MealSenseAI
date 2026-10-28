@@ -29,6 +29,7 @@ COCO_FOOD = {"banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot
 COCO_DISH_CONTAINERS = {"bowl", "cup", "wine glass"}
 COCO_REFERENCE = {"dining table", "bowl", "fork", "knife", "spoon"}
 DET_MIN = 0.30
+# Defaults of the admin settings vision.* (services/tuning.py); analyze() reads the live values.
 UNKNOWN_MIN = 0.45       # a region whose top-1 is below this is shown as "unidentified" instead of forcing a class
 MIN_ITEM_AREA = 0.03     # smaller segmentation regions are only offered as possible items (noise / garnish)
 PROPOSE_MIN = 0.20       # below this the photo's top-1 is not added automatically; the user picks from the top-3
@@ -39,6 +40,70 @@ PALETTE = [(20, 184, 166), (14, 165, 233), (245, 158, 11), (16, 185, 129), (139,
 
 _lock = threading.RLock()
 _state: dict = {"loaded": False}
+# The live classifier: the built-in EXP-002, or a model package an admin promoted at the model gate
+# (services/gate.py). A shadow model runs beside it on the same crops, for comparison only.
+_choice: dict = {"dir": None, "label": None, "shadow": None}
+REQUIRED_CARD = ("name", "version", "num_classes", "classes")
+
+
+def load_classifier(cdir: Path, opts=None, prov=None) -> dict:
+    """Open a classifier package (model.onnx, class_mapping.json, model_card.json) and check that it is complete
+    and self-consistent. Raises ValueError with a readable reason otherwise."""
+    import onnxruntime as ort
+    if opts is None:
+        opts = ort.SessionOptions()
+        opts.log_severity_level = 3
+    for f in ("model.onnx", "class_mapping.json", "model_card.json"):
+        if not (cdir / f).is_file():
+            raise ValueError(f"{f} is missing")
+    card = json.loads((cdir / "model_card.json").read_text())
+    missing = [k for k in REQUIRED_CARD if k not in card]
+    if missing:
+        raise ValueError(f"model_card.json lacks {', '.join(missing)}")
+    taxonomy = json.loads((cdir / "class_mapping.json").read_text())
+    sess = ort.InferenceSession(str(cdir / "model.onnx"), opts, providers=prov or _providers())
+    n_out = sess.get_outputs()[0].shape[-1]
+    if n_out != len(taxonomy) or sorted(taxonomy.values()) != list(range(len(taxonomy))) or card["num_classes"] != len(taxonomy):
+        raise ValueError(f"taxonomy mismatch: model outputs {n_out}, taxonomy has {len(taxonomy)} classes, "
+                         f"card says {card['num_classes']}")
+    names = [None] * len(taxonomy)
+    for name, i in taxonomy.items():
+        names[i] = name
+    by_id = {c["id"]: c for c in card["classes"]}
+    return {"session": sess, "card": card, "names": names, "map": by_id, "dir": str(cdir)}
+
+
+def use_model(cdir: Path | None, label: str | None) -> None:
+    """Switch the live classifier (None = the built-in model). Takes effect for the next analysis."""
+    with _lock:
+        _choice.update(dir=cdir, label=label)
+        _state["loaded"] = False
+
+
+def set_shadow(cdir: Path | None, name: str | None) -> str | None:
+    """Run a candidate beside the live model (None stops it). Returns an error message, or None."""
+    with _lock:
+        if cdir is None:
+            _choice["shadow"] = None
+            return None
+        try:
+            _choice["shadow"] = {**load_classifier(cdir), "name": name}
+        except Exception as e:   # noqa: BLE001 - reported to the admin
+            _choice["shadow"] = None
+            return f"{type(e).__name__}: {e}"
+    return None
+
+
+def shadow_name() -> str | None:
+    return (_choice.get("shadow") or {}).get("name")
+
+
+def _shadow_top1(img: Image.Image) -> str | None:
+    sh = _choice.get("shadow")
+    if not sh:
+        return None
+    logits = sh["session"].run(None, {"input": to_input(img)})[0][0]
+    return sh["names"][int(np.argmax(logits))]
 
 
 def _providers() -> list[str]:
@@ -61,23 +126,15 @@ def _load():
     opts.log_severity_level = 3
     prov = _providers()
     d = settings.models_dir
-    cdir = d / "exp002"
-    try:
-        card = json.loads((cdir / "model_card.json").read_text())
-        taxonomy = json.loads((cdir / "class_mapping.json").read_text())
-        sess = ort.InferenceSession(str(cdir / "model.onnx"), opts, providers=prov)
-        n_out = sess.get_outputs()[0].shape[-1]
-        if n_out != len(taxonomy) or sorted(taxonomy.values()) != list(range(len(taxonomy))):
-            raise ValueError(f"taxonomy mismatch: model outputs {n_out}, taxonomy has {len(taxonomy)} classes")
-        names = [None] * len(taxonomy)
-        for name, i in taxonomy.items():
-            names[i] = name
-        by_id = {c["id"]: c for c in card["classes"]}
-        _state["cls"] = {"session": sess, "card": card, "names": names, "map": by_id}
-        _state["device"] = "cuda" if sess.get_providers()[0] == "CUDAExecutionProvider" else "cpu"
-    except Exception as e:
-        _state["errors"]["classifier"] = f"{type(e).__name__}: {e}"
-        log.exception("food classifier failed to load")
+    choices = ([(Path(_choice["dir"]), _choice["label"])] if _choice["dir"] else []) + [(d / "exp002", None)]
+    for cdir, label in choices:   # a promoted package first; the built-in model if it cannot load
+        try:
+            _state["cls"] = {**load_classifier(cdir, opts, prov), "promoted": label}
+            _state["device"] = "cuda" if _state["cls"]["session"].get_providers()[0] == "CUDAExecutionProvider" else "cpu"
+            break
+        except Exception as e:
+            _state["errors"]["classifier" if label is None else "promoted_model"] = f"{type(e).__name__}: {e}"
+            log.exception("food classifier %s failed to load", cdir)
     seg_path = d / "yolo11n-seg.onnx"
     if seg_path.exists():
         try:
@@ -110,11 +167,12 @@ def models() -> dict:
     out = {}
     if _state["cls"]:
         c = _state["cls"]["card"]
-        m = c["metrics"]["reported_by_developer"]
-        out["classifier"] = {"name": c["name"], "version": c["version"], "trained_on": " + ".join(c["training_data"]),
+        m = (c.get("metrics") or {}).get("reported_by_developer") or {}
+        out["classifier"] = {"name": c["name"], "version": c["version"], "trained_on": " + ".join(c.get("training_data") or []),
                              "task": f"food classification ({c['num_classes']} classes)", "food_classes": c["num_classes"], "stage": "4 · Food classification",
-                             "device": _state["device"], "reported_metrics": {k: m[k] for k in ("top1_accuracy", "top3_accuracy", "macro_f1")},
-                             "metrics_source": m["source"], "sha256": c["files"]["best_model.pth"]["sha256"]}
+                             "device": _state["device"], "reported_metrics": {k: m[k] for k in ("top1_accuracy", "top3_accuracy", "macro_f1") if k in m} or None,
+                             "metrics_source": m.get("source"), "sha256": ((c.get("files") or {}).get("best_model.pth") or {}).get("sha256"),
+                             "promoted": _state["cls"].get("promoted"), "shadow": shadow_name()}
     if _state["seg"]:
         out["detector"] = {"name": "YOLO11n-seg", "version": "ultralytics-8.3 / ONNX", "trained_on": "COCO-2017",
                            "task": "instance segmentation", "food_classes": len(COCO_FOOD),
@@ -286,7 +344,10 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
     Item kinds: "food" (top-1 >= UNKNOWN_MIN), "unknown" (weak region, user names it), "suggestion" (weak region
     inside a named food, offered but not counted), or a single "whole photo" item when no regions are found.
     """
+    from app.services import tuning
     from app.services.proposals import propose
+    UNKNOWN_MIN, WHOLE_DISH = tuning.get("vision.unknown_min"), tuning.get("vision.whole_dish")
+    PROPOSE_MIN, MAX_UNKNOWN = tuning.get("vision.propose_min"), tuning.get("vision.max_unknown")
     with _lock:
         _load()
         if not _state["cls"]:
@@ -299,6 +360,7 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
         prop = propose(img)
         t1 = time.perf_counter()
         whole, whole_fp = classify_fp(full)
+        whole_shadow = _shadow_top1(full)
         regions = [{"bbox": r["bbox"], "area_frac": r["area_frac"], "source": "segmentation", "detector_label": None,
                     "detector_score": None, "has_mask": True} for r in prop["regions"]]
         inside = lambda r, box: (box["x"] <= r["bbox"]["x"] + r["bbox"]["w"] / 2 <= box["x"] + box["w"]
@@ -326,7 +388,9 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
             containers.append({"label": "dining table", "score": None, "source": "segmentation (white plate)",
                                "bbox": {"x": 0, "y": 0, "w": 1, "h": 1}, "area_frac": prop["plate_area_frac"]})
         for r in regions:
-            r["top"], r["fp"] = classify_fp(_crop_full(full, r["bbox"]))
+            piece = _crop_full(full, r["bbox"])
+            r["top"], r["fp"] = classify_fp(piece)
+            r["shadow"] = _shadow_top1(piece)
         # merge touching fragments that the classifier agrees on (one food split into colours)
         changed = True
         while changed:
@@ -370,7 +434,8 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
                       "match": top["match"] if kind == "food" else "none", "score": top["score"], "candidates": r["top"],
                       "bbox": r["bbox"], "area_frac": r["area_frac"], "instance": r["source"],
                       "detector_label": r["detector_label"], "detector_score": r["detector_score"],
-                      "has_mask": r["has_mask"], "view": view, "model": "classifier", "fingerprint": r["fp"]})
+                      "has_mask": r["has_mask"], "view": view, "model": "classifier", "fingerprint": r["fp"],
+                      "shadow_label": r.get("shadow")})
     wc = whole[0]
     if wc["score"] >= 0.60 and not any(i["kind"] == "food" and i["class_id"] == wc["class_id"] for i in items):
         # the photo as a whole is confidently one class that no single region captured: give it to the largest
@@ -379,12 +444,14 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
         host = max(hosts, key=lambda i: i["area_frac"]) if hosts else None
         if host:
             host.update(kind="food", model_label=wc["label"], class_id=wc["class_id"], nutrition_key=wc["nutrition_key"],
-                        match=wc["match"], score=wc["score"], candidates=whole, instance=host["instance"] + " + whole-photo agreement")
+                        match=wc["match"], score=wc["score"], candidates=whole, instance=host["instance"] + " + whole-photo agreement",
+                        shadow_label=whole_shadow)
         elif wc["score"] >= 0.60 and len([i for i in items if i["kind"] == "food"]) <= 1:
             items.insert(0, {"region_id": f"{view}-0", "kind": "food", "model_label": wc["label"], "class_id": wc["class_id"],
                              "nutrition_key": wc["nutrition_key"], "match": wc["match"], "score": wc["score"],
                              "candidates": whole, "bbox": None, "area_frac": 1.0, "instance": "whole photo",
-                             "detector_label": None, "detector_score": None, "has_mask": False, "view": view, "model": "classifier", "fingerprint": whole_fp})
+                             "detector_label": None, "detector_score": None, "has_mask": False, "view": view, "model": "classifier", "fingerprint": whole_fp,
+                             "shadow_label": whole_shadow})
     if whole[0]["score"] >= WHOLE_DISH and any(i["kind"] == "food" and i["class_id"] == whole[0]["class_id"] for i in items):
         for i in items:   # single-dish photo: other regions are offered as possible extra items (one tap to add)
             if i["kind"] == "unknown" or (i["kind"] == "food" and i["class_id"] != whole[0]["class_id"]):
@@ -402,7 +469,8 @@ def analyze(path: str, view: str, original_path: str | None = None) -> dict:
                              "class_id": whole[0]["class_id"], "nutrition_key": whole[0]["nutrition_key"],
                              "match": whole[0]["match"], "score": whole[0]["score"], "candidates": whole, "bbox": None,
                              "area_frac": 1.0, "instance": "whole photo", "detector_label": None, "detector_score": None,
-                             "has_mask": False, "view": view, "model": "classifier", "fingerprint": whole_fp})
+                             "has_mask": False, "view": view, "model": "classifier", "fingerprint": whole_fp,
+                             "shadow_label": whole_shadow})
     return {
         "view": view, "ok": True, "items": items, "containers": containers, "overlay_path": None,
         "instances": [{"label": i["model_label"] or "unidentified", "kind": i["kind"], "score": i["score"],

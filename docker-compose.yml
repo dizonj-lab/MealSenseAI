@@ -27,6 +27,7 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-}
+      PUBLIC_URL: ${PUBLIC_URL:-}                        # e.g. https://mealsense.xtangent.ai, for links in verification emails
     volumes: ["uploads:/data"]      # meal photos
     depends_on: { db: { condition: service_healthy }, init-perms: { condition: service_completed_successfully } }
     restart: unless-stopped

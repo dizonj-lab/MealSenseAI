@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
     smtp_from: str = ""   # defaults to smtp_user
+    public_url: str = ""  # the app's public address for links in emails (e.g. https://mealsense.xtangent.ai); empty = the request's own
+    model_updates_dir: Path | None = None   # uploaded model packages; default <data_dir>/models (the /data volume in Docker)
+
+    @property
+    def updates_dir(self) -> Path:
+        return self.model_updates_dir or self.data_dir / "models"
 
 
 settings = Settings()
