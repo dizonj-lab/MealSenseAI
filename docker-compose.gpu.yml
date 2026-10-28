@@ -3,13 +3,13 @@
 services:
   backend:
     build: { context: ., dockerfile: backend/Dockerfile, target: gpu }
-    image: mealsenseai/backend:gpu
+    image: ${COMPOSE_PROJECT_NAME:-mealsenseai}/backend:gpu
     deploy:
       resources:
         reservations:
           devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
   init-perms:
-    image: mealsenseai/backend:gpu
+    image: ${COMPOSE_PROJECT_NAME:-mealsenseai}/backend:gpu
   ollama:
     deploy:
       resources:

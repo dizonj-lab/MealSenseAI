@@ -2,6 +2,12 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.3 — Safer side-by-side installs
+
+- Docker images are named after the Compose project (`${COMPOSE_PROJECT_NAME:-mealsenseai}/backend:local`), so a
+  second copy on the same server, such as an acceptance run, builds its own images instead of replacing the live ones.
+  The live stack's names are unchanged. The test stack (`scripts/test.sh`) uses `mealsenseai-test/…`.
+
 ## v0.13.2 — Mark a food on the photo
 
 - Add missing food → **Mark it on the photo**: drag a box around the food (mouse, finger or pen). The model classifies

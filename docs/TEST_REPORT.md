@@ -124,3 +124,10 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | Draw a box, desktop mouse (1280 px) | **PASS**: Add missing food → Mark it on the photo → drag → new item 4 *pizza* (107 g), selected; no JS errors, no horizontal overflow |
 | Draw a box, phone touch (iPhone 13 profile, pointer events) | **PASS**: touch drag → new item *pizza*, scrolled into view and selected; no JS errors, no horizontal overflow |
 | Meal composition (v0.13.1 chart) | Renders in the review page under **Meal composition** (collapsed in Simple view) |
+
+## v0.13.3: image names per Compose project (28 Oct 2026)
+
+| Test | Result |
+|---|---|
+| `docker compose config` | Not run here (no Docker in this environment). Checked by reading: the default project resolves to the unchanged `mealsenseai/…:local` names; `COMPOSE_PROJECT_NAME=mealsense-acceptance` resolves to `mealsense-acceptance/…:local` |
+| Fresh-database startup (v0.13.2 code) | **PASS**: all 7 migrations applied to an empty PostgreSQL 16 database and the API started |

@@ -2,18 +2,20 @@
 #   ./scripts/start.sh            or   docker compose up -d --build      -> http://localhost:8080
 #   GPU (optional, NVIDIA):          docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
 name: mealsenseai
+# Images are named after the project, so a second copy started with COMPOSE_PROJECT_NAME=<other> (e.g. an acceptance run)
+# builds its own images and never replaces the ones the live stack uses.
 
 services:
   frontend:                         # React UI + nginx reverse proxy (single entry point)
     build: { context: ., dockerfile: frontend/Dockerfile }
-    image: mealsenseai/frontend:local
+    image: ${COMPOSE_PROJECT_NAME:-mealsenseai}/frontend:local
     ports: ["${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-8080}:80"]
     depends_on: { backend: { condition: service_healthy } }
     restart: unless-stopped
 
   backend:                          # FastAPI, EXP-002 classifier, nutrition & insights, migrations on start
     build: { context: ., dockerfile: backend/Dockerfile, target: cpu }
-    image: mealsenseai/backend:local
+    image: ${COMPOSE_PROJECT_NAME:-mealsenseai}/backend:local
     environment:
       DATABASE_URL: postgresql+psycopg://mealsense:${POSTGRES_PASSWORD:-mealsense}@db:5432/mealsenseai
       JWT_SECRET: ${JWT_SECRET:-change-me-local-only}
@@ -33,7 +35,7 @@ services:
     restart: unless-stopped
 
   init-perms:                       # one-shot: photo volume owned by the non-root backend user (also fixes old volumes)
-    image: mealsenseai/backend:local
+    image: ${COMPOSE_PROJECT_NAME:-mealsenseai}/backend:local
     user: root
     entrypoint: ["sh", "-c", "chown -R 10001:10001 /data"]
     volumes: ["uploads:/data"]

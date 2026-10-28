@@ -1,7 +1,10 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.2'
+export const APP_VERSION = '0.13.3'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.3', title: 'Safer side-by-side installs', changes: [
+    'A second copy of the app on the same server (for example a test run) no longer replaces the images the live app uses',
+  ] },
   { version: '0.13.2', title: 'Mark a food on the photo', changes: [
     'Add missing food: drag a box around it on the photo, with a mouse, finger or pen; the model names what is inside and estimates the portion',
     'Foods added by name or description can be shown on the photo too (Show where it is on the photo)',

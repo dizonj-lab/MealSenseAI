@@ -23,13 +23,13 @@ services:
 
   backend:
     build: { context: ., dockerfile: backend/Dockerfile, target: cpu }
-    image: mealsenseai/backend:local
+    image: mealsenseai-test/backend:local
     environment: *backend-env
     tmpfs: ["/data:uid=10001"]
     depends_on: { db: { condition: service_healthy } }
   frontend:
     build: { context: ., dockerfile: frontend/Dockerfile }
-    image: mealsenseai/frontend:local
+    image: mealsenseai-test/frontend:local
     ports: ["${TEST_HTTP_PORT:-8081}:80"]
     depends_on: { backend: { condition: service_healthy } }
 

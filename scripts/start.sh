@@ -18,7 +18,7 @@ if [ ! -f .env ]; then
   echo "created .env with a random JWT_SECRET"
 fi
 C=(docker compose "${FILES[@]}")
-[ ${#BUILD[@]} -gt 0 ] || docker image inspect mealsenseai/backend:local >/dev/null 2>&1 || BUILD=(--build)
+[ ${#BUILD[@]} -gt 0 ] || docker image inspect "${COMPOSE_PROJECT_NAME:-mealsenseai}/backend:local" >/dev/null 2>&1 || BUILD=(--build)
 PORT="$(sed -n 's/^HTTP_PORT=//p' .env)"; PORT="${PORT:-8080}"
 "${C[@]}" down --remove-orphans >/dev/null 2>&1 || true   # also removes containers of older versions (data volumes are kept)
 HOLDER="$(docker ps --filter "publish=$PORT" --format '{{.Names}}' | head -1)"
