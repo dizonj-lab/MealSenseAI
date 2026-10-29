@@ -1,0 +1,13 @@
+# Optional: let the demo backend reach the live stack's Ollama (read-only use of the model; nothing else is shared).
+#   DEMO_SLM=1 ./demo/run.sh       (run.sh adds this file)
+services:
+  backend:
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: ${DEMO_OLLAMA_MODEL:-qwen2.5:1.5b}
+    networks: [default, live]
+
+networks:
+  live:
+    external: true
+    name: mealsenseai_default

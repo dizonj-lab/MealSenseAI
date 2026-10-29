@@ -190,3 +190,11 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | pytest | **65 passed** (adds 1): an SLM explanation with a number not in the facts is stored as `rejected` with the failing numbers, its text is not shown, and the rule-based recommendations remain |
 | Frontend typecheck | PASS |
 | Not run here | The Buddy run with the real model; expect most explanations from qwen2.5:1.5b to be rejected (1 of 6 passed in E6) |
+
+## v0.13.18: declarations; training and configuration scenes (29 Oct 2026)
+
+| Test | Result |
+|---|---|
+| `record.mjs` training and settings scenes against the local app (admin granted with `app.tools.admin`) | **PASS**: the training card with both charts fits 1080p; the settings scene runs 68 s for a 68 s line, pointing at the thresholds, memory match, model, temperature and time limit, then the prompts page |
+| Report build and render | **PASS**: declarations tables fit |
+| Not run here | `DEMO_SLM=1` against the live Ollama on Buddy |

@@ -32,7 +32,7 @@ card = {
               "implementation": "backend/app/services/preprocess.py (bit-identical to preprocessing.py; see evidence)"},
     "metrics": {
         "reported_by_developer": {"top1_accuracy": 0.7063, "top3_accuracy": 0.8566, "macro_f1": 0.6668,
-                                  "source": "EXP-002 evaluation on the developer workstation; evidence/ files not shipped in the archive"},
+                                  "source": "EXP-002 test set (45,800 images), evaluated on Buddy's GPU; evidence/training/EXP-002_FineTuning/evaluation"},
         "checkpoint_metadata": {"epoch": 5, "validation_macro_f1": 0.6628635553920498,
                                 "source": "stored inside best_model.pth"},
         "measured_in_this_package": "see evidence/onnx_parity.json (runtime equivalence, not accuracy)",

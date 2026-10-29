@@ -23,6 +23,9 @@ set -euo pipefail
 cd "$(dirname "$0")"
 HERE="$(pwd)"
 COMPOSE=(docker compose -f docker-compose.demo.yml)
+# DEMO_SLM=1: use the live stack's Ollama (Qwen 2.5) so the settings scene shows the installed model and the
+# advisor words its answers with it. Needs the live project "mealsenseai" running with its "slm" profile.
+[ "${DEMO_SLM:-0}" = 1 ] && COMPOSE+=(-f docker-compose.demo-slm.yml)
 PORT="${DEMO_WEB_PORT:-8380}"
 BASE="http://127.0.0.1:$PORT"
 PLAYWRIGHT="${PLAYWRIGHT_VERSION:-1.63.0}"
@@ -106,6 +109,8 @@ if [ "$STEP" = all ] || [ "$STEP" = mine ]; then
 
   echo "==> Loading Wei Ming's week of meals (each analysed by the model)"
   python3 seed.py "$BASE" "$HERE/photos"
+  echo "==> Giving the demo account the admin role (for the model-settings scene)"
+  "${COMPOSE[@]}" exec -T backend python -m app.tools.admin grant weiming@mealsense.example
 fi
 
 # 1. The voice first, so every scene can be timed to its line.

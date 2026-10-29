@@ -16,9 +16,10 @@ const W = 9026; // A4 text width in DXA (2.5 cm margins: 11906 - 2*1440)
 const run = (t, o = {}) => new TextRun({ text: t, ...o });
 const rich = (s) => {   // **bold** and *italic* inside a string
   const out = [];
-  s.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).forEach((part) => {
+  s.split(/(\[\[[^\]]+\]\]|\*\*[^*]+\*\*|\*[^*]+\*)/).forEach((part) => {
     if (!part) return;
-    if (part.startsWith("**")) out.push(run(part.slice(2, -2), { bold: true }));
+    if (part.startsWith("[[")) out.push(run(part.slice(2, -2), { highlight: "yellow" }));
+    else if (part.startsWith("**")) out.push(run(part.slice(2, -2), { bold: true }));
     else if (part.startsWith("*")) out.push(run(part.slice(1, -1), { italics: true }));
     else out.push(run(part));
   });
@@ -81,7 +82,7 @@ const cover = [
   new Paragraph({ spacing: { after: 600 }, children: [run("A photo-based meal recognition and nutrition-awareness system for anyone who wants to understand their food, starting with people managing diabetes in Singapore", { size: 24, color: INK2 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("NUS-ISS Practice Project (PT & Stackable) · Individual project", { size: 22 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("Dizon Joselito Villanueva", { size: 22 })] }),
-  new Paragraph({ spacing: { after: 80 }, children: [run("Final draft · 29 October 2026 · system version v0.13.17 · follows the proposal of 30 September 2026", { size: 22, color: INK2 })] }),
+  new Paragraph({ spacing: { after: 80 }, children: [run("Final draft · 29 October 2026 · system version v0.13.18 · follows the proposal of 30 September 2026", { size: 22, color: INK2 })] }),
   new Paragraph({ spacing: { before: 2400 }, children: [run("Educational estimates, not medical advice. Wei Ming, used in examples, is fictional.", { size: 18, color: INK2, italics: true })] }),
   new Paragraph({ children: [new PageBreak()] }),
 ];
@@ -237,7 +238,7 @@ const design = [
 const dev = [
   H1("4. System development and implementation"),
   H2("4.1 Process"),
-  P("I developed the system iteratively, in versioned releases from v0.1 to v0.13.17 (about 55 commits between 23 and 29 October 2026, after the proposal of 30 September). I tested each release, recorded it in the changelog and test report, and deployed it to my home server (\"Buddy\"). The code base has about 6,800 lines of Python in the backend, 3,700 lines of TypeScript in the frontend and 2,000 lines of machine-learning tooling, with 10 test modules."),
+  P("I developed the system iteratively, in versioned releases from v0.1 to v0.13.18 (about 55 commits between 23 and 29 October 2026, after the proposal of 30 September). I tested each release, recorded it in the changelog and test report, and deployed it to my home server (\"Buddy\"). The code base has about 6,800 lines of Python in the backend, 3,700 lines of TypeScript in the frontend and 2,000 lines of machine-learning tooling, with 10 test modules."),
   H2("4.2 From proposal to build"),
   ...TABLE("Proposed design (30 September 2026) and what was built", ["Proposed", "Built", "Why"], [
     ["Web UI with a webcam; smartphone later", "Phone-first responsive web app (camera or upload) plus desktop", "Capture happens at the table, so the phone came first"],
@@ -264,6 +265,16 @@ const dev = [
     ["Govern learning", "Admin area: review queue, contributors, dataset versions, model gate, settings and versioned prompts, audit log"],
   ], [3000, 6026]),
   H2("4.4 Implementation and optimisation choices"),
+  ...TABLE("Model configuration in the admin area (defaults; changes apply without a code change and are audited)", ["Setting", "Value", "Basis"], [
+    ["Whole-photo suggestion threshold", "0.20", "Below it, top-1 accuracy on the test set is 17.4%, so the user picks from the top three"],
+    ["Identify threshold (plate regions)", "0.45", "Weaker regions are listed as unidentified instead of guessed"],
+    ["Auto-accept score", "0.50", "At or above it, top-1 accuracy on the test set is 85.7%"],
+    ["Personal memory match", "cosine ≥ 0.70, margin 0.05", "The classifier's 320-value output serves as the embedding; 94 of 120 held-out matches, all correct"],
+    ["Local language model", "Qwen 2.5 1.5B on Ollama", "Runs on CPU at about 56 tokens/s; used for rewording only (Section 6.4)"],
+    ["Temperature", "0.1", "Consistent wording between calls"],
+    ["Time limits", "15 s per call; 60 s for the advisor", "After the limit, the rule engine answers"],
+    ["Prompts", "versioned", "Each change is saved as a new version and can be activated or rolled back"],
+  ], [2600, 2200, 4226]),
   ...BUL([
     "**One process, models loaded once** at start-up; ONNX Runtime on CPU (~12 ms per classification), no GPU required.",
     "**Deferred explanation**: results appear first; the language model's explanation is requested afterwards, so it never delays the review.",
@@ -353,7 +364,7 @@ const findings = [
     "**Limited value from the small language model**: the rules performed better on parsing and matching, and 5 of 6 meal explanations contained a number of their own. Since v0.13.13 those are withheld, so most users will see the rule-based results without a model explanation. A larger or fine-tuned local model would need to be re-measured with the same benchmark.",
     "**Visually similar dishes** (local noodle and rice dishes, steak cuts, dumplings) remain the main confusion; 45 of 320 classes have F1 below 50%.",
     "**Portions** come from priors or area, not volume (±35–50%); entering grams is more accurate. I have not yet measured portion error (MAE against weighed portions) as proposed.",
-    "**Nutrition values are unverified** transcriptions (USDA- and HPB-style values) or recipe approximations (199 records); a verified import (HPB SG FoodID, USDA FDC) is required before clinical use.",
+    "**Nutrition values are unverified** transcriptions (USDA- and HPB-style values) or recipe approximations (204 records); a verified import (HPB SG FoodID, USDA FDC) is required before clinical use.",
     "**Glucose estimates** use population physiology; they are not predictions for an individual and must never inform insulin dosing.",
     "**Test conditions**: E1 uses dataset photos, which are cleaner than photos taken at a hawker stall; the calibration result may not hold for real use. The multi-food set is synthetic, and no real-user trial has been run.",
     "**Fuzzy lookup errors** (4 of 15 confident wrong matches) bypass the language model today.",
@@ -372,6 +383,53 @@ const findings = [
   P("MealSenseAI estimates the nutrition and glycaemic effect of a hawker meal from a photo, using models that run locally on a CPU server. Recognition reaches 85.7% top-3 with one-tap correction, GL can be calculated for 135 of 286 foods, and the advisor's answers contain only numbers from the system's own data. My next steps are a trial with real users and a verified nutrition source."),
 ];
 
+const declarations = [
+  H1("Declarations"),
+  P("This section declares the use of AI tools, the datasets and other third-party sources, and my own scope of work. Text highlighted in yellow is for me to confirm before submission."),
+  H2("A. Use of AI tools"),
+  ...TABLE("AI tools used in the project", ["Tool", "How I used it", "What it produced"], [
+    ["Claude (Anthropic), through Claude Code, a coding assistant with access to the repository and a cloud container", "I described features, defects and decisions in conversation; it wrote and changed code, ran tests in its container, and drafted documents. It had no access to my home server (\"Buddy\")", "Most of the application source code (backend, frontend, Docker configuration), the automated tests, the evaluation scripts, the documentation, the charts, this report's draft text, the two slide decks and the demo-video scripts"],
+    ["ChatGPT (OpenAI), which I refer to as \"Lisa\"", "[[Assistant while I prepared the data and trained the model on Buddy: describe exactly what Lisa wrote or advised, e.g. the cleaning, split, training and evaluation scripts]]", "[[e.g. dataset cleaning and audit scripts; EXP-001/EXP-002 training and evaluation scripts]]"],
+    ["[[Any other AI tool, e.g. for the proposal of 30 September 2026, or none]]", "[[ ]]", "[[ ]]"],
+  ], [2400, 3326, 3300]),
+  P("The repository records the extent of the assistance: 53 of its 54 commits (23–29 October 2026) carry a \"Co-Authored-By: Claude\" line and a link to the Claude Code session that produced them. The one commit without it is my upload of the proposal on 15 September 2026."),
+  P("The local language model in the product (Qwen 2.5 1.5B, run by Ollama) is a component of the application, not a tool used to write it. It is evaluated in Section 6.4."),
+  P("I checked AI output by running it rather than by trusting it. Every number in this report comes from an evidence file in the repository or a cited source, and the evaluation scripts can be re-run. Where AI-written text or code was wrong, I found it in use and had it corrected, for example:"),
+  ...BUL([
+    "a drawn box on the photo could not be selected or dragged on a phone (fixed in v0.13.2);",
+    "the photo hint was unreadable in light mode;",
+    "the report and slides did not follow my submitted proposal (pricing, users, pipeline names) until I asked for them to be aligned (v0.13.12);",
+    "the documents described a group project and a diabetes-only product; I corrected both (v0.13.14, v0.13.15);",
+    "the report presented the classifier results as reported by a developer; I supplied my own training evidence, which also showed that the data split was not 70/15/15 as written (v0.13.17).",
+  ]),
+  H2("B. Datasets and third-party sources"),
+  ...TABLE("Datasets, pre-trained models and other sources", ["Source", "Used for", "Terms and citation"], [
+    ["Food-101 (ETH Zürich): 101 classes, 101,000 images", "Training and testing the food classifier", "Research use; images remain the property of their owners. Bossard, Guillaumin and Van Gool, ECCV 2014 [5]"],
+    ["FoodSG-233 (NUS FoodLG): 233 Singapore classes, 209,861 images", "Training and testing the food classifier", "Non-commercial research and education; access granted by the authors on request. Zheng et al., arXiv:2301.03829, 2023 [11]"],
+    ["ImageNet-1k weights for EfficientNet-B0 (torchvision)", "Starting point for transfer learning", "Tan and Le, ICML 2019 [4]; Deng et al., CVPR 2009 [12]; torchvision weights, BSD-3-Clause code"],
+    ["YOLO11n-seg (Ultralytics), trained on COCO", "Finding food regions on a plate", "AGPL-3.0; Jocher and Qiu, Ultralytics YOLO11, 2024 [13]; COCO: Lin et al., ECCV 2014 [14]"],
+    ["Qwen 2.5 1.5B Instruct (Alibaba), run with Ollama", "Rewording advisor answers; meal explanations", "Apache-2.0; Qwen Team, Qwen2.5 Technical Report, 2024 [15]"],
+    ["USDA FoodData Central", "62 nutrition records", "Public domain (U.S. Government) [16]"],
+    ["Singapore HPB Energy & Nutrient Composition of Food", "20 nutrition records", "Health Promotion Board, Singapore [17]"],
+    ["International Tables of Glycemic Index (2021)", "Published GI values", "Atkinson et al., 2021 [1]"],
+    ["Compendium of Physical Activities", "MET values for the activity what-if", "Ainsworth et al., 2011 [2]"],
+    ["Wikimedia Commons meal photos", "Demo video and examples only, not training", "Free licences; credited per photo in demo/SOURCES.md"],
+  ], [2700, 2626, 3700]),
+  P("The remaining 204 nutrition records are approximations I added so that most classes have a value; they are labelled as such in the application and are not verified. The datasets are not redistributed with the project; only the trained model and its evaluation results are included."),
+  H2("C. My scope of work"),
+  P("I am the sole author of this project. My work covered the following; the evidence column points to where it can be checked."),
+  ...TABLE("Statement of my own work", ["Area", "What I did", "Evidence"], [
+    ["Problem and proposal", "Chose the problem, researched the market and competitors, defined the users, pricing and market scenario, designed the ten-stage pipeline and the infrastructure, and set the validation measures. [[State whether any AI tool helped with the proposal.]]", "Proposal deck (30 September 2026); 01-PRS_Project_Prposal.pdf in the repository (15 September 2026)"],
+    ["Product specification", "Decided every feature and its behaviour, and the priorities between them, for example top-3 correction, marking a missed food on the photo, choosing among unidentified items, collapsing insights to reduce clutter, borrowing GI for local dishes, and the safety rule that model text must never introduce its own numbers", "Session transcripts linked from each commit; CHANGELOG.md"],
+    ["Data and model training", "Selected Food-101 and FoodSG-233, obtained access, prepared and audited the data (310,861 images, 4,193 excluded), defined the split, and trained and evaluated EXP-001 and EXP-002 on my own GPU server, with Lisa's assistance as declared in A", "ml/models/exp002/evidence/training (configuration, environment, training history and evaluation, dated 23 October 2026)"],
+    ["Infrastructure and operations", "Built and run the home server \"Buddy\" (GPU, Docker, Ollama); deployed every release; ran the acceptance tests, the language-model benchmark and the inference-log queries; managed the GitHub repository and access", "Results I supplied: slm_eval.json, inference-log figures (Section 6.4), acceptance runs (TEST_REPORT.md)"],
+    ["Testing and review", "Used the application on phone and desktop, reported defects with screenshots, accepted or rejected each change, and approved changes that affect safety (v0.13.13)", "Session transcripts; TEST_REPORT.md"],
+    ["Positioning and presentation", "Set the positioning (for anyone, diabetes first), the individual-project framing, and the content of both presentations; I record the narration and camera segments of the video myself", "Slide decks; demo/RECORDING-SCRIPT.md"],
+    ["[[Anything else, e.g. hours spent, user interviews, research]]", "[[ ]]", "[[ ]]"],
+  ], [2000, 4626, 2400]),
+  P("I did not write most of the application code by hand; Claude did, under my direction, as declared in A. I am responsible for the system's design, its data and model, the decisions recorded above, and the accuracy of what is reported here."),
+];
+
 const refs = [
   H1("References"),
   ...NUM([
@@ -385,6 +443,13 @@ const refs = [
     "Health Promotion Board, Singapore. Healthy 365 meal log tool FAQ; My Healthy Plate.",
     "Reynolds AN, et al. Advice to walk after meals is more effective for lowering postprandial glycaemia in type 2 diabetes. Diabetologia. 2016;59(12):2572–2578.",
     "WHO. Guideline: Sugars intake for adults and children (2015); Sodium intake for adults and children (2012).",
+    "Zheng K, Nguyen T, Chong JHS, Goh CE, Herschel M, Lee HH, Liu C, Ooi BC, Wang W, Yip J. From Plate to Prevention: A Dietary Nutrient-aided Platform for Health Promotion in Singapore. arXiv:2301.03829, 2023.",
+    "Deng J, Dong W, Socher R, Li LJ, Li K, Fei-Fei L. ImageNet: A large-scale hierarchical image database. CVPR 2009.",
+    "Jocher G, Qiu J. Ultralytics YOLO11, version 11.0.0. 2024. https://github.com/ultralytics/ultralytics (AGPL-3.0).",
+    "Lin TY, et al. Microsoft COCO: Common objects in context. ECCV 2014.",
+    "Qwen Team. Qwen2.5 Technical Report. arXiv:2412.15115, 2024.",
+    "U.S. Department of Agriculture, Agricultural Research Service. FoodData Central. https://fdc.nal.usda.gov/",
+    "Health Promotion Board, Singapore. Energy & Nutrient Composition of Food. https://focos.hpb.gov.sg/",
   ], "ref"),
   H2("Appendix: evidence files"),
   ...BUL([
@@ -415,7 +480,7 @@ const doc = new Document({
     { properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 }, pageNumbers: { start: 1 } } },
       headers: { default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [run("MealSenseAI · Final Report", { size: 16, color: INK2 })] })] }) },
       footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ children: [PageNumber.CURRENT], size: 18, color: INK2 })] })] }) },
-      children: [...toc, ...summary, ...business, ...tools, ...design, ...dev, ...experiments, ...perf, ...findings, ...refs] },
+      children: [...toc, ...summary, ...business, ...tools, ...design, ...dev, ...experiments, ...perf, ...findings, ...declarations, ...refs] },
   ],
 });
 Packer.toBuffer(doc).then((b) => { fs.writeFileSync(path.join(HERE, "MealSenseAI-Final-Report.docx"), b); console.log("written"); });

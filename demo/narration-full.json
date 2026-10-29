@@ -174,8 +174,15 @@
    "id": "vision",
    "part": "System design",
    "title": "Recognising the food",
-   "text": "Recognition uses EfficientNet-B0, fine-tuned by transfer learning on Food-101 and a Singapore food dataset: three hundred and twenty classes. I trained the last three blocks and the classifier head with AdamW, with a smaller learning rate for the backbone than for the head, and with data augmentation. It reached seventy-one percent top-one and eighty-six percent top-three accuracy. Exported to ONNX, it gave the same top three answers as the original model on six hundred test images, in about twelve milliseconds per photo on a CPU.",
+   "text": "Recognition uses EfficientNet-B0, a compact network that runs on an ordinary CPU. I trained it myself, on two public datasets: Food-101 and the Singapore dataset FoodSG-233. Here is how.",
    "mode": "camera"
+  },
+  {
+   "id": "training",
+   "part": "System design",
+   "title": "Training the model",
+   "mode": "screen",
+   "text": "I started with three hundred and ten thousand images. A checksum audit found two thousand groups of identical files, so I removed forty-one hundred images with conflicting labels or duplicates; no image appears in both training and test. I kept Food-101's official test set and split FoodSG eighty, ten, ten. Training ran in two stages on my own GPU server. First, a new head for three hundred and twenty classes on a frozen backbone. Then the last three blocks as well, with a lower learning rate for the pretrained layers. Each stage took about twenty minutes, and validation macro-F1 rose from fifty-eight to sixty-six percent. On forty-five thousand eight hundred test images it scores seventy-one percent top-one and eighty-six percent top-three. Its confidence tracks its accuracy to within about two percent, which supports the app's thresholds. Exported to ONNX, it gives the same top three as the original, in about twelve milliseconds on a CPU."
   },
   {
    "id": "multifood",
@@ -211,6 +218,13 @@
    "title": "Learning safely",
    "text": "It also learns safely. A food the user names is stored as a fingerprint and matched by cosine similarity, so it's recognised next time without retraining. Photos are shared for training only with consent. Each one is screened for poisoning patterns, and a new model must pass a gate on a fixed test set, then run in shadow mode, before it can go live.",
    "mode": "camera"
+  },
+  {
+   "id": "settings",
+   "part": "System design",
+   "title": "Configuring the models",
+   "mode": "screen",
+   "text": "Every model is configured in the admin area, without changing code. For recognition, the thresholds are set here, and the calibration results back them: below point two a guess is not added, and a plate region below point four five is shown as unidentified. The personal food memory works like an embedding: each food a user names is stored as the classifier's own three-hundred-and-twenty-value output, and a new photo reuses that name when the cosine similarity is at least point seven. For the local language model I choose the model, here Qwen 2.5 with one and a half billion parameters on Ollama, a temperature of point one for consistent wording, and time limits after which the rule engine answers instead. Its prompts are versioned, so I can change one and roll it back. I benchmarked it against the rules: it was good at rewording and weak on facts, so it only rewords, and every output is checked."
   },
   {
    "id": "quality",

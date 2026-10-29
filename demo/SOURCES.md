@@ -11,7 +11,11 @@
 | Premium trackers around US$80 a year | MyFitnessPal Premium published pricing (US$79.99/year), 2026; confirm at myfitnesspal.com/premium |
 | Pricing (freemium; subscription S$3.99/month Singapore, S$2.99/month ASEAN; organisations later) | Project proposal, 30 September 2026; to be validated in the trial |
 | Competitor prices (Foodvisor, Cal AI, SnapCalorie, Healthify; indicative monthly USD) | Project proposal, 30 September 2026 |
-| 70.6% top-1, 85.7% top-3, 66.7% macro-F1 | EXP-002 developer evaluation (`ml/models/exp002/model_card.json`) |
+| 70.6% top-1, 85.7% top-3, 66.7% macro-F1 (45,800 test images) | EXP-002 evaluation on Buddy (`ml/models/exp002/evidence/training/EXP-002_FineTuning/evaluation/overall_metrics.json`) |
+| 310,861 images; ~4,100 removed; no duplicate across splits; Food-101 official test, FoodSG 80/10/10 | `evidence/training/cleaning_summary.json`, `dataset_splits.json`, `derived_summary.json` |
+| Two stages of ~20 min; validation macro-F1 58% → 66% | `EXP-001_UnifiedFood/` and `EXP-002_FineTuning/` `summary.json`, `training_history.csv` |
+| Confidence within ~2% of accuracy (ECE 2.35%) | `derived_summary.json` (from `confidence_calibration.json`) |
+| Thresholds 0.20 / 0.45, memory cosine ≥ 0.70, Qwen 2.5 1.5B, temperature 0.1 | `backend/app/services/tuning.py` (admin settings defaults) |
 | Same top 3 after ONNX export on 601 images; 11.8 ms per photo | Measured (`ml/models/exp002/evidence/onnx_parity.json`) |
 | 74.7% precision, 68.4% recall, 262 ms median per plate | Measured on 100 synthetic multi-food plates (`test-results/multifood_metrics.json`) |
 | 247 exact · 66 proxy · 7 none | `ml/models/exp002/evidence/nutrition_coverage.json` |

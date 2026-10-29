@@ -33,6 +33,8 @@ try {
 }
 if (!existsSync(LUNCH)) throw new Error(`No lunch photo at ${LUNCH}; run photos.py first (run.sh does).`);
 const dataUrl = (p) => `data:image/jpeg;base64,${readFileSync(p).toString("base64")}`;
+// Report figures (docs/report/charts), drawn from the training evidence in ml/models/exp002/evidence/training.
+const chart = (f) => `data:image/png;base64,${readFileSync(join(here, "..", "docs", "report", "charts", f)).toString("base64")}`;
 
 mkdirSync(OUT, { recursive: true });
 const W = 1920, H = 1080;
@@ -96,6 +98,9 @@ const overlay = () => {
     #demo-card .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
     #demo-card .metrics .tile { width: auto; padding: 18px 20px; } #demo-card .metrics .tile b { font-size: 44px; }
     #demo-card .eq { font: 600 40px "STIX Two Math", Georgia, serif; color: #fff; padding: 18px 34px; border-radius: 16px; background: rgba(240,253,250,.08); }
+    #demo-card .charts { display: flex; gap: 28px; justify-content: center; margin-top: 6px; }
+    #demo-card .charts img { height: 400px; max-width: 820px; object-fit: contain; background: #fff; border-radius: 16px; padding: 12px; }
+    #demo-card .row.small .tile { width: 300px; padding: 18px 20px; } #demo-card .row.small .tile b { font-size: 40px; }
     #demo-card [data-at] { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
     #demo-card [data-at].in { opacity: 1; transform: none; }`;
   const mount = () => {
@@ -537,12 +542,54 @@ SCENES.vision = async (secs) => {
       <ul data-at="0.08"><li>EfficientNet-B0, ImageNet start</li><li>Food-101 + FoodSG: 320 classes</li><li>Transfer learning: last 3 blocks + head</li>
         <li>AdamW: lr 1e-5 backbone, 5e-5 head, weight decay 1e-4</li><li>Augmentation: crop, flip, rotate, colour</li><li>5 epochs, batch 32</li></ul>
       <div class="metrics">
-        <div class="tile" data-at="0.45"><b>70.6%</b><span>top-1 accuracy</span>${SRC("developer evaluation")}</div>
+        <div class="tile" data-at="0.45"><b>70.6%</b><span>top-1 accuracy</span>${SRC("45,800 test images")}</div>
         <div class="tile" data-at="0.5"><b>85.7%</b><span>top-3 accuracy</span>${SRC("macro-F1 66.7%")}</div>
         <div class="tile" data-at="0.7"><b>100%</b><span>same top 3 after ONNX export</span>${SRC("601 images")}</div>
         <div class="tile" data-at="0.78"><b>11.8 ms</b><span>per photo on CPU</span>${SRC("ONNX Runtime")}</div>
       </div>
     </div>`, secs);
+};
+
+SCENES.training = async (secs) => {
+  await chapter("");
+  await card(`
+    <h2 data-at="0">How I trained the model</h2>
+    <div class="row small">
+      <div class="tile" data-at="0.03"><b>310,861</b><span>images: Food-101 + FoodSG-233</span>${SRC("4,193 removed: conflicting labels, duplicates")}</div>
+      <div class="tile" data-at="0.16"><b>0</b><span>duplicate images across train and test</span>${SRC("SHA-256 audit")}</div>
+      <div class="tile" data-at="0.24"><b>2 stages</b><span>frozen backbone, then last 3 blocks + head</span>${SRC("RTX 5060 Ti, ~20 min each")}</div>
+      <div class="tile" data-at="0.62"><b>70.6% · 85.7%</b><span>top-1 · top-3 on 45,800 test images</span>${SRC("macro-F1 66.7%")}</div>
+    </div>
+    <div class="charts">
+      <img data-at="0.36" src="${chart("11_training_curves.png")}" alt="">
+      <img data-at="0.74" src="${chart("12_calibration.png")}" alt="">
+    </div>`, secs);
+};
+
+SCENES.settings = async (secs) => {
+  // Paced to the narration: recognition ~45%, language model ~35%, prompts the rest.
+  const t0 = Date.now(), ms = secs * 1000;
+  const until = async (share) => pause(Math.max(400, t0 + ms * share - Date.now()));
+  await card("");
+  await page.goto(`${BASE}/admin/settings`);
+  await page.waitForLoadState("networkidle");
+  await chapter("Admin · model settings");
+  await page.getByText("Whole-photo suggestion threshold").first().waitFor({ timeout: 15000 });
+  const steps = [["Whole-photo suggestion threshold", 0.17], ["Identify threshold", 0.27], ["Personal memory match", 0.45]];
+  for (const [label, share] of steps) {
+    await point(page.getByText(label, { exact: true }).first(), { click: false });
+    await until(share);
+  }
+  await bringIntoView(page.getByText("Local language model", { exact: true }).first(), 120);
+  for (const [label, share] of [["Preferred model", 0.6], ["Temperature", 0.7], ["Time limit per call", 0.8]]) {
+    await point(page.getByText(label, { exact: true }).first(), { click: false });
+    await until(share);
+  }
+  await page.goto(`${BASE}/admin/prompts`);
+  await page.waitForLoadState("networkidle");
+  await chapter("Admin · versioned prompts");
+  await point(page.getByText(/History \(/).first(), { click: false });
+  await until(0.97);
 };
 
 SCENES.multifood = async (secs) => {
@@ -609,7 +656,7 @@ SCENES.quality = async (secs) => {
   await card(`
     <h2 data-at="0">Tested and deployable</h2>
     <div class="row">
-      <div class="tile" data-at="0.15"><b>64</b><span>automated tests, real PostgreSQL</span></div>
+      <div class="tile" data-at="0.15"><b>65</b><span>automated tests, real PostgreSQL</span></div>
       <div class="tile" data-at="0.35"><b>9 / 9</b><span>acceptance checks, sign-up to saved meal, also offline</span></div>
       <div class="tile" data-at="0.6"><b>Restart</b><span>account, meal and photo kept</span></div>
       <div class="tile" data-at="0.75"><b>1 command</b><span>docker compose up, on a CPU server</span></div>

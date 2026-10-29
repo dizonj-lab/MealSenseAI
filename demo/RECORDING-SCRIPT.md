@@ -23,7 +23,7 @@ And the stakes are high. The World Health Organization counts about eight hundre
 
 I know visibility works. After Nutri-Grade labels, household sugar from pre-packed drinks fell by about eighteen percent. But labels stop at the bottle and the box. Food apps help you count calories or search a food list. What's still hard is the moment at the stall: knowing what this plate may do to your glucose, and how sure that estimate is.
 
-**05 · What MealSenseAI does** — on camera (video + audio), file `05.mp4`, about 18 s
+**05 · What MealSenseAI does** — on camera (video + audio), file `05.mp4`, about 36 s
 
 That's the gap MealSenseAI fills. One photo becomes foods, portions and nutrition. The numbers become meaning: glucose impact, glycaemic load, and a practical next step. And every estimate is honest about its uncertainty, so the person stays in control of every number. It works for anyone who wants to understand their food, with or without a health condition: the profile sets the goals, such as weight, heart health or balanced eating. I start with diabetes, because that's where the need is sharpest.
 
@@ -67,7 +67,7 @@ Questions come up, so there's a Meal Advisor. Wei Ming asks how his week went. T
 
 Over time, Nutrition Insights turns meals into trends: carbohydrates, sugar, fibre and sodium, day by day. Habits become visible, and so do the small changes that work.
 
-**16 · Pricing** — on camera (video + audio), file `16.mp4`, about 35 s
+**16 · Pricing** — on camera (video + audio), file `16.mp4`, about 33 s
 
 Here's the model from my proposal: freemium, to be tested in my trial. A free tier, to log meals and see their nutrition. The subscription, at three ninety-nine a month in Singapore and two ninety-nine in other ASEAN markets, adds the glucose estimates, the Meal Advisor and the simulators. That's well below AI nutrition apps, which run from about nine to sixty US dollars a month. Later, clinics and employers can offer it to their members.
 
@@ -81,38 +81,46 @@ Now, how it works. MealSenseAI runs as four containers on a single server. The b
 
 Every photo goes through ten stages, and each one is visible to the user: capture, preprocessing, detection, classification, portion, nutrition, aggregation, explanation, recommendations, and the editable review. Model outputs, estimates and guidance are labelled differently, so it's always clear which is which.
 
-**19 · Recognising the food** — on camera (video + audio), file `19.mp4`, about 37 s
+**19 · Recognising the food** — on camera (video + audio), file `19.mp4`, about 13 s
 
-Recognition uses EfficientNet-B0, fine-tuned by transfer learning on Food-101 and a Singapore food dataset: three hundred and twenty classes. I trained the last three blocks and the classifier head with AdamW, with a smaller learning rate for the backbone than for the head, and with data augmentation. It reached seventy-one percent top-one and eighty-six percent top-three accuracy. Exported to ONNX, it gave the same top three answers as the original model on six hundred test images, in about twelve milliseconds per photo on a CPU.
+Recognition uses EfficientNet-B0, a compact network that runs on an ordinary CPU. I trained it myself, on two public datasets: Food-101 and the Singapore dataset FoodSG-233. Here is how.
 
-**20 · Several foods on a plate** — on camera (video + audio), file `20.mp4`, about 25 s
+**20 · Training the model** — voice only (over the app demo), file `20.m4a`, about 67 s
+
+I started with three hundred and ten thousand images. A checksum audit found two thousand groups of identical files, so I removed forty-one hundred images with conflicting labels or duplicates; no image appears in both training and test. I kept Food-101's official test set and split FoodSG eighty, ten, ten. Training ran in two stages on my own GPU server. First, a new head for three hundred and twenty classes on a frozen backbone. Then the last three blocks as well, with a lower learning rate for the pretrained layers. Each stage took about twenty minutes, and validation macro-F1 rose from fifty-eight to sixty-six percent. On forty-five thousand eight hundred test images it scores seventy-one percent top-one and eighty-six percent top-three. Its confidence tracks its accuracy to within about two percent, which supports the app's thresholds. Exported to ONNX, it gives the same top three as the original, in about twelve milliseconds on a CPU.
+
+**21 · Several foods on a plate** — on camera (video + audio), file `21.mp4`, about 25 s
 
 Real plates have several foods. A YOLO segmentation model proposes regions, and each region is classified. On a hundred multi-food test plates, detection reached seventy-five percent precision and sixty-eight percent recall, at about a quarter of a second per plate. That's why the review stays human in the loop: a correction is one tap, or one dragged box.
 
-**21 · Portions, nutrition and glycaemic load** — on camera (video + audio), file `21.mp4`, about 30 s
+**22 · Portions, nutrition and glycaemic load** — on camera (video + audio), file `22.mp4`, about 30 s
 
 Each class maps to a nutrition record: two hundred and forty-seven exactly, sixty-six through the nearest food, and seven left for the user to choose. Portions come from typical servings, or from the food's area against the plate, always with an uncertainty band. Glycaemic load uses published GI values, and where a dish has none, fixed rules borrow the value of its staple. That covers seventy-eight more foods.
 
-**22 · The glucose estimate** — on camera (video + audio), file `22.mp4`, about 25 s
+**23 · The glucose estimate** — on camera (video + audio), file `23.mp4`, about 25 s
 
 The glucose estimate is a one-compartment mass-balance model. Glucose from the meal appears over time, is cleared at a rate set by the person's condition, and is used faster by working muscle during activity. It's anchored to typical glucose tolerance results, and after three meals with before and after readings, it calibrates to the person's own response.
 
-**23 · A grounded Meal Advisor** — on camera (video + audio), file `23.mp4`, about 31 s
+**24 · A grounded Meal Advisor** — on camera (video + audio), file `24.mp4`, about 31 s
 
 The Meal Advisor is grounded by design. A rule engine writes the answer from the user's own data first. The local language model, Qwen two point five, only rewords it, and a validator checks every number and food name against the facts before anything is shown. If the check fails, the rule-based answer is used. On thirty-eight test questions, covering arithmetic, safety and prompt injection, every answer passed, with no unsupported claims.
 
-**24 · Learning safely** — on camera (video + audio), file `24.mp4`, about 28 s
+**25 · Learning safely** — on camera (video + audio), file `25.mp4`, about 28 s
 
 It also learns safely. A food the user names is stored as a fingerprint and matched by cosine similarity, so it's recognised next time without retraining. Photos are shared for training only with consent. Each one is screened for poisoning patterns, and a new model must pass a gate on a fixed test set, then run in shadow mode, before it can go live.
 
-**25 · Tested and deployable** — on camera (video + audio), file `25.mp4`, about 22 s
+**26 · Configuring the models** — voice only (over the app demo), file `26.m4a`, about 68 s
+
+Every model is configured in the admin area, without changing code. For recognition, the thresholds are set here, and the calibration results back them: below point two a guess is not added, and a plate region below point four five is shown as unidentified. The personal food memory works like an embedding: each food a user names is stored as the classifier's own three-hundred-and-twenty-value output, and a new photo reuses that name when the cosine similarity is at least point seven. For the local language model I choose the model, here Qwen 2.5 with one and a half billion parameters on Ollama, a temperature of point one for consistent wording, and time limits after which the rule engine answers instead. Its prompts are versioned, so I can change one and roll it back. I benchmarked it against the rules: it was good at rewording and weak on facts, so it only rewords, and every output is checked.
+
+**27 · Tested and deployable** — on camera (video + audio), file `27.mp4`, about 22 s
 
 Quality is tested end to end, against a real database and a real browser: sixty-four automated tests, plus an acceptance run from sign-up to saved meal, which also passes with no internet, and keeps every record across a restart. It deploys with one Docker Compose command on a CPU server.
 
 ## Close
 
-**26 · MealSenseAI** — voice only (over the app demo), file `26.m4a`, about 16 s
+**28 · MealSenseAI** — voice only (over the app demo), file `28.m4a`, about 18 s
 
 Diabetes is managed one meal at a time, and so is everyday healthy eating. Most of those meals have no label. MealSenseAI puts the information on the plate, at the moment the choice is made. MealSenseAI. Understand your food. Make healthier choices.
 
-About 10 minutes of speech at 138 words a minute.
+About 12 minutes of speech at 138 words a minute.

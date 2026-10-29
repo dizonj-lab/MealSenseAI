@@ -2,6 +2,18 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.18 — Declarations; training and configuration in the video (no app change)
+
+- Report: a Declarations section (AI tools used and what they produced, datasets and third-party sources with terms
+  and citations, the author's scope of work with evidence), with highlighted placeholders for the author to
+  complete; a model-configuration table; nutrition approximations corrected to 204 records.
+- Video (`narration-full.json`, `record.mjs`): the model line is shortened and followed by "Training the model"
+  (data audit, split, two-stage training, results and calibration, over the report's training charts) and, after
+  "Learning safely", "Configuring the models" (admin settings and versioned prompts, paced to the narration).
+  `run.sh` gives the demo account the admin role; `DEMO_SLM=1` lets the demo use the live stack's Ollama
+  (`docker-compose.demo-slm.yml`). Recording files after line 19 are renumbered.
+- `model_card.json`: the metrics source now points to the training evidence.
+
 ## v0.13.17 — Training evidence (no app change)
 
 - `ml/models/exp002/evidence/training/`: EXP-001 and EXP-002 configuration, environment, training history, test
