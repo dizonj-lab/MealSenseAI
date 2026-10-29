@@ -1,7 +1,10 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.15'
+export const APP_VERSION = '0.13.16'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.16', title: 'Report wording', changes: [
+    'Behind the scenes: the final report rewritten in plain, first-person report language; no change to the app',
+  ] },
   { version: '0.13.15', title: 'For anyone, diabetes first', changes: [
     'Behind the scenes: the report, slides and video script now present MealSenseAI for anyone, with or without a health condition, with diabetes as the first focus; no change to the app',
   ] },

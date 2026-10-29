@@ -81,7 +81,7 @@ const cover = [
   new Paragraph({ spacing: { after: 600 }, children: [run("A photo-based meal recognition and nutrition-awareness system for anyone who wants to understand their food, starting with people managing diabetes in Singapore", { size: 24, color: INK2 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("NUS-ISS Practice Project (PT & Stackable) · Individual project", { size: 22 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("Dizon Joselito Villanueva", { size: 22 })] }),
-  new Paragraph({ spacing: { after: 80 }, children: [run("Final draft · 29 October 2026 · system version v0.13.13 · follows the proposal of 30 September 2026", { size: 22, color: INK2 })] }),
+  new Paragraph({ spacing: { after: 80 }, children: [run("Final draft · 29 October 2026 · system version v0.13.16 · follows the proposal of 30 September 2026", { size: 22, color: INK2 })] }),
   new Paragraph({ spacing: { before: 2400 }, children: [run("Educational estimates, not medical advice. Wei Ming, used in examples, is fictional.", { size: 18, color: INK2, italics: true })] }),
   new Paragraph({ children: [new PageBreak()] }),
 ];
@@ -94,7 +94,7 @@ const toc = [
 
 const summary = [
   H1("Executive summary"),
-  P("People living with diabetes decide what and how much to eat several times a day, and most hawker meals carry no label. **MealSenseAI** turns one meal photo into foods, portions and nutrition, then into meaning: potential glucose impact, glycaemic load (GL) and a practical next step, with every estimate labelled and correctable. It serves anyone, with or without a health condition: the profile sets goals such as general wellness, weight, heart health or balanced eating, and the guidance adapts. Diabetes is the first focus, as proposed, because the need there is sharpest."),
+  P("MealSenseAI is a web application that estimates the foods, portions and nutrition of a meal from one photo, and from these the meal's likely effect on blood glucose, its glycaemic load (GL) and a suggested next step. Each estimate is labelled with its type and range and can be corrected by the user. The application can be used by anyone; the user's profile sets the health condition, if any, and the goals that the guidance follows. As in my proposal, the first target group is people with Type 1 and Type 2 diabetes in Singapore."),
   ...TABLE("Headline results (all measured unless marked)", ["Area", "Result", "Evidence"], [
     ["Food recognition", "EfficientNet-B0, 320 classes: **70.6% top-1, 85.7% top-3**, macro-F1 66.7% (developer evaluation)", "model_card.json"],
     ["Runtime fidelity", "ONNX export gives the **same top-3 on 601 of 601 images**; 11.8 ms per photo on CPU", "onnx_parity.json"],
@@ -104,13 +104,13 @@ const summary = [
     ["Quality", "**65** automated tests passing; 9/9 acceptance checks, also offline; data kept across restart", "TEST_REPORT.md"],
     ["Language model", SLM ? `qwen2.5:1.5b on Buddy: ${SLM.rewrite.passed_validator} rewordings passed the validator; ${SLM.explain.grounded} explanations grounded` : "Benchmark ready (app/tools/slm_eval.py); **results pending** the run on the deployment server", "slm_eval.json"],
   ], [1900, 5026, 2100]),
-  P("The main weaknesses are honest ones: visually similar dishes (steak was recognised as itself in only 11% of matched cases), portions that a photo cannot weigh (±35–50%), nutrition values that are transcribed but not yet verified, and no trial with real users yet. Section 7 discusses each and the planned next steps."),
+  P("The main limitations are confusion between similar dishes (steak was correctly identified in 11% of matched cases), portion estimates of ±35–50% from a photo, nutrition values that have not been verified against an official source, and the absence of a trial with real users. These are discussed in Section 7."),
 ];
 
 const business = [
   H1("1. Business case and market research"),
   H2("1.1 The problem"),
-  P("A packet of biscuits states its sugar; a plate of chicken rice states nothing. In hawker meals the carbohydrate hides in the rice, the sauce and the drink, portions vary from stall to stall, and mixed dishes are hard to decompose. People therefore guess, and manual logging is tedious enough that most stop."),
+  P("Packaged food in Singapore carries nutrition labels; hawker food does not. In a typical hawker meal the carbohydrate is spread across rice, sauce and a sweetened drink, portion sizes differ between stalls, and mixed dishes are difficult to break down. People who need to manage carbohydrate therefore estimate by eye, and manual food logging is commonly abandoned because it takes too long."),
   H2("1.2 Why it matters"),
   ...TABLE("Burden of diabetes (cited figures)", ["Indicator", "Figure", "Source"], [
     ["People living with diabetes worldwide", "about 830 million", "WHO, 2022 (cited in the project proposal)"],
@@ -121,7 +121,7 @@ const business = [
     ["Yearly cost of diabetes to Singapore", "about S$1 billion (2010), rising to S$2.5 billion (2050); most of it lost productivity", "Png et al., BMC Public Health 2016"],
     ["Effect of making nutrition visible", "about 18% less household sugar from pre-packed drinks after Nutri-Grade", "Before-and-after study (cited in the proposal)"],
   ], [3300, 3126, 2600]),
-  P("The Nutri-Grade result is the business imperative in one line: when nutrition is easy to see, choices change. Labels, however, stop at the bottle and the box. The plate, where most carbohydrate is eaten, remains unlabelled."),
+  P("The Nutri-Grade study indicates that making nutrition visible changes purchasing. Labelling, however, covers packaged drinks and foods only; meals bought from hawker stalls remain unlabelled."),
   H2("1.3 Existing solutions"),
   ...TABLE("Competitive landscape (indicative monthly prices as in the proposal, USD unless stated; MyFitnessPal and Healthy 365 added)", ["Product", "Model and positioning", "Price"], [
     ["Foodvisor", "Freemium + premium; AI nutrition and coaching", "from US$15/month"],
@@ -132,18 +132,18 @@ const business = [
     ["Healthy 365 (HPB)", "Free government app; logging by search or photo, 3,000+ local foods", "Free"],
     ["**MealSenseAI (proposed)**", "Freemium + subscription; local food recognition, portion estimate, glucose meaning; ASEAN focus", "**S$3.99/month (Singapore), S$2.99/month (ASEAN)**"],
   ], [2300, 4426, 2300]),
-  P("As the proposal put it, the goal is not to be the cheapest but to deliver the right features at a competitive price. Existing apps help people count calories or find a food. What remains hard is the moment of choice at the stall: knowing what this specific plate may do to glucose, and how sure that estimate is. MealSenseAI is designed around that moment."),
+  P("The existing products support calorie counting and food search. None of them estimates the effect of a specific local meal on blood glucose together with the uncertainty of that estimate, which is the gap MealSenseAI addresses. In the proposal I positioned the product on features at a competitive price rather than on the lowest price."),
   H2("1.4 Value proposition and users"),
   ...BUL([
-    "**One photo → foods, portions and nutrition**, with Singapore dishes in the 320-class vocabulary and a local nutrition table.",
-    "**Numbers → meaning**: potential glucose impact, glycaemic load, a portion simulator and a walk what-if, before the person eats.",
-    "**Honest by design**: every value is labelled as model prediction, estimate, guidance or the user's own input, with its range and source; nothing is saved until the user confirms.",
+    "**From photo to nutrition**: foods, portions and nutrients, with Singapore dishes among the 320 classes and a local nutrition table.",
+    "**Glucose context**: likely glucose impact, glycaemic load, a portion simulator and an activity what-if, available before eating.",
+    "**Labelled outputs**: each value is marked as a model prediction, estimate, guidance or user input, with its range and source; nothing is saved until the user confirms.",
     "**Users**: anyone who wants to understand their food, with or without a health condition. The profile records a condition (none, prediabetes, Type 1, Type 2, gestational, or not disclosed) and goals (general wellness, carbohydrate or calorie awareness, weight management, balanced nutrition, diabetes-friendly, heart health); personalised notes follow them, for example salt and saturated fat against WHO limits for heart health, or energy density for weight.",
     "**First focus (MVP, as proposed)**: people with Type 1 and Type 2 diabetes in Singapore, where carbohydrate and portion awareness matter most; **also**: families and carers; **later**: organisations that support members. For Type 1 diabetes the app supports awareness only and is never a basis for insulin dosing.",
     "**Market focus**: Singapore first, scaling to Southeast Asia; aligned with UN SDG 3 (good health and well-being).",
   ]),
   H2("1.5 Pricing and market scenario"),
-  P("The proposal set a freemium model with a subscription at **SGD 3.99 a month in Singapore and SGD 2.99 a month in ASEAN markets**. The built product supports that split: logging and nutrition stay free, and the subscription carries the features that make the product different."),
+  P("In the proposal I set a freemium model with a subscription of S$3.99 a month in Singapore and S$2.99 a month in other ASEAN markets. In the built application I kept meal logging and nutrition free; glucose impact, the Meal Advisor and the simulators form the subscription."),
   ...TABLE("Tiers (prices as proposed; feature split from the built product)", ["Tier", "Includes", "Price"], [
     ["Free", "Photo and text meal logging, nutrition per meal and day, history and trends", "S$0"],
     ["Subscription", "Glucose impact and GL, Meal Advisor, portion and activity simulators, personal glucose calibration", "S$3.99/month (Singapore) · S$2.99/month (ASEAN)"],
@@ -156,7 +156,7 @@ const business = [
     ["Year-1 gross revenue", "≈ S$334.7K at a constant user base; ≈ S$353.6K with 1% monthly growth", "≈ S$147.9 million with 1% monthly growth"],
     ["Operating cost assumption", "50% of revenue (planning range 40–60%)", "50% of revenue"],
   ], [2700, 3163, 3163]),
-  P("The scenario counts people with diabetes only, so it is conservative: users without a condition are not included. These are scenario calculations carried over from the proposal, not financial forecasts. The cost assumption is not yet validated; what the build adds is evidence that the marginal compute cost is low, because every model runs on one CPU server with no paid AI service. Willingness to pay is part of the trial plan (Section 7.4)."),
+  P("The scenario is the one from my proposal and is not a forecast. It counts adults with diabetes only and so excludes users without a condition. The 50% operating-cost assumption has not been validated; the build shows only that the compute cost is low, since all models run on one CPU server without a paid AI service. I will measure willingness to pay in the trial (Section 7.4)."),
 ];
 
 const tools = [
@@ -164,14 +164,14 @@ const tools = [
   ...TABLE("Tools and techniques used, and why", ["Area", "Tool / technique", "Why"], [
     ["Food recognition", "EfficientNet-B0 (torchvision), transfer learning; ONNX Runtime", "Accurate for its size; runs in ~12 ms on CPU"],
     ["Food regions", "YOLO11n-seg (COCO), mask and box regions", "Finds several foods and containers on one plate"],
-    ["Portions", "Typical-serving priors, mask-area ratio to plate or bowl, user grams; uncertainty bands", "A photo cannot weigh food; bands make that explicit"],
-    ["Nutrition", "286-record table with provenance; exact / proxy / none mapping; difflib fuzzy lookup", "Every number traceable to a record"],
+    ["Portions", "Typical-serving priors, mask-area ratio to plate or bowl, user grams; uncertainty bands", "A photo gives no weight; the bands state the error"],
+    ["Nutrition", "286-record table with provenance; exact / proxy / none mapping; difflib fuzzy lookup", "Each value traceable to a record"],
     ["Glycaemic load", "Published GI (Atkinson 2021) plus rule-based GI borrowing from the staple", "Covers local dishes without inventing values"],
-    ["Glucose estimate", "One-compartment mass-balance ODE, OGTT anchor, per-user median-ratio calibration", "Explainable and conservative"],
-    ["Language model", "Ollama with Qwen 2.5 1.5B, JSON-schema output, temperature control", "Local, small, structured; wording only"],
+    ["Glucose estimate", "One-compartment mass-balance ODE, OGTT anchor, per-user median-ratio calibration", "Interpretable; errs on the high side"],
+    ["Language model", "Ollama with Qwen 2.5 1.5B, JSON-schema output, temperature control", "Runs locally on CPU; used for wording only"],
     ["Grounding", "Rule engine draft → SLM rewrite → validator (numbers ±2%, food names, unsafe phrases)", "No unsupported number reaches the user (advisor replies and, from v0.13.13, meal explanations)"],
     ["Personal memory", "Class-probability fingerprints, cosine similarity ≥ 0.70 with a 0.05 margin", "Recognises a user's own foods without retraining"],
-    ["Data governance", "Per-sample consent, 11 screening checks, perceptual hashes, frozen dataset versions, model gate with shadow mode", "Safe learning from user photos"],
+    ["Data governance", "Per-sample consent, 11 screening checks, perceptual hashes, frozen dataset versions, model gate with shadow mode", "Controlled use of user photos for training"],
     ["Backend", "FastAPI, SQLAlchemy 2, Alembic, PostgreSQL 16, Python 3.12", "Typed API, migrations on start"],
     ["Frontend", "React 18, TypeScript, Vite 6, Tailwind CSS 4, Recharts", "Phone-first, light and dark themes"],
     ["Deployment", "Docker Compose (nginx, backend, db, optional Ollama and Redis), CPU", "One command; works offline"],
@@ -183,13 +183,13 @@ const tools = [
 const design = [
   H1("3. System design and models"),
   H2("3.1 Architecture"),
-  P("The system is four containers on one server (Figure 1). The browser only talks to nginx, which serves the app and proxies /api to the FastAPI backend. The backend holds the models, rules and advisor in one process and stores everything in PostgreSQL; meal photos and model packages live in a volume. An optional local language model runs beside it. No paid cloud AI is involved."),
+  P("The system runs as four containers on one server (Figure 1). The browser connects only to nginx, which serves the web application and forwards /api requests to the FastAPI backend. The backend loads the models, rules and advisor in one process and stores data in PostgreSQL; photos and model packages are kept in a volume. An optional local language model runs in a separate container. No cloud AI service is used."),
   ...FIG("09_architecture.png", 6.2, "Deployment architecture."),
   H2("3.2 The ten-stage pipeline"),
-  P("The pipeline follows the proposal's ten stages: meal capture, image pre-processing, food instance detection, food classification, portion estimation, nutrition mapping, meal aggregation, AI contextualisation (with the user's context), recommendations and application output (Figure 2). Each stage is shown to the user with what it did, and outputs are tagged by kind: model prediction, estimate, guidance or user input."),
+  P("The pipeline uses the ten stages I defined in the proposal: meal capture, image pre-processing, food instance detection, food classification, portion estimation, nutrition mapping, meal aggregation, AI contextualisation with the user's context, recommendations and application output (Figure 2). The result of each stage is shown to the user, and each output is tagged as a model prediction, an estimate, guidance or user input."),
   ...FIG("10_pipeline.png", 6.2, "Inference pipeline; colour shows the kind of output."),
   H2("3.3 Data"),
-  P("As proposed, the localised source is **FoodSG-233** (209,861 images, 233 Singapore food classes, 13 food groups) and the general source is **Food-101** (101,000 images, 101 classes). Class names were harmonised into one taxonomy of **320 classes**, images validated and de-duplicated, and the data split **70% / 15% / 15%** (train / validation / test), stratified with a fixed seed so no duplicate crosses splits. Augmentation is applied to the training set only (ml/training/config.yaml). Every class maps to a nutrition record or is marked for the user to choose (Section 3.6)."),
+  P("I used the two datasets named in the proposal. FoodSG-233 provides 209,861 images of 233 Singapore food classes in 13 food groups; Food-101 provides 101,000 images of 101 classes. I harmonised the class names into a single taxonomy of 320 classes and validated and de-duplicated the images. I split the data 70/15/15 into training, validation and test sets, stratified by class with a fixed seed, and applied augmentation to the training set only (ml/training/config.yaml). Each class is mapped to a nutrition record or marked for the user to choose (Section 3.6)."),
   H2("3.4 Recognition model"),
   ...TABLE("EXP-002 training configuration (ml/models/exp002/evidence/train_finetune.py)", ["Setting", "Value"], [
     ["Backbone", "EfficientNet-B0, initialised from EXP-001 (ImageNet weights, unified Food-101 + FoodSG taxonomy)"],
@@ -200,9 +200,9 @@ const design = [
     ["Augmentation", "RandomResizedCrop (0.8–1.0), horizontal flip 0.5, rotation 20°, colour jitter (0.2, 0.2, 0.2, hue 0.05)"],
     ["Deployment", "ONNX (opset 17) on ONNX Runtime CPU; preprocessing bit-identical to training (max abs diff 0.0)"],
   ], [2200, 6826]),
-  P("Optimisation choices were made for a CPU server: a compact backbone, partial fine-tuning (fewer parameters to adapt, less over-fitting on a modest dataset), discriminative learning rates (smaller for pretrained layers) and export to ONNX. Scores are raw softmax values, not calibrated probabilities, so the UI never presents them as \"% sure\"; items below 0.20 are not auto-added and items between 0.20 and 0.50 are marked for checking."),
+  P("I configured the model for a CPU server: a compact backbone, partial fine-tuning to limit over-fitting, lower learning rates for the pretrained layers than for the head, and export to ONNX. The scores are softmax outputs and are not calibrated, so the interface does not present them as percentages of certainty. Items scoring below 0.20 are not added automatically, and items between 0.20 and 0.50 are marked for the user to check."),
   H2("3.5 Several foods on a plate"),
-  P("YOLO11n-seg proposes food and container regions; each region is cropped from the original photo and classified. Weak regions become \"Unidentified food\" with the model's own top three, and small or nested ones are kept as hidden suggestions. Users can also drag a box over a missed food (v0.13.2), which is classified on its own."),
+  P("YOLO11n-seg proposes regions for foods and containers. Each region is cropped from the original photo and classified separately. Regions with low scores are listed as \"Unidentified food\" with the model's top three classes, and small or nested regions are kept as hidden suggestions. Since v0.13.2 the user can also draw a box around a food that was missed; the box is classified in the same way."),
   H2("3.6 Portions, nutrition and glycaemic load"),
   ...BUL([
     "**Portion**: grams entered by the user (±15%), mask area against a detected plate or bowl (±35%), or a typical serving (±50%); a serving note such as \"half\" scales it.",
@@ -220,7 +220,7 @@ const design = [
     "**Scale**: the relative curve is anchored so a 75 g glucose drink gives a typical OGTT peak rise (+3, +5, +8 mmol/L for normal, prediabetes, diabetes). After three meals with before-and-after readings, the median ratio of measured to predicted rise calibrates it to the person.",
   ]),
   H2("3.8 Grounded Meal Advisor"),
-  P("A rule engine writes each answer from the user's meals, profile and the food table, tagging every point with its evidence level (you, the model, the food table, guidance, calculated). If the local language model is available it only rewords the draft; a validator then checks that every number is within ±2% of a number in the facts, that no new food names appear, and that no unsafe statement (dosing, diagnosis, guarantees) is present. If any check fails, the rule answer is shown. Medication and urgent questions bypass the model entirely."),
+  P("A rule engine drafts each answer from the user's meals, profile and the food table, and each statement is tagged with its source. When the local language model is available it rewrites the wording of the draft. A validator then checks that every number in the rewrite is within ±2% of a number in the facts, that no new food names were added, and that there are no unsafe statements such as dosing or diagnosis. If any check fails, the rule-based answer is shown. Questions about medication or urgent symptoms are answered by rules only."),
   H2("3.9 Learning safely from users"),
   ...BUL([
     "**Personal memory**: a named photo region is stored as a fingerprint (square root of the 320 class probabilities). A later region is matched by cosine similarity ≥ 0.70 with a 0.05 margin over any other label. On held-out Food-101 photos, 0.70 gave 94 of 120 matches, all correct.",
@@ -232,7 +232,7 @@ const design = [
 const dev = [
   H1("4. System development and implementation"),
   H2("4.1 Process"),
-  P("The system was built iteratively in versioned increments (v0.1 to v0.13.13, about 50 commits from 23 to 29 October 2026, following the proposal of 30 September). Each change was tested, versioned, recorded in the changelog and test report, and deployed to the home server (\"Buddy\") by the developer. The code base has about 6,800 lines of Python in the backend, 3,700 lines of TypeScript in the frontend and 2,000 lines of ML tooling, with 10 test modules."),
+  P("I developed the system iteratively, in versioned releases from v0.1 to v0.13.16 (about 55 commits between 23 and 29 October 2026, after the proposal of 30 September). I tested each release, recorded it in the changelog and test report, and deployed it to my home server (\"Buddy\"). The code base has about 6,800 lines of Python in the backend, 3,700 lines of TypeScript in the frontend and 2,000 lines of machine-learning tooling, with 10 test modules."),
   H2("4.2 From proposal to build"),
   ...TABLE("Proposed design (30 September 2026) and what was built", ["Proposed", "Built", "Why"], [
     ["Web UI with a webcam; smartphone later", "Phone-first responsive web app (camera or upload) plus desktop", "Capture happens at the table, so the phone came first"],
@@ -244,7 +244,7 @@ const dev = [
     ["ML development environment (Jupyter / PyTorch)", "ml/training pipeline and evaluation scripts", "Reproducible from a config file"],
     ["Nutrition reference store", "286-record table with provenance, plus users' custom foods", "As proposed"],
     ["Local SLM (Ollama); optional frontier LLM", "Ollama with Qwen 2.5 1.5B; no external LLM", "Data stays on the server; no paid AI service"],
-    ["Portion from plate/bowl dimensions (open challenge)", "Typical-serving priors, plate/bowl area ratio, reference objects, user grams, with bands", "Volume from one 2D photo remains unsolved; the bands say so"],
+    ["Portion from plate/bowl dimensions (open challenge)", "Typical-serving priors, plate/bowl area ratio, reference objects, user grams, with bands", "Volume from a single 2D photo is not solved; ranges are shown"],
   ], [2700, 3626, 2700]),
   H2("4.3 Main features"),
   ...TABLE("Features and the use cases they serve", ["Use case", "Implementation"], [
@@ -287,58 +287,58 @@ const experiments = [
     ["Portion / nutrition: MAE or % error against known reference portions", "Not measured: no weighed reference portions yet; estimates carry ±15–50% bands", "Gap, planned with the trial"],
     ["Recommendations: factuality, relevance, safety", "38/38 labelled questions passed, 0% unsupported claims, safety 6/6, injection 3/3", "Measured (E4)"],
   ], [2900, 4126, 2000]),
-  P("All experiments run on CPU (a 4-vCPU environment for E2–E5, E7 and E8; the deployment server for E6). E1 is reported, not reproduced, because the training datasets are not part of the package; ml/evaluation/evaluate.py re-measures it on any labelled folder."),
+  P("I ran all experiments on CPU: E2–E5, E7 and E8 on a 4-vCPU environment and E6 on the deployment server. E1 is reported from my training run and was not reproduced here, because the training datasets are not included in the package; ml/evaluation/evaluate.py can repeat it on any labelled folder."),
 ];
 
 const perf = [
   H1("6. System performance"),
   H2("6.1 Recognition"),
   ...FIG("01_model_metrics.png", 5.6, "Classifier quality (E1)."),
-  P("Roughly 7 in 10 photos get the right top-1 class and about 86% have it in the top three, which is why the review always offers three candidates. The ONNX deployment reproduces the trained model exactly in ranking (E2: 100% top-1 and top-3 agreement, logits within 1.35 × 10⁻⁴)."),
+  P("The classifier placed the correct class first for 70.6% of test photos and within the top three for 85.7%; for this reason the review screen always shows three candidates. The ONNX model ranked classes identically to the trained PyTorch model on all 601 images (E2), with logits differing by at most 1.35 × 10⁻⁴."),
   ...FIG("02_multifood_outcomes.png", 6.0, "What happened to each true item on multi-food plates (E3)."),
-  P("On mixed plates, detection found 180 of 263 items (recall 68.4%) with 61 false regions (precision 74.7%; AP50 0.59). Classification of matched items was 56.1% top-1 and 75.0% top-3. Pizza was recognised well (86%), but steak only 11% of the time: 29% went to close variants (sirloin, filet mignon) that carry similar nutrition, and 48% were left unidentified for the user to name rather than guessed."),
+  P("On the 100 multi-food plates, detection found 180 of 263 items (recall 68.4%) and produced 61 false regions (precision 74.7%; AP50 0.59). Of the matched items, 56.1% were classified correctly first and 75.0% within the top three. Results varied by food: pizza was correct in 86% of cases, steak in 11%; a further 29% of steaks were labelled as close variants such as sirloin, which have similar nutrition, and 48% were left as unidentified."),
   H2("6.2 Speed"),
   ...FIG("03_latency.png", 5.8, "Response times on CPU."),
   H2("6.3 Nutrition and glycaemic coverage"),
   ...FIG("04_coverage.png", 5.8, "Mapping coverage: classes to nutrition records, foods to GI."),
   ...FIG("05_gi_borrowing.png", 5.4, "Where borrowed GI values come from (78 foods)."),
-  P("Before v0.13.8 only 57 of 286 foods had a GI, so most hawker meals showed \"glycaemic load not estimated\". Rule-based borrowing raises that to 135 foods (47%); the remaining 151 are mostly meat, vegetables, kueh and fruit, where no single staple dominates."),
+  P("Before v0.13.8, 57 of the 286 foods had a published GI, so GL could not be calculated for most hawker meals. With rule-based borrowing, 135 foods (47%) have a GI value. Most of the remaining 151 foods are meat, vegetables, kueh and fruit, for which no single staple applies."),
   H2("6.4 Language and text matching"),
   ...FIG("06_text_matching.png", 5.6, "Matching food names that the table does not list verbatim (E5" + (SLM ? ", E6)." : ").")),
-  P("Before any language model is asked, the rules do well on whole descriptions: the splitter recovered the exact food set for **19 of 20** descriptions (F1 0.987; it missed \"soft boiled eggs\"). On unknown names, however, the fuzzy lookup was right for only 7 of 15 and **confidently wrong for 4** (sugarcane juice → orange juice, curry chicken → chicken breast, mung bean soup → consommé, fishball soup → fried bee hoon). Because the language model is only consulted when the lookup returns nothing, these wrong matches currently bypass it; Section 7 proposes the fix."),
+  P("The rule-based parser returned the exact set of foods for 19 of 20 meal descriptions (F1 0.987); it missed \"soft boiled eggs\". The fuzzy lookup matched 7 of 15 unknown food names correctly and 4 incorrectly (sugarcane juice to orange juice, curry chicken to chicken breast, mung bean soup to consommé, fishball soup to fried bee hoon). Because the language model is consulted only when the lookup finds no match, these incorrect matches are not checked by it (Section 7.3)."),
   ...(slmRows ? TABLE(`Local language model on the deployment server (E6): ${SLM.model}, ${SLM.tokens_per_s ? SLM.tokens_per_s.mean + " tokens/s" : ""}`, ["Task", "Language model", "Rule baseline", "p50 / p95 ms"], slmRows, [2200, 3626, 1900, 1300])
     : [P("**E6 results pending.** The benchmark (app/tools/slm_eval.py) runs the four language-model tasks above on fixed inputs with known answers, read-only, on the deployment server. This table will be completed from that run.", { shading: { fill: "FDF2E7", type: ShadingType.CLEAR, color: "auto" } })]),
-  ...(SLM ? [P("The result is clear and not flattering to the language model. On every task with a rule baseline, the **rules were better**: description parsing F1 0.987 against 0.732 (19 against 9 exact sets), and on unknown names the model was right 4 times in 15 and **wrong 6 times**, against the fuzzy lookup's 7 right and 4 wrong. Rewording advisor drafts is where it helps: **7 of 8** rewordings passed the validator and could be shown; the eighth fell back to the rule answer. Its meal explanations were the weakest: only **1 of 6** used only numbers from the facts."),
-    P("That last result exposed a gap. Advisor replies passed through the validator before they were shown, but meal explanations were displayed **without that check**, so an explanation could state a number the system never computed. **Fixed in v0.13.13**: explanations now pass the same validator, and one that fails is not shown (the rule-based results remain; the check is stored for audit). With this model most explanations will now be withheld, which is the right trade-off for a health app. The general lesson is the design's premise: a 1.5-billion-parameter model is useful for wording, not for facts, and every model output needs a deterministic check.")] : []),
+  ...(SLM ? [P("On every task that had a rule baseline, the rules performed better than the language model: description parsing F1 0.987 against 0.732 (19 against 9 exact sets), and unknown-name matching 7 correct and 4 wrong against 4 correct and 6 wrong. For rewording advisor drafts, 7 of 8 outputs passed the validator. Only 1 of 6 meal explanations used numbers that were all present in the facts."),
+    P("Meal explanations were displayed without validation, so an explanation could include a number the system had not calculated. From v0.13.13 they pass the same validator as advisor replies, and an explanation that fails is not shown; the check result is stored. With this model most explanations will be withheld. From these results I conclude that a 1.5-billion-parameter model is suitable for rewording but not as a source of facts, and that its output needs to be checked.")] : []),
   ...TABLE("Language model in real use on the deployment server (inference log, all calls since it was enabled)", ["Task", "Calls", "Completed", "Mean ms", "p50 / p95 ms"], [
     ["Meal explanation", "24", "100%", "1,515", "1,465 / 3,299"],
     ["Meal Advisor reply", "3", "100%", "4,735", "5,304 / 5,314"],
   ], [2600, 1200, 1500, 1500, 2226]),
-  P("Every call returned a valid answer within its timeout. That is a small sample (27 calls) and measures availability and speed, not quality. The rules answer in about 12 ms, so the model adds 1.5–5 seconds; this is why explanations are deferred (the result appears first) and the rules stay the fallback."),
+  P("All 27 calls returned a valid answer within the timeout. The sample is small and shows availability and speed, not answer quality. The language model added 1.5 to 5 seconds per call, compared with about 12 ms for the rules, which is why the explanation is requested after the results are displayed."),
   H2("6.5 Grounded advisor"),
-  P("All 38 labelled questions passed (E4), across meal retrieval, carbohydrate arithmetic, explainability, food lookup, week summaries, safety (6/6), prompt injection (3/3), conversation (4/4) and user isolation, with **no unsupported claims** and a 12 ms median reply (18 ms p95) from the rule engine."),
+  P("All 38 labelled questions passed (E4), covering meal retrieval, carbohydrate arithmetic, explanations, food lookup, weekly summaries, safety (6/6), prompt injection (3/3), conversation (4/4) and user isolation. No answer contained an unsupported claim. The median response time was 12 ms (18 ms p95)."),
   H2("6.6 Glucose model scenarios"),
   ...FIG("07_glucose_curves.png", 6.0, "Estimated meal glucose for one meal under three choices (E8)."),
-  P("For chicken rice with teh tarik (95.6 g carbohydrate, GL 66.3), the model estimates that a 15-minute brisk walk 15 minutes after eating lowers the peak by only 2.3% and the area by 2.7% (it uses about 55 kcal, 7% of the meal's energy), while eating two-thirds of the rice lowers GL to 48.4 and the peak by about a quarter. The model therefore points users to the portion before the walk, consistent with GL arithmetic. These are population-level estimates, not measurements."),
+  P("For chicken rice with teh tarik (95.6 g carbohydrate, GL 66.3), the model estimates that a 15-minute brisk walk starting 15 minutes after the meal lowers the peak by 2.3% and the area under the curve by 2.7%; the walk uses about 55 kcal, 7% of the meal's energy. Eating two-thirds of the rice lowers GL to 48.4 and the peak by about 23%. In this example the portion has a larger effect than the walk. The values are population-level estimates, not measurements."),
   H2("6.7 Quality"),
   ...FIG("08_tests_growth.png", 5.6, "Automated tests over the project."),
-  P("All 65 automated tests pass against a real PostgreSQL database; browser flows pass on phone and desktop sizes with no JavaScript errors; the acceptance run passed 9 of 9 checks, also with the internet disconnected, and data survived a restart."),
+  P("All 65 automated tests pass against a real PostgreSQL database. Browser tests pass at phone and desktop sizes without JavaScript errors. The acceptance run passed 9 of 9 checks, including with the internet disconnected, and data was retained after a restart."),
 ];
 
 const findings = [
   H1("7. Findings and discussion"),
   H2("7.1 What worked"),
   ...BUL([
-    "**Human in the loop beats a single answer.** With top-3 at 85.7% and one-tap correction, a wrong top-1 costs a tap, not a wrong log.",
-    "**Grounding by construction.** Letting rules produce facts and the language model only produce wording gave zero unsupported claims in the advisor, and a safe fallback when the model is slow or offline. Where the check was missing (meal explanations), the model added numbers of its own in 5 of 6 cases; the benchmark found it, and the check now covers both.",
-    "**Honest uncertainty is a feature.** Leaving an item unidentified (48% of missed steaks) is preferable to a confident wrong dish for someone counting carbohydrate.",
-    "**Cheap to run.** Every model runs on one CPU server; the classifier takes ~12 ms and a full multi-food analysis ~0.26 s.",
+    "**Top-3 with correction**: with the correct class in the top three for 85.7% of photos, a wrong first guess is usually fixed with one tap.",
+    "**Rules for facts, model for wording**: the advisor gave no unsupported claims in testing and falls back to rules when the model is slow or offline. Meal explanations, which were not validated, contained unsupported numbers in 5 of 6 cases; they are validated from v0.13.13.",
+    "**Unidentified rather than wrong**: 48% of steaks were left unidentified for the user to name instead of being given a wrong label, which is safer when carbohydrate is being counted.",
+    "**Low running cost**: all models run on one CPU server; classification takes about 12 ms and a multi-food analysis about 0.26 s.",
   ]),
   H2("7.2 Limitations"),
   ...BUL([
-    "**The small language model adds little**: rules beat it on parsing and matching, and 5 of 6 meal explanations contained a number of their own. Since v0.13.13 those are withheld, so most users will see the rule-based results without a model explanation. A larger or fine-tuned local model would need to be re-measured with the same benchmark.",
+    "**Limited value from the small language model**: the rules performed better on parsing and matching, and 5 of 6 meal explanations contained a number of their own. Since v0.13.13 those are withheld, so most users will see the rule-based results without a model explanation. A larger or fine-tuned local model would need to be re-measured with the same benchmark.",
     "**Visually similar dishes** (steak vs sirloin, noodle soups, rice plates) remain the main confusion; scores are uncalibrated.",
-    "**Portions** come from priors or area, not volume (±35–50%); entering grams is the accurate path. The proposal's portion error measure (MAE against weighed portions) has not been run.",
+    "**Portions** come from priors or area, not volume (±35–50%); entering grams is more accurate. I have not yet measured portion error (MAE against weighed portions) as proposed.",
     "**Nutrition values are unverified** transcriptions (USDA- and HPB-style values) or recipe approximations (199 records); a verified import (HPB SG FoodID, USDA FDC) is required before clinical use.",
     "**Glucose estimates** use population physiology; they are not predictions for an individual and must never inform insulin dosing.",
     "**Accuracy evidence for E1 is reported**, not reproduced in this package; the multi-food set is synthetic; no real-user trial has been run.",
@@ -353,9 +353,9 @@ const findings = [
     "Calibrate scores (temperature scaling) so the review can show reliable confidence.",
   ], "num2"),
   H2("7.4 Trial plan"),
-  P("The trial should also weigh a set of reference portions, to measure portion error as the proposal intended. A two-phase evaluation is proposed: five to eight moderated sessions (task success, time, one-question ease rating) followed by a two-week field trial with 15–30 people (System Usability Scale, UMUX-Lite, trust and comprehension items, willingness to pay for Plus). The app already logs the needed behaviour: accepted vs corrected foods, top-3 hits, drawn boxes, memory matches, portion edits and language-model use. Consent under Singapore's PDPA, training consent off by default and a clear not-medical-advice statement are prerequisites."),
+  P("I plan a two-phase evaluation. Phase 1 is five to eight moderated sessions measuring task success, time and ease. Phase 2 is a two-week field trial with 15–30 participants, measuring the System Usability Scale, UMUX-Lite, trust, comprehension and willingness to pay. I will weigh reference portions to measure portion error (MAE), as set out in the proposal. The application already logs the required behaviour: accepted and corrected foods, top-3 selections, drawn boxes, memory matches, portion edits and language-model use. Participation requires PDPA consent; training consent is off by default, and the application states that it does not give medical advice."),
   H1("8. Conclusion", false),
-  P("MealSenseAI shows that a small, local, explainable system can make an unlabelled hawker plate legible: recognition good enough when paired with one-tap correction, glycaemic load for most local staples, a glucose estimate that favours sensible portions, and an advisor that cannot make up numbers. The next step is evidence from real users and verified nutrition data."),
+  P("MealSenseAI estimates the nutrition and glycaemic effect of a hawker meal from a photo, using models that run locally on a CPU server. Recognition reaches 85.7% top-3 with one-tap correction, GL can be calculated for 135 of 286 foods, and the advisor's answers contain only numbers from the system's own data. My next steps are a trial with real users and a verified nutrition source."),
 ];
 
 const refs = [
