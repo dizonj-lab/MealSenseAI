@@ -303,3 +303,30 @@ for i, (lab, col) in enumerate([("model prediction", AQUA), ("estimate", ORANGE)
 ax.set_ylim(-0.3, 3)
 ax.set_title("The ten-stage pipeline from the proposal (each stage shown to the user)")
 save(fig, "10_pipeline.png", "backend/app/services/analysis.py, docs/ARCHITECTURE.md")
+
+# 21. TF-IDF nearest-neighbour name matching vs the fuzzy lookup (and the SLM on the 15 names) ---------------------
+tf = HERE / "tfidf_eval.json"
+if tf.exists():
+    T = json.loads(tf.read_text())
+    sets = [("15 unknown names", T["unknown_names"]["results"]), (f"{T['leave_one_alias_out']['n']} held-out aliases", T["leave_one_alias_out"]["results"])]
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.7), gridspec_kw={"width_ratios": [1, 1]})
+    for ax, (title, R) in zip(axes, sets):
+        methods = [("Fuzzy lookup (current)", R["lookup"]), ("TF-IDF, cosine ≥ 0.6", R["tfidf@0.6"])]
+        if title.startswith("15") and slm.exists():
+            m = s["match"]; ok = round(m["accuracy"] * m["n"])
+            methods.insert(1, ("Language model", {"correct": ok, "wrong": m["slm_wrong_match"], "no_match": m["n"] - ok - m["slm_wrong_match"], "n": m["n"]}))
+        left = [0] * len(methods); yy = list(range(len(methods)))[::-1]
+        for key, lab, col in [("correct", "Correct", BLUE), ("wrong", "Wrong food", ORANGE), ("no_match", "No match", GREY)]:
+            vals = [mm[1][key] / mm[1]["n"] * 100 for mm in methods]
+            bars = ax.barh(yy, vals, left=left, height=0.55, color=col, label=lab, edgecolor="white", linewidth=1.5)
+            for b, v, l0, mm in zip(bars, vals, left, methods):
+                if v >= 9: ax.text(l0 + v / 2, b.get_y() + b.get_height() / 2, f"{mm[1][key]}", ha="center", va="center", fontsize=8, color="white" if col != GREY else INK)
+            left = [l + v for l, v in zip(left, vals)]
+        ax.set_yticks(yy, [mm[0] for mm in methods], fontsize=8.5); ax.set_xlim(0, 100); ax.set_xlabel("% of names")
+        ax.set_title(title, fontsize=10); ax.tick_params(left=False)
+    axes[1].set_yticks(list(range(2))[::-1], ["Fuzzy lookup (current)", "TF-IDF, cosine ≥ 0.6"], fontsize=8.5)
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, frameon=False, ncol=3, loc="upper left", bbox_to_anchor=(0.01, 0.9), fontsize=8)
+    fig.suptitle("Matching food names: character TF-IDF nearest neighbour", x=0.01, ha="left", fontsize=12, weight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.8))
+    save(fig, "21_tfidf_matching.png", "backend/app/tools/tfidf_eval.py (tfidf_eval.json); slm_eval.json for the language model")

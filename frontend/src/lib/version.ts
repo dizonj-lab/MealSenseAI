@@ -1,7 +1,10 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.18'
+export const APP_VERSION = '0.13.19'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.19', title: 'TF-IDF and embedding evaluations', changes: [
+    'Behind the scenes: two read-only experiments, TF-IDF matching of food names and a PCA, clustering and nearest-neighbour analysis of the food model; no change to the app',
+  ] },
   { version: '0.13.18', title: 'Declarations; training and configuration in the video', changes: [
     'Behind the scenes: the report declares AI use, datasets and the author\'s scope of work; the presentation video gains scenes on training the model and configuring the models; no change to the app',
   ] },

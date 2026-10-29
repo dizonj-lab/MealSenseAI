@@ -198,3 +198,11 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | `record.mjs` training and settings scenes against the local app (admin granted with `app.tools.admin`) | **PASS**: the training card with both charts fits 1080p; the settings scene runs 68 s for a 68 s line, pointing at the thresholds, memory match, model, temperature and time limit, then the prompts page |
 | Report build and render | **PASS**: declarations tables fit |
 | Not run here | `DEMO_SLM=1` against the live Ollama on Buddy |
+
+## v0.13.19: TF-IDF and embedding evaluations (29 Oct 2026)
+
+| Test | Result |
+|---|---|
+| `app.tools.tfidf_eval` on the local food table | **Ran**: results above (`docs/report/tfidf_eval.json`) |
+| `embedding_eval.py` analysis functions on synthetic clusters | **PASS**: perfect labels give NMI = ARI = 1; random labels ARI ≈ 0; silhouette matches a direct computation |
+| Not run here | `embedding_eval.py` on the real test images (needs Buddy, PyTorch and the datasets) |

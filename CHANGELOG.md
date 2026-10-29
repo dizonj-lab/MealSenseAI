@@ -2,6 +2,16 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.19 — TF-IDF and embedding evaluations (no app change)
+
+- `python -m app.tools.tfidf_eval`: character 3–5-gram TF-IDF with cosine 1-nearest-neighbour for food names,
+  against the fuzzy lookup, on the 15 unknown names and on 480 held-out aliases (leave one alias out). Result in
+  `docs/report/tfidf_eval.json`: on held-out aliases 320 correct / 75 wrong / 85 no match at cosine ≥ 0.6, against
+  108 / 24 / 348 for the lookup; on the 15 names 10 / 2 / 3 against 7 / 4 / 4 (language model 4 / 6 / 5).
+- `ml/evaluation/embedding_eval.py` (run on the training machine): the classifier's 1280-value features for a
+  stratified test sample; PCA explained variance and k-NN accuracy after reduction, cosine k-NN (k = 1, 5, 10) next
+  to the linear head, k-means against the labels (NMI, ARI, purity), silhouette, and 2-D PCA points. NumPy only.
+
 ## v0.13.18 — Declarations; training and configuration in the video (no app change)
 
 - Report: a Declarations section (AI tools used and what they produced, datasets and third-party sources with terms
