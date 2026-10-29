@@ -26,7 +26,7 @@ SMTP_FROM=you@gmail.com
 ```
 Without them, read messages with `docker compose exec backend python -m app.services.mailer`.
 
-Code: branch `mealsense-mvp`. The last commit before this work is **`152852d`** (rollback target).
+Code: branch `mealsenseai-mvp`. The last commit before this work is **`152852d`** (rollback target).
 
 ## 1. What changes in the database (migrations `0005`, `0006`, additive only)
 | Change | Effect on existing data |
@@ -55,7 +55,7 @@ Use the **same compose files and flags Buddy uses today** (for example `-f docke
 -f docker-compose.gpu.yml` and `--profile slm` if Ollama runs in compose). The commands only rebuild the two app images.
 They never remove volumes.
 ```bash
-git fetch origin mealsense-mvp && git checkout mealsense-mvp && git pull
+git fetch origin mealsenseai-mvp && git checkout mealsenseai-mvp && git pull
 docker compose <same -f files> build backend frontend
 docker compose <same -f files> up -d backend frontend      # db, ollama, volumes and the tunnel keep running
 docker compose <same -f files> logs --tail=50 backend      # expect "Running upgrade 0004 -> 0005" and "0005 -> 0006"
