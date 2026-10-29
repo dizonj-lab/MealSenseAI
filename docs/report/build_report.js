@@ -78,7 +78,7 @@ const cover = [
   new Paragraph({ spacing: { after: 240 }, children: [run("Understand your food. Make healthier choices.", { size: 30, color: INK2 })] }),
   new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: TEAL, space: 6 } }, spacing: { after: 360 }, children: [] }),
   new Paragraph({ spacing: { after: 120 }, children: [run("Final Report", { bold: true, size: 36 })] }),
-  new Paragraph({ spacing: { after: 600 }, children: [run("A photo-based meal recognition and glucose-awareness system for people managing diabetes in Singapore", { size: 24, color: INK2 })] }),
+  new Paragraph({ spacing: { after: 600 }, children: [run("A photo-based meal recognition and nutrition-awareness system for anyone who wants to understand their food, starting with people managing diabetes in Singapore", { size: 24, color: INK2 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("NUS-ISS Practice Project (PT & Stackable) · Individual project", { size: 22 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("Dizon Joselito Villanueva", { size: 22 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("Final draft · 29 October 2026 · system version v0.13.13 · follows the proposal of 30 September 2026", { size: 22, color: INK2 })] }),
@@ -94,7 +94,7 @@ const toc = [
 
 const summary = [
   H1("Executive summary"),
-  P("People living with diabetes decide what and how much to eat several times a day, and most hawker meals carry no label. **MealSenseAI** turns one meal photo into foods, portions and nutrition, then into meaning: potential glucose impact, glycaemic load (GL) and a practical next step, with every estimate labelled and correctable."),
+  P("People living with diabetes decide what and how much to eat several times a day, and most hawker meals carry no label. **MealSenseAI** turns one meal photo into foods, portions and nutrition, then into meaning: potential glucose impact, glycaemic load (GL) and a practical next step, with every estimate labelled and correctable. It serves anyone, with or without a health condition: the profile sets goals such as general wellness, weight, heart health or balanced eating, and the guidance adapts. Diabetes is the first focus, as proposed, because the need there is sharpest."),
   ...TABLE("Headline results (all measured unless marked)", ["Area", "Result", "Evidence"], [
     ["Food recognition", "EfficientNet-B0, 320 classes: **70.6% top-1, 85.7% top-3**, macro-F1 66.7% (developer evaluation)", "model_card.json"],
     ["Runtime fidelity", "ONNX export gives the **same top-3 on 601 of 601 images**; 11.8 ms per photo on CPU", "onnx_parity.json"],
@@ -138,7 +138,8 @@ const business = [
     "**One photo → foods, portions and nutrition**, with Singapore dishes in the 320-class vocabulary and a local nutrition table.",
     "**Numbers → meaning**: potential glucose impact, glycaemic load, a portion simulator and a walk what-if, before the person eats.",
     "**Honest by design**: every value is labelled as model prediction, estimate, guidance or the user's own input, with its range and source; nothing is saved until the user confirms.",
-    "**MVP users** (as proposed): people with Type 1 and Type 2 diabetes in Singapore, focused on carbohydrate and portion awareness; **secondary**: families and carers; **later**: other conditions that need diet control, and organisations that support members with diabetes. For Type 1 diabetes the app supports awareness only and is never a basis for insulin dosing.",
+    "**Users**: anyone who wants to understand their food, with or without a health condition. The profile records a condition (none, prediabetes, Type 1, Type 2, gestational, or not disclosed) and goals (general wellness, carbohydrate or calorie awareness, weight management, balanced nutrition, diabetes-friendly, heart health); personalised notes follow them, for example salt and saturated fat against WHO limits for heart health, or energy density for weight.",
+    "**First focus (MVP, as proposed)**: people with Type 1 and Type 2 diabetes in Singapore, where carbohydrate and portion awareness matter most; **also**: families and carers; **later**: organisations that support members. For Type 1 diabetes the app supports awareness only and is never a basis for insulin dosing.",
     "**Market focus**: Singapore first, scaling to Southeast Asia; aligned with UN SDG 3 (good health and well-being).",
   ]),
   H2("1.5 Pricing and market scenario"),
@@ -155,7 +156,7 @@ const business = [
     ["Year-1 gross revenue", "≈ S$334.7K at a constant user base; ≈ S$353.6K with 1% monthly growth", "≈ S$147.9 million with 1% monthly growth"],
     ["Operating cost assumption", "50% of revenue (planning range 40–60%)", "50% of revenue"],
   ], [2700, 3163, 3163]),
-  P("These are scenario calculations carried over from the proposal, not financial forecasts. The cost assumption is not yet validated; what the build adds is evidence that the marginal compute cost is low, because every model runs on one CPU server with no paid AI service. Willingness to pay is part of the trial plan (Section 7.4)."),
+  P("The scenario counts people with diabetes only, so it is conservative: users without a condition are not included. These are scenario calculations carried over from the proposal, not financial forecasts. The cost assumption is not yet validated; what the build adds is evidence that the marginal compute cost is low, because every model runs on one CPU server with no paid AI service. Willingness to pay is part of the trial plan (Section 7.4)."),
 ];
 
 const tools = [

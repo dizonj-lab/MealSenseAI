@@ -454,8 +454,9 @@ SCENES.value = async (secs) => {
     <div class="pains">
       <div class="tile" data-at="0.12"><b>One photo</b><span>becomes foods, portions and nutrition.</span></div>
       <div class="tile" data-at="0.35"><b>Meaning</b><span>glucose impact, glycaemic load and a practical next step.</span></div>
-      <div class="tile" data-at="0.6"><b>Honest</b><span>every estimate shows its range and source. You confirm.</span></div>
-    </div>`, secs);
+      <div class="tile" data-at="0.45"><b>Honest</b><span>every estimate shows its range and source. You confirm.</span></div>
+    </div>
+    <small data-at="0.72">For anyone, with or without a health condition: wellness, weight, heart health, balanced eating. Diabetes first, where the need is sharpest.</small>`, secs);
 };
 
 SCENES.mark = async () => {

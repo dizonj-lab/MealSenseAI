@@ -2,6 +2,12 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.15 — For anyone, diabetes first (no app change)
+
+- Positioning in the report, slides and video script: MealSenseAI serves anyone, with or without a health condition
+  (the profile's goals already cover wellness, weight, heart health and balanced eating); diabetes stays the first
+  focus, as proposed. Narration: the value and closing lines; the value card adds a "for anyone" line.
+
 ## v0.13.14 — Individual project wording (no app change)
 
 - Report cover, slide covers and the video script: an individual project (no group); "we/our" became "I/my" in the

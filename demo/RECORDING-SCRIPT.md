@@ -25,7 +25,7 @@ I know visibility works. After Nutri-Grade labels, household sugar from pre-pack
 
 **05 · What MealSenseAI does** — on camera (video + audio), file `05.mp4`, about 18 s
 
-That's the gap MealSenseAI fills. One photo becomes foods, portions and nutrition. The numbers become meaning: glucose impact, glycaemic load, and a practical next step. And every estimate is honest about its uncertainty, so the person stays in control of every number.
+That's the gap MealSenseAI fills. One photo becomes foods, portions and nutrition. The numbers become meaning: glucose impact, glycaemic load, and a practical next step. And every estimate is honest about its uncertainty, so the person stays in control of every number. It works for anyone who wants to understand their food, with or without a health condition: the profile sets the goals, such as weight, heart health or balanced eating. I start with diabetes, because that's where the need is sharpest.
 
 **06 · Meet Wei Ming** — voice only (over the app demo), file `06.m4a`, about 13 s
 
@@ -113,6 +113,6 @@ Quality is tested end to end, against a real database and a real browser: sixty-
 
 **26 · MealSenseAI** — voice only (over the app demo), file `26.m4a`, about 16 s
 
-Diabetes is managed one meal at a time, and most of those meals have no label. MealSenseAI puts the information on the plate, at the moment the choice is made. MealSenseAI. Understand your food. Make healthier choices.
+Diabetes is managed one meal at a time, and so is everyday healthy eating. Most of those meals have no label. MealSenseAI puts the information on the plate, at the moment the choice is made. MealSenseAI. Understand your food. Make healthier choices.
 
 About 10 minutes of speech at 138 words a minute.

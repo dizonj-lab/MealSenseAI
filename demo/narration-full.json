@@ -76,7 +76,7 @@
    "id": "value",
    "part": "Business",
    "title": "What MealSenseAI does",
-   "text": "That's the gap MealSenseAI fills. One photo becomes foods, portions and nutrition. The numbers become meaning: glucose impact, glycaemic load, and a practical next step. And every estimate is honest about its uncertainty, so the person stays in control of every number.",
+   "text": "That's the gap MealSenseAI fills. One photo becomes foods, portions and nutrition. The numbers become meaning: glucose impact, glycaemic load, and a practical next step. And every estimate is honest about its uncertainty, so the person stays in control of every number. It works for anyone who wants to understand their food, with or without a health condition: the profile sets the goals, such as weight, heart health or balanced eating. I start with diabetes, because that's where the need is sharpest.",
    "mode": "camera"
   },
   {
@@ -223,7 +223,7 @@
    "id": "outro",
    "part": "Close",
    "title": "MealSenseAI",
-   "text": "Diabetes is managed one meal at a time, and most of those meals have no label. MealSenseAI puts the information on the plate, at the moment the choice is made. MealSenseAI. Understand your food. Make healthier choices.",
+   "text": "Diabetes is managed one meal at a time, and so is everyday healthy eating. Most of those meals have no label. MealSenseAI puts the information on the plate, at the moment the choice is made. MealSenseAI. Understand your food. Make healthier choices.",
    "mode": "screen"
   }
  ]
