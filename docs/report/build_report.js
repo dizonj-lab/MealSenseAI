@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Table, TableRow, TableCell, WidthType,
-  ShadingType, BorderStyle, ImageRun, PageBreak, TableOfContents, Footer, Header, PageNumber, LevelFormat,
+  ShadingType, BorderStyle, ImageRun, PageBreak, TableOfContents, Footer, Header, PageNumber, LevelFormat, TabStopType,
 } = require("docx");
 
 const HERE = __dirname;
@@ -478,8 +478,8 @@ const doc = new Document({
   sections: [
     { properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 } } }, children: cover },
     { properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 }, pageNumbers: { start: 1 } } },
-      headers: { default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [run("MealSenseAI · Final Report", { size: 16, color: INK2 })] })] }) },
-      footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ children: [PageNumber.CURRENT], size: 18, color: INK2 })] })] }) },
+      headers: { default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new ImageRun({ type: "png", data: fs.readFileSync(path.join(HERE, "nus_iss_logo.png")), transformation: { width: 158, height: 40 }, altText: { title: "NUS ISS", description: "National University of Singapore, Institute of Systems Science", name: "NUS ISS logo" } })] })] }) },
+      footers: { default: new Footer({ children: [new Paragraph({ tabStops: [{ type: TabStopType.CENTER, position: W / 2 }, { type: TabStopType.RIGHT, position: W }], children: [run("MealSenseAI · Final Report", { size: 16, color: INK2 }), run("\t© National University of Singapore", { size: 16, color: INK2 }), new TextRun({ children: ["\t", PageNumber.CURRENT], size: 18, color: INK2 })] })] }) },
       children: [...toc, ...summary, ...business, ...tools, ...design, ...dev, ...experiments, ...perf, ...findings, ...declarations, ...refs] },
   ],
 });
