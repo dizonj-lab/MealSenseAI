@@ -79,7 +79,7 @@ const cover = [
   new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: TEAL, space: 6 } }, spacing: { after: 360 }, children: [] }),
   new Paragraph({ spacing: { after: 120 }, children: [run("Final Report", { bold: true, size: 36 })] }),
   new Paragraph({ spacing: { after: 600 }, children: [run("A photo-based meal recognition and glucose-awareness system for people managing diabetes in Singapore", { size: 24, color: INK2 })] }),
-  new Paragraph({ spacing: { after: 80 }, children: [run("NUS-ISS Practice Project · Practice Project Group (PT & Stackable) 31", { size: 22 })] }),
+  new Paragraph({ spacing: { after: 80 }, children: [run("NUS-ISS Practice Project (PT & Stackable) · Individual project", { size: 22 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("Dizon Joselito Villanueva", { size: 22 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("Final draft · 29 October 2026 · system version v0.13.13 · follows the proposal of 30 September 2026", { size: 22, color: INK2 })] }),
   new Paragraph({ spacing: { before: 2400 }, children: [run("Educational estimates, not medical advice. Wei Ming, used in examples, is fictional.", { size: 18, color: INK2, italics: true })] }),
@@ -382,7 +382,7 @@ const refs = [
 
 const num = (ref, fmt) => ({ reference: ref, levels: [{ level: 0, format: fmt, text: fmt === LevelFormat.BULLET ? "•" : "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 300 } } } }] });
 const doc = new Document({
-  creator: "Dizon Joselito Villanueva", title: "MealSenseAI Final Report", description: "Final report, Practice Project Group 31",
+  creator: "Dizon Joselito Villanueva", title: "MealSenseAI Final Report", description: "Final report, Individual project",
   features: { updateFields: true },
   styles: {
     default: { document: { run: { font: "Calibri", size: 22 } } },

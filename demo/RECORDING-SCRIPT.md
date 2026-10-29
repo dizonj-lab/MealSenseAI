@@ -21,7 +21,7 @@ And the stakes are high. The World Health Organization counts about eight hundre
 
 **04 · The gap** — on camera (video + audio), file `04.mp4`, about 27 s
 
-We know visibility works. After Nutri-Grade labels, household sugar from pre-packed drinks fell by about eighteen percent. But labels stop at the bottle and the box. Food apps help you count calories or search a food list. What's still hard is the moment at the stall: knowing what this plate may do to your glucose, and how sure that estimate is.
+I know visibility works. After Nutri-Grade labels, household sugar from pre-packed drinks fell by about eighteen percent. But labels stop at the bottle and the box. Food apps help you count calories or search a food list. What's still hard is the moment at the stall: knowing what this plate may do to your glucose, and how sure that estimate is.
 
 **05 · What MealSenseAI does** — on camera (video + audio), file `05.mp4`, about 18 s
 
@@ -69,7 +69,7 @@ Over time, Nutrition Insights turns meals into trends: carbohydrates, sugar, fib
 
 **16 · Pricing** — on camera (video + audio), file `16.mp4`, about 35 s
 
-Here's the model from our proposal: freemium, to be tested in our trial. A free tier, to log meals and see their nutrition. The subscription, at three ninety-nine a month in Singapore and two ninety-nine in other ASEAN markets, adds the glucose estimates, the Meal Advisor and the simulators. That's well below AI nutrition apps, which run from about nine to sixty US dollars a month. Later, clinics and employers can offer it to their members.
+Here's the model from my proposal: freemium, to be tested in my trial. A free tier, to log meals and see their nutrition. The subscription, at three ninety-nine a month in Singapore and two ninety-nine in other ASEAN markets, adds the glucose estimates, the Meal Advisor and the simulators. That's well below AI nutrition apps, which run from about nine to sixty US dollars a month. Later, clinics and employers can offer it to their members.
 
 ## System design
 
@@ -83,7 +83,7 @@ Every photo goes through ten stages, and each one is visible to the user: captur
 
 **19 · Recognising the food** — on camera (video + audio), file `19.mp4`, about 37 s
 
-Recognition uses EfficientNet-B0, fine-tuned by transfer learning on Food-101 and a Singapore food dataset: three hundred and twenty classes. We trained the last three blocks and the classifier head with AdamW, with a smaller learning rate for the backbone than for the head, and with data augmentation. It reached seventy-one percent top-one and eighty-six percent top-three accuracy. Exported to ONNX, it gave the same top three answers as the original model on six hundred test images, in about twelve milliseconds per photo on a CPU.
+Recognition uses EfficientNet-B0, fine-tuned by transfer learning on Food-101 and a Singapore food dataset: three hundred and twenty classes. I trained the last three blocks and the classifier head with AdamW, with a smaller learning rate for the backbone than for the head, and with data augmentation. It reached seventy-one percent top-one and eighty-six percent top-three accuracy. Exported to ONNX, it gave the same top three answers as the original model on six hundred test images, in about twelve milliseconds per photo on a CPU.
 
 **20 · Several foods on a plate** — on camera (video + audio), file `20.mp4`, about 25 s
 

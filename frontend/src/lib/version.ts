@@ -1,7 +1,10 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.13'
+export const APP_VERSION = '0.13.14'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.14', title: 'Individual project wording', changes: [
+    'Behind the scenes: the report, slides and video script are worded for an individual project; no change to the app',
+  ] },
   { version: '0.13.13', title: 'Checked meal explanations', changes: [
     'The plain-language meal explanation from the local language model is now checked like Meal Advisor replies: if it states a number that is not in your results, it is not shown',
   ] },

@@ -2,6 +2,11 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.14 — Individual project wording (no app change)
+
+- Report cover, slide covers and the video script: an individual project (no group); "we/our" became "I/my" in the
+  three narration lines that used it (gap, pricing, model).
+
 ## v0.13.13 — Meal explanations are validated
 
 - The local SLM's meal explanation (stage 8) now passes the Meal Advisor's validator before it is shown: every number
