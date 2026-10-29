@@ -9,7 +9,8 @@
 | About 18% less household sugar from pre-packed drinks after Nutri-Grade | Nutri-Grade before-and-after study (as cited in the project proposal) |
 | Photo calorie apps around US$30 a year | Cal AI published pricing (~US$29.99/year), 2026; third-party summaries, confirm in the App Store |
 | Premium trackers around US$80 a year | MyFitnessPal Premium published pricing (US$79.99/year), 2026; confirm at myfitnesspal.com/premium |
-| Pricing tiers (Free, Plus S$4.90/month or S$39/year, Care per member) | Proposed by the project; to be validated in the trial |
+| Pricing (freemium; subscription S$3.99/month Singapore, S$2.99/month ASEAN; organisations later) | Project proposal, 30 September 2026; to be validated in the trial |
+| Competitor prices (Foodvisor, Cal AI, SnapCalorie, Healthify; indicative monthly USD) | Project proposal, 30 September 2026 |
 | 70.6% top-1, 85.7% top-3, 66.7% macro-F1 | EXP-002 developer evaluation (`ml/models/exp002/model_card.json`) |
 | Same top 3 after ONNX export on 601 images; 11.8 ms per photo | Measured (`ml/models/exp002/evidence/onnx_parity.json`) |
 | 74.7% precision, 68.4% recall, 262 ms median per plate | Measured on 100 synthetic multi-food plates (`test-results/multifood_metrics.json`) |

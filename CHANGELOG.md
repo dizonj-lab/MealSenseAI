@@ -2,6 +2,16 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.12 — Aligned with the submitted proposal (no app change)
+
+- Report, slides and video script harmonised with the proposal of 30 September 2026: pricing is freemium with a
+  subscription at S$3.99/month (Singapore) and S$2.99/month (ASEAN), replacing S$4.90/S$39; MVP users are people with
+  Type 1 and Type 2 diabetes; competitors and the IDF market scenario are the proposal's; the pipeline chart uses the
+  proposal's ten stage names.
+- Report: a data section (FoodSG-233 + Food-101, 70/15/15), a "proposed vs built" table, and the proposal's
+  validation measures against the results, including the gap: portion error (MAE) has not been measured.
+- `demo/`: pricing line, pricing card and sources updated.
+
 ## v0.13.11 — Final report sources (no app change)
 
 - `docs/report/`: the figure script (`make_charts.py`, ten charts from the evidence files and the app's own models),

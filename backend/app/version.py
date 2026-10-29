@@ -1,1 +1,1 @@
-APP_VERSION = "0.13.11"   # kept in step with frontend/src/lib/version.ts
+APP_VERSION = "0.13.12"   # kept in step with frontend/src/lib/version.ts

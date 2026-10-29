@@ -215,16 +215,16 @@ ax.text(0.1, 0.4, "Docker Compose, one CPU server\nno paid cloud AI service", fo
 ax.set_title("Deployment architecture")
 save(fig, "09_architecture.png", "docker-compose.yml, docs/ARCHITECTURE.md")
 
-stages = [("1 Capture", "user input"), ("2 Preprocess", "EXIF, ≤1024 px"), ("3 Detect", "YOLO11n-seg"), ("4 Classify", "EfficientNet-B0\ntop-3"),
-          ("5 Portion", "prior or area\n± band"), ("6 Nutrition", "exact · proxy\n· none"), ("7 Aggregate", "totals, GL\n(GI ≥70% carbs)"),
-          ("8 Explain", "local SLM\nor rules"), ("9 Recommend", "rules, cited\nguidance"), ("10 Review", "user confirms\n& corrects")]
+stages = [("1 Meal capture", "camera or upload"), ("2 Pre-processing", "EXIF, ≤1024 px"), ("3 Detection", "YOLO11n-seg"), ("4 Classification", "EfficientNet-B0\ntop-3"),
+          ("5 Portion", "prior or area\n± band"), ("6 Nutrition map", "exact · proxy\n· none"), ("7 Aggregation", "meal totals, GL\n(GI ≥70% carbs)"),
+          ("8 Context (AI)", "user context +\nlocal SLM or rules"), ("9 Recommend", "rules, cited\nguidance"), ("10 Output", "user confirms\n& corrects")]
 fig, ax = plt.subplots(figsize=(7.2, 2.6))
 ax.set_xlim(0, 10); ax.set_ylim(0, 3); ax.axis("off")
 for i, (t1, t2) in enumerate(stages):
     row, col = divmod(i, 5)
     x, y = 0.1 + col * 2.0, 1.65 - row * 1.5
     tag = AQUA if i in (2, 3) else ORANGE if i in (4, 5, 6) else BLUE if i in (7, 8) else TEAL
-    box(ax, x, y, 1.7, 1.15, t1, t2, edge=tag, tsize=8.5, bsize=7.5)
+    box(ax, x, y, 1.7, 1.15, t1, t2, edge=tag, tsize=7.6, bsize=7.5)
     if col < 4:
         arrow(ax, x + 1.7, y + 0.57, x + 2.0, y + 0.57)
 ax.annotate("", (0.95, 1.3), (9.05, 1.65), arrowprops=dict(arrowstyle="-|>", color=INK2, lw=1.0, connectionstyle="arc3,rad=0.0", ls=":"))
@@ -232,5 +232,5 @@ for i, (lab, col) in enumerate([("model prediction", AQUA), ("estimate", ORANGE)
     ax.add_patch(FancyBboxPatch((0.1 + i * 2.2, -0.2), 0.25, 0.18, boxstyle="round,pad=0.01", fc="white", ec=col, lw=1.6))
     ax.text(0.45 + i * 2.2, -0.11, lab, va="center", fontsize=8, color=INK2)
 ax.set_ylim(-0.3, 3)
-ax.set_title("The ten-stage inference pipeline (each stage shown to the user)")
+ax.set_title("The ten-stage pipeline from the proposal (each stage shown to the user)")
 save(fig, "10_pipeline.png", "backend/app/services/analysis.py, docs/ARCHITECTURE.md")

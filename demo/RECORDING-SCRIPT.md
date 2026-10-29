@@ -69,7 +69,7 @@ Over time, Nutrition Insights turns meals into trends: carbohydrates, sugar, fib
 
 **16 · Pricing** — on camera (video + audio), file `16.mp4`, about 35 s
 
-Here's how we propose to offer it, to be tested in our trial. A free tier, to log meals and see their nutrition. MealSenseAI Plus, at four ninety a month or thirty-nine dollars a year, adds the glucose estimates, the Meal Advisor and the simulators. That places it between photo calorie apps, at around thirty US dollars a year, and premium trackers, at around eighty. And MealSenseAI Care, licensed per member to clinics, employers and insurers who support people with diabetes.
+Here's the model from our proposal: freemium, to be tested in our trial. A free tier, to log meals and see their nutrition. The subscription, at three ninety-nine a month in Singapore and two ninety-nine in other ASEAN markets, adds the glucose estimates, the Meal Advisor and the simulators. That's well below AI nutrition apps, which run from about nine to sixty US dollars a month. Later, clinics and employers can offer it to their members.
 
 ## System design
 

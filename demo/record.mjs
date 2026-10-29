@@ -495,13 +495,13 @@ SCENES.mark = async () => {
 SCENES.pricing = async (secs) => {
   await chapter("");
   await card(`
-    <h2 data-at="0">Pricing <small style="font-size:22px">(proposed, to validate in the trial)</small></h2>
+    <h2 data-at="0">Pricing <small style="font-size:22px">(freemium, as proposed; to validate in the trial)</small></h2>
     <div class="tiers">
       <div class="tile" data-at="0.08"><b>Free</b><em>S$0</em><ul><li>Photo and text meal logging</li><li>Nutrition per meal and day</li><li>History and trends</li></ul></div>
-      <div class="tile hi" data-at="0.3"><b>Plus</b><em>S$4.90 a month · S$39 a year</em><ul><li>Glucose impact and glycaemic load</li><li>Meal Advisor</li><li>Portion and activity simulators, your own readings</li></ul></div>
-      <div class="tile" data-at="0.78"><b>Care</b><em>per member, for organisations</em><ul><li>Clinics, employers, insurers</li><li>Same app for members</li><li>Priced per member per month</li></ul></div>
+      <div class="tile hi" data-at="0.3"><b>Subscription</b><em>S$3.99/month Singapore · S$2.99 ASEAN</em><ul><li>Glucose impact and glycaemic load</li><li>Meal Advisor</li><li>Portion and activity simulators, your own readings</li></ul></div>
+      <div class="tile" data-at="0.78"><b>Organisations</b><em>later, per member</em><ul><li>Clinics, employers, insurers</li><li>Same app for members</li><li>Priced with pilots</li></ul></div>
     </div>
-    <small data-at="0.5">Reference: photo calorie apps ~US$30/yr (Cal AI); premium trackers ~US$80/yr (MyFitnessPal Premium). Published prices, 2026.</small>`, secs);
+    <small data-at="0.5">AI nutrition apps: Foodvisor, Cal AI, SnapCalorie, Healthify, about US$9–60/month (indicative, as in the proposal).</small>`, secs);
 };
 
 SCENES.design = async (secs) => {
