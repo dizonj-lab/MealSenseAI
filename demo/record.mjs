@@ -21,7 +21,8 @@ const PHOTOS = resolve(process.env.PHOTOS ?? join(here, "photos"));
 const EMAIL = "weiming@mealsense.example";
 const PASSWORD = "demo-mealsense-2026";
 const LUNCH = join(PHOTOS, "chicken_rice.jpg");
-const narration = JSON.parse(readFileSync(join(here, "narration.json"), "utf8")).scenes;
+const SCRIPT = process.env.NARRATION ?? "narration.json";   // narration-full.json: the 12-minute presentation
+const narration = JSON.parse(readFileSync(join(here, SCRIPT), "utf8")).scenes;
 const plan = Object.fromEntries(narration.map((s) => [s.id, { ...s, seconds: s.text.split(/\s+/).length / 2.35 + 1 }]));
 try {
   const spoken = JSON.parse(readFileSync(join(here, "clips", "durations.json"), "utf8")).seconds;
@@ -75,6 +76,26 @@ const overlay = () => {
       font: 700 22px Inter, system-ui, sans-serif; }
     #demo-card .pains { display: grid; grid-template-columns: repeat(3, 330px); gap: 28px; margin-top: 10px; }
     #demo-card .pains .tile b { font-size: 34px; color: #fff; }
+    #demo-card .tiers { display: grid; grid-template-columns: repeat(3, 400px); gap: 28px; margin-top: 10px; }
+    #demo-card .tiers .tile b { font-size: 44px; } #demo-card .tiers .tile em { display: block; margin-top: 6px; font-style: normal; font-size: 19px; color: #99f6e4; }
+    #demo-card .tiers .tile ul { margin: 14px 0 0; padding-left: 20px; font-size: 19px; line-height: 1.5; color: #f0fdfa; }
+    #demo-card .tiers .tile.hi { border-color: #5eead4; background: rgba(94,234,212,.12); }
+    #demo-card .arch { display: flex; align-items: center; gap: 18px; margin-top: 12px; }
+    #demo-card .box { padding: 18px 20px; min-width: 190px; border-radius: 16px; background: rgba(240,253,250,.08); border: 1px solid rgba(153,246,228,.35);
+      text-align: left; font-size: 18px; line-height: 1.35; color: #ccfbf1; }
+    #demo-card .box b { display: block; font-size: 23px; color: #fff; margin-bottom: 4px; }
+    #demo-card .box.side { border-style: dashed; }
+    #demo-card .arrow { font-size: 34px; color: #5eead4; }
+    #demo-card .steps { display: grid; grid-template-columns: repeat(5, 290px); gap: 16px; margin-top: 10px; }
+    #demo-card .steps div { padding: 14px 16px; border-radius: 14px; background: rgba(240,253,250,.08); border: 1px solid rgba(153,246,228,.25);
+      text-align: left; font-size: 20px; color: #fff; }
+    #demo-card .steps div i { display: block; font-style: normal; font-size: 15px; color: #99f6e4; margin-top: 4px; }
+    #demo-card .steps div span { color: #5eead4; font-weight: 800; margin-right: 8px; }
+    #demo-card .two { display: grid; grid-template-columns: 640px 760px; gap: 40px; text-align: left; margin-top: 8px; }
+    #demo-card .two ul { margin: 0; padding-left: 22px; font-size: 22px; line-height: 1.6; color: #f0fdfa; }
+    #demo-card .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    #demo-card .metrics .tile { width: auto; padding: 18px 20px; } #demo-card .metrics .tile b { font-size: 44px; }
+    #demo-card .eq { font: 600 40px "STIX Two Math", Georgia, serif; color: #fff; padding: 18px 34px; border-radius: 16px; background: rgba(240,253,250,.08); }
     #demo-card [data-at] { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
     #demo-card [data-at].in { opacity: 1; transform: none; }`;
   const mount = () => {
@@ -108,6 +129,8 @@ const overlay = () => {
         }
       }
       el.style.opacity = html ? "1" : "0";
+      const cursor = document.getElementById("demo-cursor");   // no pointer over a title card
+      if (cursor) cursor.style.opacity = html ? "0" : "1";
     },
   };
   if (document.body) mount(); else addEventListener("DOMContentLoaded", mount);
@@ -196,11 +219,10 @@ async function scene(id, run) {
   log[log.length - 1].actual = (Date.now() - start) / 1000;
 }
 
-// The opening runs over title cards on the landing page, signed out.
-await page.goto(`${BASE}/`);
-await page.waitForLoadState("networkidle");
+// Scenes by id; narration.json (or NARRATION) decides which run, in its order.
+const SCENES = {};
 
-await scene("hook", async (secs) => {
+SCENES.hook = async (secs) => {
   await card(`
     <h1 data-at="0">Most meals don't come with a label.</h1>
     <div class="versus">
@@ -212,9 +234,9 @@ await scene("hook", async (secs) => {
         <span class="q" style="left:60px;bottom:30px">? portion</span></div>
     </div>
     <small data-at="0.5">Illustrative label. Photo: Wikimedia Commons (credits in the description).</small>`, secs);
-});
+};
 
-await scene("pain", async (secs) => {
+SCENES.pain = async (secs) => {
   await card(`
     <h2 data-at="0">So people guess.</h2>
     <div class="pains">
@@ -223,9 +245,9 @@ await scene("pain", async (secs) => {
       <div class="tile" data-at="0.55"><b>So what?</b><span>Even good numbers are hard to act on.</span></div>
     </div>
     <p data-at="0.75">Logging every meal by hand is tedious, so most people stop.</p>`, secs);
-});
+};
 
-await scene("stakes", async (secs) => {
+SCENES.stakes = async (secs) => {
   await card(`
     <h2 data-at="0">Why it matters now</h2>
     <div class="row">
@@ -235,18 +257,18 @@ await scene("stakes", async (secs) => {
       <div class="tile" data-at="0.5"><b>−18%</b><span>household sugar from pre-packed drinks after Nutri-Grade</span><i>Before-and-after study</i></div>
     </div>
     <p data-at="0.82">Labels reach the bottle and the box. Not the plate.</p>`, secs);
-});
+};
 
-await scene("meet", async () => {
+SCENES.meet = async () => {
   await card("");
   await pause(1400);
   await moveTo(960, 520);
   await pause(Math.max(0, plan.meet.seconds * 1000 * 0.45 - 1400));
   await scroll(620, 20);
   await pause(2500);
-});
+};
 
-await scene("dashboard", async () => {
+SCENES.dashboard = async () => {
   // Signed in as Wei Ming from here on.
   await page.evaluate((t) => localStorage.setItem("msai_token", t), token);
   await page.goto(`${BASE}/profile`);
@@ -269,9 +291,9 @@ await scene("dashboard", async () => {
   await pause(1200);
   await point(page.getByText("Today's macro energy"), { click: false });
   await pause(1500);
-});
+};
 
-await scene("capture", async () => {
+SCENES.capture = async () => {
   await scroll(-900, 8);
   await point(page.getByRole("link", { name: "Capture Meal" }).last());
   await page.waitForURL(/capture/);
@@ -291,9 +313,9 @@ await scene("capture", async () => {
   }
   await pause(400);
   await point(page.getByRole("button", { name: /^lunch$/i }).first());
-});
+};
 
-await scene("review", async () => {
+SCENES.review = async () => {
   await chapter("Review");
   await pause(500);
   const card1 = page.getByRole("button", { name: /Why\? Show how this was estimated/ }).first();
@@ -308,11 +330,11 @@ await scene("review", async () => {
   }
   await point(card1);  // hide the details again
   await pause(800);
-});
+};
 
-await scene("meaning", async (secs) => {
+SCENES.meaning = async (secs) => {
   await chapter("What it means");
-  await bringIntoView(page.getByText("Key takeaways").first(), 130);
+  await open("Key takeaways");   // collapsed since 0.13.4
   await pause(Math.max(2500, secs * 1000 * 0.3));
   await open("Glucose, energy & tips");
   await pause(Math.max(2500, secs * 1000 * 0.25));
@@ -320,9 +342,9 @@ await scene("meaning", async (secs) => {
   await pause(1500);
   await bringIntoView(advisory, 120);
   await pause(1500);
-});
+};
 
-await scene("portion", async () => {
+SCENES.portion = async () => {
   await chapter("Portion simulator");
   const sim = await open("Portion simulator");
   await pause(1500);
@@ -346,9 +368,9 @@ await scene("portion", async () => {
   await pause(2500);
   const reset = sim.getByRole("button", { name: /Reset/ });
   if (await reset.count()) await point(reset);
-});
+};
 
-await scene("whatif", async (secs) => {
+SCENES.whatif = async (secs) => {
   await chapter("What if I walk?");
   const forecast = await open("Forecast & what-if");
   await pause(1200);
@@ -366,9 +388,9 @@ await scene("whatif", async (secs) => {
   await point(page.getByRole("button", { name: /Save meal/ }).first());
   await page.waitForURL(/\/meals\/\d+/, { timeout: 15000 }).catch(() => {});
   await pause(1200);
-});
+};
 
-await scene("advisor", async () => {
+SCENES.advisor = async () => {
   await point(page.getByRole("link", { name: "Meal Advisor", exact: true }).first());
   await page.waitForURL(/advisor/);
   await chapter("Meal Advisor");
@@ -378,9 +400,9 @@ await scene("advisor", async () => {
   await pause(3500);
   const sources = page.getByText(/sources?\s*▾/).first();
   if (await point(sources)) await pause(3500);
-});
+};
 
-await scene("insights", async () => {
+SCENES.insights = async () => {
   await point(page.getByRole("link", { name: "Nutrition Insights", exact: true }).first());
   await page.waitForURL(/insights/);
   await chapter("Nutrition Insights");
@@ -389,16 +411,221 @@ await scene("insights", async () => {
   await pause(1500);
   await scroll(480);
   await pause(2000);
-});
+};
 
-await scene("outro", async (secs) => {
+SCENES.outro = async (secs) => {
   await chapter("");
   await card(`
     <img class="logo" data-at="0" src="/favicon.svg" alt="">
     <h1 data-at="0.05">MealSenseAI</h1>
     <p data-at="0.55">Understand your food. Make healthier choices.</p>
     <small data-at="0.6">Wei Ming is fictional. Educational estimates only, not medical advice.<br>Meal photos from Wikimedia Commons under free licences; credits in the description.</small>`, secs);
-});
+};
+
+
+// ---- The 12-minute presentation (narration-full.json): business case, pricing and system design cards.
+const SRC = (t) => `<i>${t}</i>`;
+
+SCENES.burden = async (secs) => {
+  await card(`
+    <h2 data-at="0">Why it matters</h2>
+    <div class="row">
+      <div class="tile" data-at="0.08"><b>~830M</b><span>people living with diabetes worldwide</span>${SRC("WHO, 2022")}</div>
+      <div class="tile" data-at="0.25"><b>1 in 12</b><span>adults in Singapore</span>${SRC("MOH, 2023")}</div>
+      <div class="tile" data-at="0.4"><b>Up to 1M</b><span>Singapore residents by 2050, without effective prevention</span>${SRC("MOH projection")}</div>
+      <div class="tile" data-at="0.6"><b>S$1B → 2.5B</b><span>yearly cost to Singapore, 2010 → 2050, most of it lost productivity</span>${SRC("Png et al., BMC Public Health 2016")}</div>
+    </div>`, secs);
+};
+
+SCENES.gap = async (secs) => {
+  await card(`
+    <h2 data-at="0">Visibility changes choices. The plate is still invisible.</h2>
+    <div class="row">
+      <div class="tile" data-at="0.1"><b>−18%</b><span>household sugar from pre-packed drinks after Nutri-Grade</span>${SRC("Before-and-after study")}</div>
+      <div class="tile" data-at="0.4"><b>Labels</b><span>reach the bottle and the box, not the hawker plate</span></div>
+      <div class="tile" data-at="0.55"><b>Apps</b><span>count calories or search a food list</span></div>
+      <div class="tile" data-at="0.7"><b>Missing</b><span>what this plate may do to your glucose, and how sure that is</span></div>
+    </div>`, secs);
+};
+
+SCENES.value = async (secs) => {
+  await card(`
+    <h2 data-at="0">MealSenseAI</h2>
+    <div class="pains">
+      <div class="tile" data-at="0.12"><b>One photo</b><span>becomes foods, portions and nutrition.</span></div>
+      <div class="tile" data-at="0.35"><b>Meaning</b><span>glucose impact, glycaemic load and a practical next step.</span></div>
+      <div class="tile" data-at="0.6"><b>Honest</b><span>every estimate shows its range and source. You confirm.</span></div>
+    </div>`, secs);
+};
+
+SCENES.mark = async () => {
+  await card("");
+  await chapter("Mark a missed food");
+  const before = await page.locator('[id^="food-"]').evaluateAll((els) => els.map((e) => e.id));
+  const mark = page.getByRole("button", { name: /Mark it on the photo/ }).first();
+  await bringIntoView(mark, 300);
+  await point(mark);
+  const area = page.locator('[data-testid="draw-area"]').first();
+  await area.waitFor({ timeout: 5000 });
+  await scroll(-400, 6);
+  await pause(1500);
+  const box = await area.boundingBox();
+  if (box) {   // drag a box over the lower right of the plate, as a finger would
+    await moveTo(box.x + box.width * 0.58, box.y + box.height * 0.55);
+    await page.mouse.down();
+    await moveTo(box.x + box.width * 0.86, box.y + box.height * 0.86, 45);
+    await page.mouse.up();
+  }
+  await page.waitForFunction((ids) => [...document.querySelectorAll('[id^="food-"]')].some((e) => !ids.includes(e.id)),
+    before, { timeout: 20000 }).catch(() => {});
+  await pause(1800);
+  const fresh = (await page.locator('[id^="food-"]').evaluateAll((els, ids) => els.map((e) => e.id).filter((i) => !ids.includes(i)), before))[0];
+  if (fresh) {
+    const item = page.locator(`#${fresh}`);
+    await point(item, { click: false });
+    await pause(1500);
+    // Unsure? Name it from the model's own guesses: a tap, and it is remembered next time.
+    const guess = item.locator("button:has-text('%')").first();
+    if (await guess.count()) { await point(guess); await pause(2000); }
+  }
+  await scroll(-2000, 8);
+  await pause(800);
+};
+
+SCENES.pricing = async (secs) => {
+  await chapter("");
+  await card(`
+    <h2 data-at="0">Pricing <small style="font-size:22px">(proposed, to validate in the trial)</small></h2>
+    <div class="tiers">
+      <div class="tile" data-at="0.08"><b>Free</b><em>S$0</em><ul><li>Photo and text meal logging</li><li>Nutrition per meal and day</li><li>History and trends</li></ul></div>
+      <div class="tile hi" data-at="0.3"><b>Plus</b><em>S$4.90 a month · S$39 a year</em><ul><li>Glucose impact and glycaemic load</li><li>Meal Advisor</li><li>Portion and activity simulators, your own readings</li></ul></div>
+      <div class="tile" data-at="0.78"><b>Care</b><em>per member, for organisations</em><ul><li>Clinics, employers, insurers</li><li>Same app for members</li><li>Priced per member per month</li></ul></div>
+    </div>
+    <small data-at="0.5">Reference: photo calorie apps ~US$30/yr (Cal AI); premium trackers ~US$80/yr (MyFitnessPal Premium). Published prices, 2026.</small>`, secs);
+};
+
+SCENES.design = async (secs) => {
+  await card(`
+    <h2 data-at="0">System design</h2>
+    <div class="arch">
+      <div class="box" data-at="0.1"><b>Browser</b>phone or desktop<br>React + TypeScript</div><div class="arrow" data-at="0.15">→</div>
+      <div class="box" data-at="0.2"><b>Web server</b>nginx: the app,<br>/api proxy, rate limits</div><div class="arrow" data-at="0.25">→</div>
+      <div class="box" data-at="0.3"><b>Backend</b>FastAPI · ONNX Runtime<br>EfficientNet-B0 + YOLO11n-seg<br>nutrition · insights · advisor</div><div class="arrow" data-at="0.45">→</div>
+      <div class="box" data-at="0.45"><b>PostgreSQL 16</b>users, meals, foods,<br>corrections, logs</div>
+    </div>
+    <div class="arch" style="margin-top:4px">
+      <div class="box side" data-at="0.6"><b>Ollama · Qwen 2.5 1.5B</b>local language model, wording only</div>
+      <div class="box side" data-at="0.7"><b>Docker Compose</b>one server, CPU; photos and data in volumes</div>
+    </div>
+    <p data-at="0.85">No paid cloud AI in the loop.</p>`, secs);
+};
+
+SCENES.pipeline = async (secs) => {
+  const steps = [["Capture", "your input"], ["Preprocess", "EXIF, resize"], ["Detect", "YOLO11n-seg"], ["Classify", "EfficientNet-B0, top 3"],
+    ["Portion", "estimate ± band"], ["Nutrition", "exact · proxy · none"], ["Aggregate", "totals, GL"], ["Explain", "local SLM or rules"],
+    ["Recommend", "rules, cited"], ["Review", "you confirm"]];
+  await card(`<h2 data-at="0">Ten stages, all visible</h2><div class="steps">${steps.map(([t, d], i) =>
+    `<div data-at="${(0.08 + i * 0.07).toFixed(2)}"><span>${i + 1}</span>${t}<i>${d}</i></div>`).join("")}</div>
+    <p data-at="0.85">Model prediction · Estimate · Guidance · Your input: each labelled differently.</p>`, secs);
+};
+
+SCENES.vision = async (secs) => {
+  await card(`
+    <h2 data-at="0">Recognising the food</h2>
+    <div class="two">
+      <ul data-at="0.08"><li>EfficientNet-B0, ImageNet start</li><li>Food-101 + FoodSG: 320 classes</li><li>Transfer learning: last 3 blocks + head</li>
+        <li>AdamW: lr 1e-5 backbone, 5e-5 head, weight decay 1e-4</li><li>Augmentation: crop, flip, rotate, colour</li><li>5 epochs, batch 32</li></ul>
+      <div class="metrics">
+        <div class="tile" data-at="0.45"><b>70.6%</b><span>top-1 accuracy</span>${SRC("developer evaluation")}</div>
+        <div class="tile" data-at="0.5"><b>85.7%</b><span>top-3 accuracy</span>${SRC("macro-F1 66.7%")}</div>
+        <div class="tile" data-at="0.7"><b>100%</b><span>same top 3 after ONNX export</span>${SRC("601 images")}</div>
+        <div class="tile" data-at="0.78"><b>11.8 ms</b><span>per photo on CPU</span>${SRC("ONNX Runtime")}</div>
+      </div>
+    </div>`, secs);
+};
+
+SCENES.multifood = async (secs) => {
+  await card(`
+    <h2 data-at="0">Several foods on one plate</h2>
+    <div class="row">
+      <div class="tile" data-at="0.3"><b>74.7%</b><span>detection precision</span>${SRC("IoU ≥ 0.5")}</div>
+      <div class="tile" data-at="0.36"><b>68.4%</b><span>detection recall</span>${SRC("180 of 263 items")}</div>
+      <div class="tile" data-at="0.45"><b>262 ms</b><span>per plate, median, CPU</span>${SRC("p95 320 ms")}</div>
+      <div class="tile" data-at="0.7"><b>1 tap</b><span>to correct: a top-3 guess, or one dragged box</span></div>
+    </div>
+    <small data-at="0.3">100 synthetic multi-food plates built from Food-101 test images.</small>`, secs);
+};
+
+SCENES.nutrition = async (secs) => {
+  await card(`
+    <h2 data-at="0">Portions, nutrition, glycaemic load</h2>
+    <div class="row">
+      <div class="tile" data-at="0.08"><b>247 · 66 · 7</b><span>classes mapped exactly · by nearest food · left to you</span></div>
+      <div class="tile" data-at="0.35"><b>±15–50%</b><span>portion bands: your grams · plate area · typical serving</span></div>
+      <div class="tile" data-at="0.6"><b>57 + 78</b><span>foods with a published GI + foods borrowing their staple's GI</span>${SRC("of 286 foods")}</div>
+    </div>`, secs);
+};
+
+SCENES.glucose = async (secs) => {
+  await card(`
+    <h2 data-at="0">The glucose estimate</h2>
+    <div class="eq" data-at="0.1">dG/dt = R<sub>a</sub>(t) − k·G − U<sub>ex</sub>(t)</div>
+    <div class="row">
+      <div class="tile" data-at="0.2"><b>R<sub>a</sub></b><span>meal glucose appearing: available carbs × GI, slowed by fat, fibre, protein</span></div>
+      <div class="tile" data-at="0.35"><b>k</b><span>clearance, set by the person's condition</span></div>
+      <div class="tile" data-at="0.45"><b>U<sub>ex</sub></b><span>extra uptake by working muscle (MET × weight × time)</span></div>
+      <div class="tile" data-at="0.7"><b>3 meals</b><span>with readings: calibrates to you (median ratio)</span></div>
+    </div>`, secs);
+};
+
+SCENES.grounding = async (secs) => {
+  await card(`
+    <h2 data-at="0">A grounded Meal Advisor</h2>
+    <div class="arch">
+      <div class="box" data-at="0.08"><b>Your data</b>meals, profile, food table</div><div class="arrow" data-at="0.1">→</div>
+      <div class="box" data-at="0.12"><b>Rule engine</b>writes the answer</div><div class="arrow" data-at="0.2">→</div>
+      <div class="box side" data-at="0.22"><b>Qwen 2.5 (local)</b>rewords it</div><div class="arrow" data-at="0.3">→</div>
+      <div class="box" data-at="0.32"><b>Validator</b>numbers · foods · safety</div><div class="arrow" data-at="0.4">→</div>
+      <div class="box" data-at="0.42"><b>Shown</b>or the rule answer</div>
+    </div>
+    <div class="row">
+      <div class="tile" data-at="0.7"><b>38 / 38</b><span>test questions passed</span>${SRC("arithmetic, safety, injection")}</div>
+      <div class="tile" data-at="0.75"><b>0%</b><span>unsupported claims</span></div>
+    </div>`, secs);
+};
+
+SCENES.learning = async (secs) => {
+  await card(`
+    <h2 data-at="0">Learning safely</h2>
+    <div class="pains">
+      <div class="tile" data-at="0.08"><b>Memory</b><span>fingerprint + cosine similarity ≥ 0.70: recognised next time, no retraining</span></div>
+      <div class="tile" data-at="0.4"><b>Consent + screening</b><span>shared only if switched on; checked for poisoning patterns; people review the rest</span></div>
+      <div class="tile" data-at="0.65"><b>Model gate</b><span>within 0.2 points of the live model on a fixed test set, safety foods no worse, then shadow mode</span></div>
+    </div>`, secs);
+};
+
+SCENES.quality = async (secs) => {
+  await card(`
+    <h2 data-at="0">Tested and deployable</h2>
+    <div class="row">
+      <div class="tile" data-at="0.15"><b>64</b><span>automated tests, real PostgreSQL</span></div>
+      <div class="tile" data-at="0.35"><b>9 / 9</b><span>acceptance checks, sign-up to saved meal, also offline</span></div>
+      <div class="tile" data-at="0.6"><b>Restart</b><span>account, meal and photo kept</span></div>
+      <div class="tile" data-at="0.75"><b>1 command</b><span>docker compose up, on a CPU server</span></div>
+    </div>`, secs);
+};
+
+// The opening runs over title cards on the landing page, signed out.
+await page.goto(`${BASE}/`);
+await page.waitForLoadState("networkidle");
+// SCENES_MODE=screen records only the app demo ("screen" lines); the "camera" lines are the presenter's own video,
+// spliced in later (voice.py splice). The default records every scene, title cards included.
+const MODE = process.env.SCENES_MODE ?? "all";
+for (const s of narration) {
+  if (!SCENES[s.id]) throw new Error(`No scene "${s.id}" in record.mjs`);
+  if (MODE === "screen" && s.mode === "camera") continue;
+  await scene(s.id, SCENES[s.id]);
+}
 
 const video = page.video();
 await context.close();

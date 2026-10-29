@@ -7,6 +7,12 @@
 #   ./demo/run.sh samples    the opening line in ten voices, to pick one by ear
 #   ./demo/run.sh down       stop the demo stack (its data is kept)
 #
+# The 12-minute presentation (narration-full.json), with you on camera and your own voice over the demo:
+#   NARRATION=narration-full.json ./demo/run.sh script         RECORDING-SCRIPT.md: what to record, file by file
+#   NARRATION=narration-full.json ./demo/run.sh                a full preview first, every line in the Kokoro voice
+#   NARRATION=narration-full.json RECORDINGS=~/mealsense-recordings ./demo/run.sh mine
+#        your voice over the demo, then your camera takes spliced in → ~/mealsense-demo-<time>/…-final.mp4
+#
 #   VOICE=am_michael ./demo/run.sh voice     another Kokoro voice (af_sarah is the default)
 #
 # Everything runs in the Compose project "mealsense-demo" and in throwaway
@@ -22,6 +28,8 @@ BASE="http://127.0.0.1:$PORT"
 PLAYWRIGHT="${PLAYWRIGHT_VERSION:-1.63.0}"
 THEME="${THEME:-light}"
 VOICE="${VOICE:-af_sarah}"
+NARRATION="${NARRATION:-narration.json}"
+OUTPUT="$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('output','demo'))" "$NARRATION")"
 BACKEND_IMAGE="${MEALSENSE_BACKEND_IMAGE:-mealsenseai/backend:local}"
 STEP="${1:-all}"
 
@@ -31,8 +39,11 @@ case "$STEP" in
     echo "Stopped. Its data is kept; to delete the demo's own database and photos as well:"
     echo "  docker volume rm mealsense-demo_pgdata mealsense-demo_uploads"
     exit 0 ;;
-  all|record|voice|samples) ;;
-  *) echo "usage: $0 [all|record|voice|samples|down]"; exit 1 ;;
+  script)
+    NARRATION="$NARRATION" python3 voice.py script
+    exit 0 ;;
+  all|record|voice|samples|mine) ;;
+  *) echo "usage: $0 [all|record|voice|samples|script|mine|down]"; exit 1 ;;
 esac
 
 # The voice image is the same as CEREBRO's demo; reuse it if CEREBRO's was built here.
@@ -49,7 +60,8 @@ MODELS_VOLUME=mealsense-demo-models
 docker volume inspect cerebro-demo-models >/dev/null 2>&1 && MODELS_VOLUME=cerebro-demo-models  # Kokoro, already downloaded
 in_voice() {  # run voice.py in the voice container, in folder $1
   docker run --rm -v "$1:/work" -v "$HERE:/demo:ro" -v "$MODELS_VOLUME:/root/.cache" \
-    -e VOICE="$VOICE" -e ENGINE=kokoro -w /work mealsense-demo-voice python /demo/voice.py "$2"
+    -e VOICE="$VOICE" -e ENGINE=kokoro -e NARRATION="$NARRATION" -e SUBTITLES="${SUBTITLES:-1}" \
+    -e RECORDINGS=/work/recordings -w /work mealsense-demo-voice python /demo/voice.py "$2"
 }
 
 if [ "$STEP" = samples ]; then
@@ -61,7 +73,19 @@ if [ "$STEP" = samples ]; then
   exit 0
 fi
 
-if [ "$STEP" = all ]; then
+SCENES_MODE=all
+if [ "$STEP" = mine ]; then
+  # Your recordings: the voice-only lines time and narrate the demo; the camera takes are spliced in at the end.
+  [ -n "${RECORDINGS:-}" ] && [ -d "$RECORDINGS" ] || { echo "Set RECORDINGS to the folder with your files (01-05.mp4, 06.m4a …)"; exit 1; }
+  rm -rf "$HERE/recordings" && mkdir -p "$HERE/recordings" && cp "$RECORDINGS"/* "$HERE/recordings/"
+  voice_image
+  echo "==> Your recordings: cleaning and measuring the voice-only lines"
+  rm -rf "$HERE/clips"
+  in_voice "$HERE" mine
+  SCENES_MODE=screen
+fi
+
+if [ "$STEP" = all ] || [ "$STEP" = mine ]; then
   for image in "$BACKEND_IMAGE" "${MEALSENSE_FRONTEND_IMAGE:-mealsenseai/frontend:local}"; do
     docker image inspect "$image" >/dev/null 2>&1 || {
       echo "Image $image not found. Build the live app first (cd ~/MealSenseAI && docker compose build),"
@@ -85,7 +109,7 @@ if [ "$STEP" = all ]; then
 fi
 
 # 1. The voice first, so every scene can be timed to its line.
-if [ "$STEP" != record ] || [ ! -f "$HERE/clips/durations.json" ]; then
+if [ "$STEP" != record ] && [ "$STEP" != mine ] || [ ! -f "$HERE/clips/durations.json" ]; then
   voice_image
   echo "==> Speaking the narration ($VOICE)"
   rm -rf "$HERE/clips"
@@ -93,10 +117,10 @@ if [ "$STEP" != record ] || [ ! -f "$HERE/clips/durations.json" ]; then
 fi
 
 # 2. The recording, in Playwright's own container (its browser, fonts and codecs).
-echo "==> Recording the tour (about five minutes)"
+echo "==> Recording the tour (5 to 12 minutes)"
 rm -rf "$HERE/out"
 docker run --rm --network host --ipc=host -v "$HERE:/demo" -w /demo \
-  -e BASE="$BASE" -e OUT=/demo/out -e THEME="$THEME" -e PHOTOS=/demo/photos \
+  -e BASE="$BASE" -e OUT=/demo/out -e THEME="$THEME" -e PHOTOS=/demo/photos -e NARRATION="$NARRATION" -e SCENES_MODE="$SCENES_MODE" \
   "mcr.microsoft.com/playwright:v$PLAYWRIGHT-noble" \
   bash -c "npm install --no-save --silent playwright@$PLAYWRIGHT >/dev/null && node record.mjs; chown -R $(id -u):$(id -g) /demo/out /demo/node_modules 2>/dev/null || true"
 
@@ -104,13 +128,23 @@ docker run --rm --network host --ipc=host -v "$HERE:/demo" -w /demo \
 STAMP="$(date +%Y%m%d-%H%M%S)"
 DEST="$HOME/mealsense-demo-$STAMP"
 mkdir -p "$DEST"
-cp -r "$HERE/out/demo.webm" "$HERE/out/scenes.json" "$HERE/narration.json" "$HERE/clips" \
+cp -r "$HERE/out/demo.webm" "$HERE/out/scenes.json" "$HERE/$NARRATION" "$HERE/clips" \
   "$HERE/voice.py" "$HERE/music.py" "$HERE/voice_mac.sh" "$DEST/"
 cp "$HERE/photos/CREDITS.md" "$DEST/PHOTO-CREDITS.md" 2>/dev/null || true
 voice_image
 echo "==> Building the video"
-in_voice "$DEST" build
-echo
-echo "==> Done: $DEST/MealSenseAI-demo.mp4"
+if [ "$STEP" = mine ]; then
+  cp -r "$HERE/recordings" "$DEST/"
+  SUBTITLES=0 in_voice "$DEST" build    # you may not read word for word: no subtitles from the script
+  echo "==> Splicing your camera takes with the demo"
+  in_voice "$DEST" splice
+  echo
+  echo "==> Done: $DEST/$OUTPUT-final.mp4"
+  echo "    The demo stretches alone, for your own editor: $DEST/$OUTPUT-demo-*.mp4"
+else
+  in_voice "$DEST" build
+  echo
+  echo "==> Done: $DEST/$OUTPUT.mp4"
+fi
 echo "    Photo credits (for the description): $DEST/PHOTO-CREDITS.md"
 echo "    On your Mac:  scp 'admin@<buddy>:$DEST/MealSenseAI-demo.mp4' ~/Downloads/"

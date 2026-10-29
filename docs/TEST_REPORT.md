@@ -166,3 +166,11 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 |---|---|
 | pytest | **64 passed** (adds 2): the rules pick the staple (chicken rice → white rice, char kway teow → noodles, roti prata → white bread, teh tarik → sweetened drink) and leave "no noodles", cereal prawns, water, black coffee and plain chicken alone; a published GI is never replaced; a chicken rice meal gets GL = 73 × available carbs / 100, a level, and a labelled reason. One expectation changed on purpose: kaya toast + egg + kopi is now rated unhealthy (borrowed GL 34.4 ≥ 20) |
 | Meal page (Playwright, iPhone 13) | **PASS**: chicken rice + teh tarik shows HIGH, "glycaemic load ≈66.3" with an info tip, and per-food "≈53.3 (GI borrowed from white rice)"; no JS errors, no horizontal overflow |
+
+## v0.13.9: presentation video kit (29 Oct 2026)
+
+| Test | Result |
+|---|---|
+| `voice.py mine → build → splice` with synthetic stand-ins (tones for the voice lines, colour-bar takes `01-05.mp4`, `16.mp4`, `17-25.mov`) | **PASS**: final cut in script order, 1920×1080, 30 fps, AAC 48 kHz stereo; video 48.30 s, audio 48.32 s (padded to picture, no drift) |
+| `record.mjs` with the full script's scenes (short lines) against the local app | **PASS**: all 21 screen and card scenes ran; a box dragged on the photo added item 4 and a tap on a guess named it; cards fit 1080p |
+| Not run here | The Buddy run with the real demo stack, the Kokoro preview and your own recordings |

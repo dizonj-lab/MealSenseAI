@@ -2,6 +2,19 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.9 — Presentation video kit (no app change)
+
+- `demo/narration-full.json`: a 26-line, ~12-minute presentation in two halves (business case with pricing; system
+  design with the technical use cases). Lines are marked **camera** (the presenter) or **screen** (the app demo).
+- `run.sh script` writes `RECORDING-SCRIPT.md`; `run.sh mine` takes the presenter's own files (audio for screen
+  lines, video for camera lines, `01-05.mp4` for one take of several lines), records only the screen scenes timed to
+  that voice, and `voice.py splice` joins everything in script order at 1080p/30 fps/-16 LUFS with audio padded to
+  picture (no lip-sync drift). The demo stretches are also written separately for manual editing.
+- `record.mjs` scenes are a registry chosen by the script; new scenes: marking a missed food on the photo, and title
+  cards for the burden, the gap, value, pricing, architecture, pipeline, model, multi-food, nutrition/GI, the glucose
+  model, the grounded advisor, safe learning and quality. Key takeaways is opened now that it is collapsed (0.13.4).
+- `demo/SOURCES.md` lists the source of every figure in the script.
+
 ## v0.13.8 — Glycaemic load for more local dishes
 
 - 229 of 286 foods have no published GI, so most meals showed "Glycaemic load not estimated". A food without one now

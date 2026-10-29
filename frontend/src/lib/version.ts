@@ -1,7 +1,10 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.8'
+export const APP_VERSION = '0.13.9'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.9', title: 'Presentation video kit', changes: [
+    'Behind the scenes: a 12-minute presentation video that splices the presenter on camera with the recorded app demo; no change to the app',
+  ] },
   { version: '0.13.8', title: 'Glycaemic load for more local dishes', changes: [
     'A dish with no published GI, such as chicken rice, char kway teow, roti prata or teh tarik, now borrows the GI of its main carbohydrate',
     'Shown with ≈ and the food it was borrowed from; foods with no clear staple still say "not estimated"',

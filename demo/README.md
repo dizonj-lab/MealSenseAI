@@ -19,6 +19,28 @@ four-on-the-floor, brighter and busier than CEREBRO's, and it dips under the voi
 to their lines, and any stretch where the screen only waits is sped up, so the video plays without
 pauses.
 
+## The 12-minute presentation, with you on camera
+
+`narration-full.json` is a 26-line script in two halves: the business case (pain, value, use-case demo,
+pricing) and the system design (architecture, models, technical use cases). Each line is either
+**camera** (you, on Zoom or a webcam, presenting the slides) or **screen** (the app demo, which the kit
+records and times to your voice).
+
+| Step | Where | Command |
+|---|---|---|
+| 1. Print the script | Buddy or Mac | `NARRATION=narration-full.json ./demo/run.sh script` → `demo/RECORDING-SCRIPT.md` |
+| 2. Optional preview | Buddy | `NARRATION=narration-full.json ./demo/run.sh` (every line in the Kokoro voice, title cards for the camera lines) |
+| 3. Record | You | One file per line, named by its number. Camera lines as video (`01-05.mp4` may cover several lines in one take); screen lines as audio (`06.m4a` …) |
+| 4. Make the video | Buddy | `NARRATION=narration-full.json RECORDINGS=~/mealsense-recordings ./demo/run.sh mine` |
+
+Step 4 cleans your audio (rumble cut, silences trimmed, loudness evened out), records only the screen
+scenes, timed to your lines, lays your voice and the music over them, and then splices everything in
+script order. Every piece is brought to 1080p, 30 fps and the same loudness, and each piece's sound is
+padded to its picture, so lip sync holds across the joins. You get `…-final.mp4`, and the demo
+stretches on their own (`…-demo-1.mp4`, `…-demo-2.mp4`) if you would rather cut it in your own editor.
+There are no subtitles in this cut, since you may not read every line word for word. The sources for
+every figure are in `SOURCES.md`.
+
 ## What runs where
 
 - `run.sh` starts the Compose project **mealsense-demo** (`docker-compose.demo.yml`) from the live

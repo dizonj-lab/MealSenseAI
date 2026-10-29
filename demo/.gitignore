@@ -4,3 +4,9 @@ clips/
 photos/
 parts/
 __pycache__/
+recordings/
+pieces/
+built.json
+voice-samples/
+*.mp4
+*.srt
