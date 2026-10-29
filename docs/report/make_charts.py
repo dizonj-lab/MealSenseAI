@@ -112,6 +112,10 @@ for pt, lo in zip(patches, bins):
 for c, lo in zip(n, bins):
     if c: ax.text(lo + 5, c + 1.5, f"{int(c)}", ha="center", fontsize=8.5, color=INK)
 ax.set_xlabel("per-class F1 (%)"); ax.set_ylabel("classes"); ax.set_xticks(bins)
+from matplotlib.patches import Patch
+low = sum(v < 50 for v in f1)
+ax.legend(handles=[Patch(color=ORANGE, label=f"F1 below 50%: {low} classes, need improvement"),
+                   Patch(color=TEAL, label=f"F1 50% or above: {len(f1) - low} classes")], frameon=False, fontsize=8, loc="upper left")
 ax.yaxis.grid(True, color=GRID, lw=0.8); ax.set_axisbelow(True)
 ax.set_title(f"F1 across the 320 classes (median {dv['per_class_f1']['median'] * 100:.1f}%; {dv['per_class_f1']['f1_lt_0.5']} below 50%)")
 save(fig, "13_per_class_f1.png", "classification_report.json, per_class_f1.csv (Buddy)")
