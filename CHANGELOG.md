@@ -2,6 +2,12 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.11 — Final report sources (no app change)
+
+- `docs/report/`: the figure script (`make_charts.py`, ten charts from the evidence files and the app's own models),
+  the Word report builder (`build_report.js`) and the generated charts. The language-model section fills in from
+  `slm_eval.json` when it is added.
+
 ## v0.13.10 — Language model evaluation (no app change)
 
 - `python -m app.tools.slm_eval` measures the local SLM on fixed inputs with known answers: description parsing

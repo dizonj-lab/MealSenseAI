@@ -1,0 +1,303 @@
+{
+ "note": "rules baselines measured locally; the SLM fields of the stub run are not used",
+ "match": {
+  "rows": [
+   {
+    "label": "otah",
+    "want": "otak",
+    "lookup": null
+   },
+   {
+    "label": "min jiang kueh",
+    "want": "peanut_pancake",
+    "lookup": null
+   },
+   {
+    "label": "soft boiled eggs",
+    "want": "boiled_egg",
+    "lookup": null
+   },
+   {
+    "label": "mung bean soup",
+    "want": "tau_suan",
+    "lookup": "consomme"
+   },
+   {
+    "label": "kopi peng",
+    "want": "kopi",
+    "lookup": "kopi"
+   },
+   {
+    "label": "teh peng",
+    "want": "teh_tarik",
+    "lookup": "teh_tarik"
+   },
+   {
+    "label": "fishball soup with bee hoon",
+    "want": "fish_soup_beehoon",
+    "lookup": "bee_hoon_fried"
+   },
+   {
+    "label": "ang ku kueh",
+    "want": "pung_kueh",
+    "lookup": null
+   },
+   {
+    "label": "curry chicken with potatoes",
+    "want": "chicken_curry",
+    "lookup": "chicken_breast"
+   },
+   {
+    "label": "roast duck rice",
+    "want": "duck_rice",
+    "lookup": "duck_rice"
+   },
+   {
+    "label": "tau huay",
+    "want": null,
+    "lookup": null
+   },
+   {
+    "label": "ondeh ondeh",
+    "want": null,
+    "lookup": null
+   },
+   {
+    "label": "bandung",
+    "want": null,
+    "lookup": null
+   },
+   {
+    "label": "nasi padang",
+    "want": null,
+    "lookup": null
+   },
+   {
+    "label": "sugarcane juice",
+    "want": null,
+    "lookup": "orange_juice"
+   }
+  ]
+ },
+ "parse": {
+  "rows": [
+   {
+    "text": "chicken rice and teh tarik",
+    "want": [
+     "chicken_rice",
+     "teh_tarik"
+    ],
+    "rules": [
+     "chicken_rice",
+     "teh_tarik"
+    ]
+   },
+   {
+    "text": "2 roti prata with teh tarik",
+    "want": [
+     "roti_prata",
+     "teh_tarik"
+    ],
+    "rules": [
+     "roti_prata",
+     "teh_tarik"
+    ]
+   },
+   {
+    "text": "nasi lemak, fried egg and kopi",
+    "want": [
+     "fried_egg",
+     "kopi",
+     "nasi_lemak"
+    ],
+    "rules": [
+     "fried_egg",
+     "kopi",
+     "nasi_lemak"
+    ]
+   },
+   {
+    "text": "char kway teow",
+    "want": [
+     "char_kway_teow"
+    ],
+    "rules": [
+     "char_kway_teow"
+    ]
+   },
+   {
+    "text": "laksa plus iced milo",
+    "want": [
+     "laksa",
+     "milo"
+    ],
+    "rules": [
+     "laksa",
+     "milo"
+    ]
+   },
+   {
+    "text": "kaya toast with 2 soft boiled eggs and kopi",
+    "want": [
+     "boiled_egg",
+     "kaya_toast",
+     "kopi"
+    ],
+    "rules": [
+     "kaya_toast",
+     "kopi"
+    ]
+   },
+   {
+    "text": "bak chor mee and a coke",
+    "want": [
+     "bak_chor_mee",
+     "cola"
+    ],
+    "rules": [
+     "bak_chor_mee",
+     "cola"
+    ]
+   },
+   {
+    "text": "wanton mee",
+    "want": [
+     "wanton_mee"
+    ],
+    "rules": [
+     "wanton_mee"
+    ]
+   },
+   {
+    "text": "I had mee goreng and some satay",
+    "want": [
+     "chicken_satay",
+     "mee_goreng"
+    ],
+    "rules": [
+     "chicken_satay",
+     "mee_goreng"
+    ]
+   },
+   {
+    "text": "fishball noodles with a glass of orange juice",
+    "want": [
+     "fishball_noodles",
+     "orange_juice"
+    ],
+    "rules": [
+     "fishball_noodles",
+     "orange_juice"
+    ]
+   },
+   {
+    "text": "yong tau foo",
+    "want": [
+     "yong_tau_foo"
+    ],
+    "rules": [
+     "yong_tau_foo"
+    ]
+   },
+   {
+    "text": "spaghetti bolognese and a green salad",
+    "want": [
+     "green_salad",
+     "spaghetti_bolognese"
+    ],
+    "rules": [
+     "green_salad",
+     "spaghetti_bolognese"
+    ]
+   },
+   {
+    "text": "cheeseburger with french fries and coke",
+    "want": [
+     "cheeseburger",
+     "cola",
+     "french_fries"
+    ],
+    "rules": [
+     "cheeseburger",
+     "cola",
+     "french_fries"
+    ]
+   },
+   {
+    "text": "duck rice and bubble tea",
+    "want": [
+     "bubble_tea",
+     "duck_rice"
+    ],
+    "rules": [
+     "bubble_tea",
+     "duck_rice"
+    ]
+   },
+   {
+    "text": "half a plate of hokkien mee",
+    "want": [
+     "hokkien_mee"
+    ],
+    "rules": [
+     "hokkien_mee"
+    ]
+   },
+   {
+    "text": "oatmeal with banana for breakfast",
+    "want": [
+     "banana",
+     "oatmeal"
+    ],
+    "rules": [
+     "banana",
+     "oatmeal"
+    ]
+   },
+   {
+    "text": "my lunch was sushi and ramen",
+    "want": [
+     "ramen",
+     "sushi"
+    ],
+    "rules": [
+     "ramen",
+     "sushi"
+    ]
+   },
+   {
+    "text": "ice kacang",
+    "want": [
+     "ice_kacang"
+    ],
+    "rules": [
+     "ice_kacang"
+    ]
+   },
+   {
+    "text": "popiah and two curry puffs",
+    "want": [
+     "curry_puff",
+     "popiah"
+    ],
+    "rules": [
+     "curry_puff",
+     "popiah"
+    ]
+   },
+   {
+    "text": "steamed fish, brown rice and stir fried greens",
+    "want": [
+     "brown_rice",
+     "steamed_fish",
+     "stir_fried_greens"
+    ],
+    "rules": [
+     "brown_rice",
+     "steamed_fish",
+     "stir_fried_greens"
+    ]
+   }
+  ]
+ }
+}
