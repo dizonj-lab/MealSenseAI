@@ -268,6 +268,18 @@ def test_progress_and_deferred_slm_explanation(client, auth, monkeypatch):
     assert meal["insights"]["explanation"]["text"] == "Mostly carbohydrate from rice." and calls == [90]
 
 
+def test_slm_explanation_with_an_unsupported_number_is_not_shown(client, auth, monkeypatch):
+    from app.services import slm
+    monkeypatch.setattr(slm, "status", lambda force=False: {"available": True, "selected": "fake-slm", "models": ["fake-slm"], "error": None})
+    monkeypatch.setattr(slm, "explain", lambda facts, timeout=None: slm.Explanation(summary="This meal has 987 kcal and will raise glucose by 4.6 mmol/L."))
+    meal = client.post(f"{API}/meals/capture", headers=auth, data={"description": "chicken rice"}).json()
+    meal = client.post(f"{API}/meals/analyze", json={"meal_id": meal["id"]}, headers=auth).json()
+    meal = client.post(f"{API}/meals/{meal['id']}/explain", headers=auth).json()
+    exp = meal["insights"]["explanation"]
+    assert exp["text"] is None and exp["source"] == "rejected" and 987 in exp["check"]["unsupported_numbers"]
+    assert meal["insights"]["recommendations"]          # the rule-based results are still there
+
+
 def test_custom_food_memory_and_training_samples(client, auth):
     def analyse():
         r = client.post(f"{API}/meals/capture", headers=auth,

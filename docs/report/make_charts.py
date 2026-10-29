@@ -177,7 +177,7 @@ ax.set_title("Mass-balance glucose estimate, type 2 profile, 78 kg")
 save(fig, "07_glucose_curves.png", "services/forecast.py (dG/dt = Ra − k·G − U_ex) run on foods.json records; an estimate, not a measurement")
 
 # 8. Automated tests over the project ----------------------------------------------------------------------------------
-hist = [("0.3", 15), ("0.4", 18), ("0.6", 20), ("0.8", 31), ("0.9", 41), ("0.13.0", 56), ("0.13.2", 59), ("0.13.5", 60), ("0.13.7", 62), ("0.13.8", 64)]
+hist = [("0.3", 15), ("0.4", 18), ("0.6", 20), ("0.8", 31), ("0.9", 41), ("0.13.0", 56), ("0.13.2", 59), ("0.13.5", 60), ("0.13.7", 62), ("0.13.8", 64), ("0.13.13", 65)]
 fig, ax = plt.subplots(figsize=(6.4, 2.4))
 ax.step(range(len(hist)), [n for _, n in hist], where="post", color=TEAL, lw=2)
 ax.plot(range(len(hist)), [n for _, n in hist], "o", color=TEAL, ms=5, mec="white", mew=1.5)

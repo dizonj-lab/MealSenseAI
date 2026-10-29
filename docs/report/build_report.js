@@ -81,7 +81,7 @@ const cover = [
   new Paragraph({ spacing: { after: 600 }, children: [run("A photo-based meal recognition and glucose-awareness system for people managing diabetes in Singapore", { size: 24, color: INK2 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("NUS-ISS Practice Project · Practice Project Group (PT & Stackable) 31", { size: 22 })] }),
   new Paragraph({ spacing: { after: 80 }, children: [run("Dizon Joselito Villanueva", { size: 22 })] }),
-  new Paragraph({ spacing: { after: 80 }, children: [run("Final draft · 29 October 2026 · system version v0.13.12 · follows the proposal of 30 September 2026", { size: 22, color: INK2 })] }),
+  new Paragraph({ spacing: { after: 80 }, children: [run("Final draft · 29 October 2026 · system version v0.13.13 · follows the proposal of 30 September 2026", { size: 22, color: INK2 })] }),
   new Paragraph({ spacing: { before: 2400 }, children: [run("Educational estimates, not medical advice. Wei Ming, used in examples, is fictional.", { size: 18, color: INK2, italics: true })] }),
   new Paragraph({ children: [new PageBreak()] }),
 ];
@@ -101,7 +101,7 @@ const summary = [
     ["Multi-food plates", "Detection **precision 74.7%, recall 68.4%**; 262 ms median per plate", "multifood_metrics.json"],
     ["Grounded advisor", "**38/38** test questions passed, **0%** unsupported claims, 12 ms median (rule engine)", "advisor_eval.json"],
     ["Coverage", "247 of 320 classes map exactly to a nutrition record; GL now estimable for **135 of 286** foods (57 published GI + 78 borrowed)", "nutrition_coverage.json, v0.13.8"],
-    ["Quality", "**64** automated tests passing; 9/9 acceptance checks, also offline; data kept across restart", "TEST_REPORT.md"],
+    ["Quality", "**65** automated tests passing; 9/9 acceptance checks, also offline; data kept across restart", "TEST_REPORT.md"],
     ["Language model", SLM ? `qwen2.5:1.5b on Buddy: ${SLM.rewrite.passed_validator} rewordings passed the validator; ${SLM.explain.grounded} explanations grounded` : "Benchmark ready (app/tools/slm_eval.py); **results pending** the run on the deployment server", "slm_eval.json"],
   ], [1900, 5026, 2100]),
   P("The main weaknesses are honest ones: visually similar dishes (steak was recognised as itself in only 11% of matched cases), portions that a photo cannot weigh (±35–50%), nutrition values that are transcribed but not yet verified, and no trial with real users yet. Section 7 discusses each and the planned next steps."),
@@ -168,7 +168,7 @@ const tools = [
     ["Glycaemic load", "Published GI (Atkinson 2021) plus rule-based GI borrowing from the staple", "Covers local dishes without inventing values"],
     ["Glucose estimate", "One-compartment mass-balance ODE, OGTT anchor, per-user median-ratio calibration", "Explainable and conservative"],
     ["Language model", "Ollama with Qwen 2.5 1.5B, JSON-schema output, temperature control", "Local, small, structured; wording only"],
-    ["Grounding", "Rule engine draft → SLM rewrite → validator (numbers ±2%, food names, unsafe phrases)", "No unsupported number reaches the user in the Meal Advisor (meal explanations: see 6.4)"],
+    ["Grounding", "Rule engine draft → SLM rewrite → validator (numbers ±2%, food names, unsafe phrases)", "No unsupported number reaches the user (advisor replies and, from v0.13.13, meal explanations)"],
     ["Personal memory", "Class-probability fingerprints, cosine similarity ≥ 0.70 with a 0.05 margin", "Recognises a user's own foods without retraining"],
     ["Data governance", "Per-sample consent, 11 screening checks, perceptual hashes, frozen dataset versions, model gate with shadow mode", "Safe learning from user photos"],
     ["Backend", "FastAPI, SQLAlchemy 2, Alembic, PostgreSQL 16, Python 3.12", "Typed API, migrations on start"],
@@ -231,7 +231,7 @@ const design = [
 const dev = [
   H1("4. System development and implementation"),
   H2("4.1 Process"),
-  P("The system was built iteratively in versioned increments (v0.1 to v0.13.12, about 50 commits from 23 to 29 October 2026, following the proposal of 30 September). Each change was tested, versioned, recorded in the changelog and test report, and deployed to the home server (\"Buddy\") by the developer. The code base has about 6,800 lines of Python in the backend, 3,700 lines of TypeScript in the frontend and 2,000 lines of ML tooling, with 10 test modules."),
+  P("The system was built iteratively in versioned increments (v0.1 to v0.13.13, about 50 commits from 23 to 29 October 2026, following the proposal of 30 September). Each change was tested, versioned, recorded in the changelog and test report, and deployed to the home server (\"Buddy\") by the developer. The code base has about 6,800 lines of Python in the backend, 3,700 lines of TypeScript in the frontend and 2,000 lines of ML tooling, with 10 test modules."),
   H2("4.2 From proposal to build"),
   ...TABLE("Proposed design (30 September 2026) and what was built", ["Proposed", "Built", "Why"], [
     ["Web UI with a webcam; smartphone later", "Phone-first responsive web app (camera or upload) plus desktop", "Capture happens at the table, so the phone came first"],
@@ -308,7 +308,7 @@ const perf = [
   ...(slmRows ? TABLE(`Local language model on the deployment server (E6): ${SLM.model}, ${SLM.tokens_per_s ? SLM.tokens_per_s.mean + " tokens/s" : ""}`, ["Task", "Language model", "Rule baseline", "p50 / p95 ms"], slmRows, [2200, 3626, 1900, 1300])
     : [P("**E6 results pending.** The benchmark (app/tools/slm_eval.py) runs the four language-model tasks above on fixed inputs with known answers, read-only, on the deployment server. This table will be completed from that run.", { shading: { fill: "FDF2E7", type: ShadingType.CLEAR, color: "auto" } })]),
   ...(SLM ? [P("The result is clear and not flattering to the language model. On every task with a rule baseline, the **rules were better**: description parsing F1 0.987 against 0.732 (19 against 9 exact sets), and on unknown names the model was right 4 times in 15 and **wrong 6 times**, against the fuzzy lookup's 7 right and 4 wrong. Rewording advisor drafts is where it helps: **7 of 8** rewordings passed the validator and could be shown; the eighth fell back to the rule answer. Its meal explanations were the weakest: only **1 of 6** used only numbers from the facts."),
-    P("That last result exposed a gap. Advisor replies pass through the validator before they are shown, but meal explanations are displayed **without that check**, so an explanation can state a number the system never computed. The fix is to run the same validator on explanations and show nothing (the rule-based results remain) when it fails. The general lesson is the design's premise: a 1.5-billion-parameter model is useful for wording, not for facts, and every model output needs a deterministic check.")] : []),
+    P("That last result exposed a gap. Advisor replies passed through the validator before they were shown, but meal explanations were displayed **without that check**, so an explanation could state a number the system never computed. **Fixed in v0.13.13**: explanations now pass the same validator, and one that fails is not shown (the rule-based results remain; the check is stored for audit). With this model most explanations will now be withheld, which is the right trade-off for a health app. The general lesson is the design's premise: a 1.5-billion-parameter model is useful for wording, not for facts, and every model output needs a deterministic check.")] : []),
   ...TABLE("Language model in real use on the deployment server (inference log, all calls since it was enabled)", ["Task", "Calls", "Completed", "Mean ms", "p50 / p95 ms"], [
     ["Meal explanation", "24", "100%", "1,515", "1,465 / 3,299"],
     ["Meal Advisor reply", "3", "100%", "4,735", "5,304 / 5,314"],
@@ -321,7 +321,7 @@ const perf = [
   P("For chicken rice with teh tarik (95.6 g carbohydrate, GL 66.3), the model estimates that a 15-minute brisk walk 15 minutes after eating lowers the peak by only 2.3% and the area by 2.7% (it uses about 55 kcal, 7% of the meal's energy), while eating two-thirds of the rice lowers GL to 48.4 and the peak by about a quarter. The model therefore points users to the portion before the walk, consistent with GL arithmetic. These are population-level estimates, not measurements."),
   H2("6.7 Quality"),
   ...FIG("08_tests_growth.png", 5.6, "Automated tests over the project."),
-  P("All 64 automated tests pass against a real PostgreSQL database; browser flows pass on phone and desktop sizes with no JavaScript errors; the acceptance run passed 9 of 9 checks, also with the internet disconnected, and data survived a restart."),
+  P("All 65 automated tests pass against a real PostgreSQL database; browser flows pass on phone and desktop sizes with no JavaScript errors; the acceptance run passed 9 of 9 checks, also with the internet disconnected, and data survived a restart."),
 ];
 
 const findings = [
@@ -329,13 +329,13 @@ const findings = [
   H2("7.1 What worked"),
   ...BUL([
     "**Human in the loop beats a single answer.** With top-3 at 85.7% and one-tap correction, a wrong top-1 costs a tap, not a wrong log.",
-    "**Grounding by construction.** Letting rules produce facts and the language model only produce wording gave zero unsupported claims in the advisor, and a safe fallback when the model is slow or offline. Where the check was missing (meal explanations), the model added numbers of its own in 5 of 6 cases.",
+    "**Grounding by construction.** Letting rules produce facts and the language model only produce wording gave zero unsupported claims in the advisor, and a safe fallback when the model is slow or offline. Where the check was missing (meal explanations), the model added numbers of its own in 5 of 6 cases; the benchmark found it, and the check now covers both.",
     "**Honest uncertainty is a feature.** Leaving an item unidentified (48% of missed steaks) is preferable to a confident wrong dish for someone counting carbohydrate.",
     "**Cheap to run.** Every model runs on one CPU server; the classifier takes ~12 ms and a full multi-food analysis ~0.26 s.",
   ]),
   H2("7.2 Limitations"),
   ...BUL([
-    "**Meal explanations are not validated**: the language model's explanation is shown without the advisor's number check; in the benchmark 5 of 6 contained a number not in the facts. Fix before release (Section 6.4).",
+    "**The small language model adds little**: rules beat it on parsing and matching, and 5 of 6 meal explanations contained a number of their own. Since v0.13.13 those are withheld, so most users will see the rule-based results without a model explanation. A larger or fine-tuned local model would need to be re-measured with the same benchmark.",
     "**Visually similar dishes** (steak vs sirloin, noodle soups, rice plates) remain the main confusion; scores are uncalibrated.",
     "**Portions** come from priors or area, not volume (±35–50%); entering grams is the accurate path. The proposal's portion error measure (MAE against weighed portions) has not been run.",
     "**Nutrition values are unverified** transcriptions (USDA- and HPB-style values) or recipe approximations (199 records); a verified import (HPB SG FoodID, USDA FDC) is required before clinical use.",

@@ -237,7 +237,13 @@ def contextualise(foods: list[dict], t: dict, ins: dict, profile, timeout: float
              "user_goals": list(profile.goals or []) if profile else [],
              "recommendations": [r["title"] for r in ins["recommendations"]]}
     res = slm.explain(facts, timeout=timeout)
-    return {"text": res.summary, "source": f"slm:{slm.status()['selected']}"} if res else {"text": None, "source": "none"}
+    if not res or not res.summary.strip():
+        return {"text": None, "source": "none"}
+    from app.services import advisor   # local import: advisor → forecast → insights
+    check = advisor.validate(res.summary, "", facts)   # the advisor's own check: numbers, food names, unsafe phrases
+    if not check["ok"]:
+        return {"text": None, "source": "rejected", "check": check}
+    return {"text": res.summary.strip(), "source": f"slm:{slm.status()['selected']}"}
 
 
 def pending_explanation(foods: list[dict]) -> dict:

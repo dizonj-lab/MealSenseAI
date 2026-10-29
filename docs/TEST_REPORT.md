@@ -182,3 +182,11 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | Report build (`node docs/report/build_report.js`) and LibreOffice render | **PASS**: 21 pages, tables and the renamed pipeline figure fit |
 | `node --check demo/record.mjs`, narration JSON parses | **PASS** |
 | App | No change; tests not re-run |
+
+## v0.13.13: meal explanations validated (29 Oct 2026)
+
+| Test | Result |
+|---|---|
+| pytest | **65 passed** (adds 1): an SLM explanation with a number not in the facts is stored as `rejected` with the failing numbers, its text is not shown, and the rule-based recommendations remain |
+| Frontend typecheck | PASS |
+| Not run here | The Buddy run with the real model; expect most explanations from qwen2.5:1.5b to be rejected (1 of 6 passed in E6) |

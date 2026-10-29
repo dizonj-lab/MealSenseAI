@@ -2,6 +2,14 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.13 — Meal explanations are validated
+
+- The local SLM's meal explanation (stage 8) now passes the Meal Advisor's validator before it is shown: every number
+  must come from the meal's facts (±1 or 2%), no new food names, no unsafe statements. A failing explanation is not
+  shown (`source: "rejected"`, with the check stored for audit); the rule-based results stay. Found by the E6
+  benchmark on Buddy, where 5 of 6 explanations contained a number of their own.
+- Test: an explanation stating an unsupported number is rejected and the recommendations remain (65 tests).
+
 ## v0.13.12 — Aligned with the submitted proposal (no app change)
 
 - Report, slides and video script harmonised with the proposal of 30 September 2026: pricing is freemium with a
