@@ -97,7 +97,7 @@ const summary = [
   H1("Executive summary"),
   P("MealSenseAI is a web application that estimates the foods, portions and nutrition of a meal from one photo, and from these the meal's likely effect on blood glucose, its glycaemic load (GL) and a suggested next step. Each estimate is labelled with its type and range and can be corrected by the user. The application can be used by anyone; the user's profile sets the health condition, if any, and the goals that the guidance follows. As in my proposal, the first target group is people with Type 1 and Type 2 diabetes in Singapore."),
   ...TABLE("Headline results (all measured unless marked)", ["Area", "Result", "Evidence"], [
-    ["Food recognition", "EfficientNet-B0, 320 classes, 45,800 test images: **70.6% top-1, 85.7% top-3**, macro-F1 66.7%; calibration error 2.35%", "training evidence (Buddy)"],
+    ["Food recognition", "EfficientNet-B0, 320 classes, 45,800 test images: **70.6% top-1, 85.7% top-3**, macro-F1 66.7%; calibration error 2.35%", "overall_metrics.json, derived_summary.json"],
     ["Runtime fidelity", "ONNX export gives the **same top-3 on 601 of 601 images**; 11.8 ms per photo on CPU", "onnx_parity.json"],
     ["Multi-food plates", "Detection **precision 74.7%, recall 68.4%**; 262 ms median per plate", "multifood_metrics.json"],
     ["Grounded advisor", "**38/38** test questions passed, **0%** unsupported claims, 12 ms median (rule engine)", "advisor_eval.json"],
