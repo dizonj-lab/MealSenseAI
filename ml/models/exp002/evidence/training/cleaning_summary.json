@@ -1,0 +1,16 @@
+{
+  "original_images": 310861,
+  "clean_images": 306668,
+  "excluded_images": 4193,
+  "conflicting_label_images": 4172,
+  "deduplicated_images": 21,
+  "remaining_classes": 320,
+  "split_counts": {
+    "Food101_test": 25250,
+    "Food101_train": 68165,
+    "Food101_val": 7575,
+    "FoodSG233_test": 20550,
+    "FoodSG233_train": 164548,
+    "FoodSG233_val": 20580
+  }
+}

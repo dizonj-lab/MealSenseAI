@@ -1,0 +1,13 @@
+{
+  "accuracy": 0.7062882096069869,
+  "precision_macro": 0.669292277557868,
+  "recall_macro": 0.6786782354417614,
+  "f1_macro": 0.666810119346615,
+  "top3_accuracy": 0.8565502183406114,
+  "test_images": 45800,
+  "elapsed_seconds": 31.755649200000335,
+  "images_per_second": 1442.263066692383,
+  "milliseconds_per_image_amortized": 0.6933547860262081,
+  "batch_size": 32,
+  "device": "cuda"
+}

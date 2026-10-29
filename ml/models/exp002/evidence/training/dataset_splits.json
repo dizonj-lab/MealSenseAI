@@ -1,0 +1,15 @@
+{
+  "seed": 42,
+  "food101_split_method": "Official test; 10% of official train for validation",
+  "foodsg_split_method": "Stratified 80/10/10",
+  "total_images": 310861,
+  "total_classes": 320,
+  "split_counts": {
+    "Food101_test": 25250,
+    "Food101_train": 68175,
+    "Food101_val": 7575,
+    "FoodSG233_test": 20987,
+    "FoodSG233_train": 167888,
+    "FoodSG233_val": 20986
+  }
+}

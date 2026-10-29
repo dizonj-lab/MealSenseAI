@@ -1,0 +1,13 @@
+{
+  "created_at_utc": "2026-10-23T10:57:24.858249+00:00",
+  "total_images": 310861,
+  "datasets": {
+    "Food101": 101000,
+    "FoodSG233": 209861
+  },
+  "original_categories": {
+    "Food101": 101,
+    "FoodSG233": 233
+  },
+  "normalized_categories": 324
+}

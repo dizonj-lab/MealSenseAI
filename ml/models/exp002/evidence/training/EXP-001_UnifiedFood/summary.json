@@ -1,0 +1,6 @@
+{
+  "experiment": "EXP-001_UnifiedFood",
+  "total_training_seconds": 1214.1631668140003,
+  "best_validation_macro_f1": 0.5770200750012042,
+  "epochs_completed": 5
+}

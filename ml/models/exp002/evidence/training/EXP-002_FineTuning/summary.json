@@ -1,0 +1,10 @@
+{
+  "experiment": "EXP-002_FineTuning",
+  "source_experiment": "EXP-001_UnifiedFood",
+  "total_training_seconds": 1222.73776326,
+  "best_validation_macro_f1": 0.6628635553920498,
+  "best_epoch": 5,
+  "epochs_completed": 5,
+  "training_images": 232713,
+  "validation_images": 28155
+}

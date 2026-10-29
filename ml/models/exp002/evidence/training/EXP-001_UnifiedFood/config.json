@@ -1,0 +1,25 @@
+{
+  "experiment": "EXP-001_UnifiedFood",
+  "model": "efficientnet_b0",
+  "pretrained": true,
+  "classes": 320,
+  "epochs": 5,
+  "batch_size": 32,
+  "learning_rate": 0.0001,
+  "seed": 42,
+  "image_size": 224,
+  "device": "cuda",
+  "training_strategy": "frozen_backbone",
+  "augmentation": {
+    "rotation": 20,
+    "horizontal_flip": 0.5,
+    "crop_scale": [
+      0.8,
+      1.0
+    ],
+    "brightness": 0.2,
+    "contrast": 0.2,
+    "saturation": 0.2,
+    "hue": 0.05
+  }
+}

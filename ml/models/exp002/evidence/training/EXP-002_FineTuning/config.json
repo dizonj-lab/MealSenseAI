@@ -1,0 +1,29 @@
+{
+  "experiment": "EXP-002_FineTuning",
+  "model": "efficientnet_b0",
+  "initial_checkpoint": "/home/admin/development/mealsenseai/evidence/EXP-001_UnifiedFood/best_model.pth",
+  "classes": 320,
+  "epochs": 5,
+  "batch_size": 32,
+  "backbone_learning_rate": 1e-05,
+  "classifier_learning_rate": 5e-05,
+  "weight_decay": 0.0001,
+  "seed": 42,
+  "image_size": 224,
+  "num_workers": 8,
+  "training_strategy": "partial_backbone_finetuning",
+  "unfrozen_feature_blocks": 3,
+  "augmentation": {
+    "rotation": 20,
+    "horizontal_flip": 0.5,
+    "crop_scale": [
+      0.8,
+      1.0
+    ],
+    "brightness": 0.2,
+    "contrast": 0.2,
+    "saturation": 0.2,
+    "hue": 0.05
+  },
+  "device": "NVIDIA GeForce RTX 5060 Ti"
+}

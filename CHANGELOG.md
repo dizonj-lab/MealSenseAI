@@ -2,6 +2,16 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.17 — Training evidence (no app change)
+
+- `ml/models/exp002/evidence/training/`: EXP-001 and EXP-002 configuration, environment, training history, test
+  evaluation (overall, per dataset, classification report, calibration, confusion matrix), data cleaning and split
+  summaries, from the training run on Buddy. `docs/report/derive_training_evidence.py` copies them and derives
+  per-class F1, per-dataset results, top confusions and confidence bands (`derived_summary.json`).
+- Report: E1 is now measured evidence (45,800 test images); new figures for training curves, calibration (ECE 2.35%)
+  and per-class F1. Corrected the data split: Food-101 official test + 10% validation, FoodSG-233 80/10/10
+  (232,713 / 28,155 / 45,800), not the 70/15/15 in the proposal and `ml/training/config.yaml`.
+
 ## v0.13.16 — Report wording (no app change)
 
 - `docs/report/build_report.js`: paragraphs rewritten in plain, first-person report language, limited to each

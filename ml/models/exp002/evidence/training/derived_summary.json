@@ -1,0 +1,238 @@
+{
+ "cleaning": {
+  "audit": {
+   "timestamp_utc": "2026-10-23T11:05:01.535740+00:00",
+   "images_checked": 310861,
+   "missing_images": 0,
+   "duplicate_groups": 2040,
+   "cross_split_duplicate_groups": 728,
+   "conflicting_label_groups": 2019,
+   "method": "SHA-256 exact file matching"
+  },
+  "excluded_by_reason": {
+   "exact_duplicate": 21,
+   "conflicting_label": 4172
+  },
+  "cross_split_groups_remaining_after_exclusion": 0
+ },
+ "per_class_f1": {
+  "classes": 320,
+  "median": 0.6849,
+  "f1_ge_0.8": 80,
+  "f1_lt_0.5": 45,
+  "lowest": [
+   [
+    "mee siam, fried",
+    0.0,
+    43
+   ],
+   [
+    "whole wheat",
+    0.145,
+    33
+   ],
+   [
+    "bee hoon, soto",
+    0.149,
+    64
+   ],
+   [
+    "tortilla plain",
+    0.156,
+    47
+   ],
+   [
+    "lontong with sayur lodeh",
+    0.229,
+    43
+   ],
+   [
+    "bee hoon",
+    0.23,
+    53
+   ],
+   [
+    "mee kuah",
+    0.237,
+    55
+   ],
+   [
+    "chinese fritters",
+    0.248,
+    104
+   ],
+   [
+    "yam rice",
+    0.25,
+    48
+   ],
+   [
+    "barley",
+    0.265,
+    40
+   ]
+  ],
+  "highest": [
+   [
+    "kiwi",
+    0.897,
+    115
+   ],
+   [
+    "rice dumpling",
+    0.91,
+    67
+   ],
+   [
+    "tumpeng",
+    0.932,
+    75
+   ],
+   [
+    "macarons",
+    0.935,
+    250
+   ],
+   [
+    "soursop",
+    0.936,
+    73
+   ],
+   [
+    "oysters",
+    0.938,
+    250
+   ],
+   [
+    "mangosteen",
+    0.952,
+    103
+   ],
+   [
+    "pitaya",
+    0.956,
+    125
+   ],
+   [
+    "rambutan",
+    0.972,
+    108
+   ],
+   [
+    "edamame",
+    0.978,
+    250
+   ]
+  ]
+ },
+ "per_dataset": {
+  "Food101": {
+   "images": 25250,
+   "classes": 101,
+   "top1": 0.7212,
+   "top3": 0.8687,
+   "macro_f1_own_classes": 0.7476
+  },
+  "FoodSG233": {
+   "images": 20550,
+   "classes": 233,
+   "top1": 0.6879,
+   "top3": 0.8417,
+   "macro_f1_own_classes": 0.6739
+  }
+ },
+ "top_confusions": [
+  [
+   "dumpling",
+   "xiao long bao",
+   70
+  ],
+  [
+   "steak",
+   "filet mignon",
+   49
+  ],
+  [
+   "donuts",
+   "bagel & croissant",
+   47
+  ],
+  [
+   "sweets",
+   "chocolate",
+   31
+  ],
+  [
+   "paella",
+   "paella seafood",
+   28
+  ],
+  [
+   "ice cream",
+   "ice cream chocolate",
+   28
+  ],
+  [
+   "filet mignon",
+   "steak",
+   27
+  ],
+  [
+   "ramen",
+   "miso ramen, with fishcake",
+   26
+  ],
+  [
+   "macaroni and cheese",
+   "macaroni",
+   24
+  ],
+  [
+   "chocolate cake",
+   "chocolate mousse",
+   24
+  ],
+  [
+   "chocolate",
+   "sweets",
+   23
+  ],
+  [
+   "tuna tartare",
+   "beef tartare",
+   23
+  ],
+  [
+   "steak",
+   "sirloin steak",
+   23
+  ],
+  [
+   "pork chop",
+   "filet mignon",
+   22
+  ],
+  [
+   "breakfast cereal",
+   "muesli",
+   22
+  ]
+ ],
+ "confidence": {
+  "ece_10_bins": 0.0235,
+  "bands": {
+   "0-0.2": {
+    "share": 0.0461,
+    "top1": 0.1742
+   },
+   "0.2-0.5": {
+    "share": 0.2578,
+    "top1": 0.3937
+   },
+   "0.5-1.01": {
+    "share": 0.696,
+    "top1": 0.8573
+   }
+  }
+ }
+}

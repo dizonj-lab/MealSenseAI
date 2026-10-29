@@ -1,0 +1,12 @@
+{
+  "timestamp_utc": "2026-10-23T11:40:47.247782+00:00",
+  "python": "3.12.3",
+  "platform": "Linux-6.17.0-14-generic-x86_64-with-glibc2.39",
+  "torch": "2.11.0+cu128",
+  "torchvision": "0.26.0+cu128",
+  "cuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "gpu_total_memory_gb": 15.455,
+  "source_checkpoint_sha256": "53e194374438e5a14cd6894ad90d296dfc11c9524f65950ae518c4dee1ce6674",
+  "training_manifest_sha256": "1311c4533f5b6a8fe6bdeeb20a3f0a12fbd999dbbf25ffec1b75dd5431d94ea3"
+}

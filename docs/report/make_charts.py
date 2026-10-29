@@ -48,14 +48,73 @@ def hbar(ax, labels, values, color=TEAL, fmt="{:.1f}%", xmax=100):
     ax.tick_params(left=False)
 
 
-# 1. Classifier quality ------------------------------------------------------------------------------------------
-card = json.loads((REPO / "ml/models/exp002/model_card.json").read_text())["metrics"]
-fig, ax = plt.subplots(figsize=(6.4, 2.4))
-hbar(ax, ["Top-1 accuracy", "Top-3 accuracy", "Macro-F1", "Validation macro-F1 (epoch 5)"],
-     [card["reported_by_developer"]["top1_accuracy"] * 100, card["reported_by_developer"]["top3_accuracy"] * 100,
-      card["reported_by_developer"]["macro_f1"] * 100, card["checkpoint_metadata"]["validation_macro_f1"] * 100])
-ax.set_title("EXP-002 EfficientNet-B0, 320 classes")
-save(fig, "01_model_metrics.png", "ml/models/exp002/model_card.json (developer evaluation; checkpoint metadata)")
+# 1. Classifier quality on the held-out test set (training evidence from Buddy) -----------------------------------------
+TR = REPO / "ml/models/exp002/evidence/training"
+ov = json.loads((TR / "EXP-002_FineTuning/evaluation/overall_metrics.json").read_text())
+dv = json.loads((TR / "derived_summary.json").read_text())
+pd_ = dv["per_dataset"]
+groups = [("All (45,800)", ov["accuracy"], ov["top3_accuracy"], ov["f1_macro"]),
+          (f"Food-101 ({pd_['Food101']['images']:,})", pd_["Food101"]["top1"], pd_["Food101"]["top3"], pd_["Food101"]["macro_f1_own_classes"]),
+          (f"FoodSG-233 ({pd_['FoodSG233']['images']:,})", pd_["FoodSG233"]["top1"], pd_["FoodSG233"]["top3"], pd_["FoodSG233"]["macro_f1_own_classes"])]
+fig, ax = plt.subplots(figsize=(6.4, 2.9))
+import numpy as _np
+x = _np.arange(len(groups)); wdt = 0.26
+for k, (lab, col) in enumerate([("Top-1 accuracy", BLUE), ("Top-3 accuracy", AQUA), ("Macro-F1", ORANGE)]):
+    vals = [g[k + 1] * 100 for g in groups]
+    bars = ax.bar(x + (k - 1) * wdt, vals, wdt * 0.92, color=col, label=lab)
+    for bb, v in zip(bars, vals):
+        ax.text(bb.get_x() + bb.get_width() / 2, v + 1.2, f"{v:.1f}", ha="center", fontsize=8.5, color=INK)
+ax.set_xticks(x, [g[0] for g in groups]); ax.set_ylim(0, 118); ax.set_ylabel("%")
+ax.yaxis.grid(True, color=GRID, lw=0.8); ax.set_axisbelow(True)
+ax.legend(frameon=False, ncol=3, loc="upper center", fontsize=8.5)
+ax.set_title("EXP-002 on the held-out test set (320 classes)")
+save(fig, "01_model_metrics.png", "EXP-002 evaluation on Buddy: overall_metrics.json, predictions.csv (macro-F1 per dataset over its own classes)")
+
+# 11. Training curves: EXP-001 (frozen backbone) then EXP-002 (last 3 blocks + head) -------------------------------------
+import csv as _csv
+h1 = list(_csv.DictReader(open(TR / "EXP-001_UnifiedFood/training_history.csv")))
+h2 = list(_csv.DictReader(open(TR / "EXP-002_FineTuning/training_history.csv")))
+ep = list(range(1, 11))
+fig, ax = plt.subplots(figsize=(6.4, 2.8))
+for key, lab, col in [("val_f1_macro", "Validation macro-F1", BLUE), ("val_accuracy", "Validation accuracy", AQUA), ("train_accuracy", "Training accuracy", GREY)]:
+    ys = [float(r[key]) * 100 for r in h1 + h2]
+    ax.plot(ep, ys, marker="o", ms=3.5, lw=1.8, color=col, label=f"{lab} ({ys[-1]:.1f})")
+ax.axvline(5.5, color=INK2, lw=0.8, ls=":")
+ax.text(3, 74, "EXP-001\nfrozen backbone, lr 1e-4", ha="center", fontsize=8, color=INK2)
+ax.text(8, 74, "EXP-002\nlast 3 blocks + head, lr 1e-5 / 5e-5", ha="center", fontsize=8, color=INK2)
+ax.set_xticks(ep); ax.set_xlabel("epoch"); ax.set_ylabel("%"); ax.set_ylim(20, 80); ax.set_xlim(0.6, 10.4)
+ax.yaxis.grid(True, color=GRID, lw=0.8); ax.set_axisbelow(True)
+ax.legend(frameon=False, loc="lower right", fontsize=8)
+ax.set_title("Training on Food-101 + FoodSG-233 (RTX 5060 Ti, ~20 min per stage)")
+save(fig, "11_training_curves.png", "EXP-001 and EXP-002 training_history.csv (Buddy)")
+
+# 12. Confidence vs accuracy (reliability) --------------------------------------------------------------------------------
+cal = json.loads((TR / "EXP-002_FineTuning/evaluation/confidence_calibration.json").read_text())
+fig, ax = plt.subplots(figsize=(4.4, 3.4))
+mc = [b["mean_confidence"] * 100 for b in cal]; acc = [b["actual_accuracy"] * 100 for b in cal]
+ax.plot([0, 100], [0, 100], color=GREY, lw=1, ls="--", label="perfect calibration")
+ax.plot(mc, acc, marker="o", ms=4, lw=1.8, color=TEAL, label="EXP-002 (10 bins)")
+ax.axvspan(0, 20, color=ORANGE, alpha=0.08); ax.axvspan(20, 50, color=ORANGE, alpha=0.04)
+ax.text(10, 88, "not\nadded", ha="center", fontsize=7.5, color=INK2); ax.text(35, 88, "marked\nto check", ha="center", fontsize=7.5, color=INK2)
+ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.set_xlabel("mean top-1 confidence (%)"); ax.set_ylabel("actual top-1 accuracy (%)")
+ax.text(97, 6, f"ECE {dv['confidence']['ece_10_bins'] * 100:.2f}%", ha="right", fontsize=9, color=INK)
+ax.legend(frameon=False, fontsize=8, loc="upper left", bbox_to_anchor=(0.0, 0.8))
+ax.set_title("Confidence against accuracy (test set)")
+save(fig, "12_calibration.png", "confidence_calibration.json (Buddy); app thresholds 0.20 / 0.50")
+
+# 13. Per-class F1 distribution -------------------------------------------------------------------------------------------
+f1 = [float(r["f1"]) * 100 for r in _csv.DictReader(open(TR / "per_class_f1.csv"))]
+fig, ax = plt.subplots(figsize=(6.4, 2.5))
+bins = list(range(0, 101, 10))
+n, _, patches = ax.hist(f1, bins=bins, color=TEAL, edgecolor="white", linewidth=1.5)
+for pt, lo in zip(patches, bins):
+    if lo < 50: pt.set_facecolor(ORANGE)
+for c, lo in zip(n, bins):
+    if c: ax.text(lo + 5, c + 1.5, f"{int(c)}", ha="center", fontsize=8.5, color=INK)
+ax.set_xlabel("per-class F1 (%)"); ax.set_ylabel("classes"); ax.set_xticks(bins)
+ax.yaxis.grid(True, color=GRID, lw=0.8); ax.set_axisbelow(True)
+ax.set_title(f"F1 across the 320 classes (median {dv['per_class_f1']['median'] * 100:.1f}%; {dv['per_class_f1']['f1_lt_0.5']} below 50%)")
+save(fig, "13_per_class_f1.png", "classification_report.json, per_class_f1.csv (Buddy)")
 
 # 2. Multi-food plates: what happened to each true item ------------------------------------------------------------
 mf = json.loads((REPO / "test-results/multifood_metrics.json").read_text())
