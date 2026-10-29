@@ -2,6 +2,13 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.10 — Language model evaluation (no app change)
+
+- `python -m app.tools.slm_eval` measures the local SLM on fixed inputs with known answers: description parsing
+  (20, against the rule-based splitter), unknown-name matching (15, 10 in the table and 5 absent, against the fuzzy
+  lookup), meal explanations (6, number grounding by the advisor's validator) and Meal Advisor rewording (8 drafts,
+  validator pass rate), with latency and tokens per second. Read-only: no call log, no cache.
+
 ## v0.13.9 — Presentation video kit (no app change)
 
 - `demo/narration-full.json`: a 26-line, ~12-minute presentation in two halves (business case with pricing; system
