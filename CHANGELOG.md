@@ -2,6 +2,18 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.20 — Final presentation kit (no app change)
+
+- `demo/narration-final.json`: 23 segments, about 11 minutes of speech (12–13 with the demo): opening on camera,
+  the live demo, how the system was evaluated and what the results mean, the system design, limits and close.
+  Lines are `camera` (full screen) or `pip` (the presenter's video in the bottom-right corner over the demo).
+- `voice.py`: `mine` cuts each take's audio and, for `pip` lines, its video at the same speech bounds (lip sync
+  kept); `splice` overlays the presenter on the demo stretches, holding the last frame between lines, and fades
+  between pieces; the recording script names every take `NN.mp4` and says full screen or corner.
+- `record.mjs`: scenes for the new segments (review + marking, portion + walk, and full-screen report figures for
+  the evaluation and the design), kept clear of the presenter's corner. `run.sh` mounts `docs/report/charts` into
+  the recording container (the figure scenes failed there before).
+
 ## v0.13.19 — TF-IDF and embedding evaluations (no app change)
 
 - `python -m app.tools.tfidf_eval`: character 3–5-gram TF-IDF with cosine 1-nearest-neighbour for food names,

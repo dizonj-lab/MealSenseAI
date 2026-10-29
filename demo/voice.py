@@ -43,6 +43,8 @@ LEAD = 0.35          # a scene's line begins this long after the scene does
 TAIL = 0.45          # and the scene runs this long after the line ends
 GAP = 0.3            # the least silence between two lines
 MAX_SPEEDUP = 3.0
+PIP_W = 480          # the presenter's corner window over the demo, in pixels (1080p frame)
+PIP_MARGIN = 40
 MUSIC_DB = -19       # the bed under the voice, before ducking (a little more present than CEREBRO's)
 MAC_VOICES = ["Ava (Premium)", "Zoe (Premium)", "Ava (Enhanced)", "Zoe (Enhanced)",
               "Evan (Enhanced)", "Samantha (Enhanced)", "Samantha"]
@@ -163,6 +165,23 @@ def narrated(line: dict) -> bool:
     return line.get("mode", "screen") != "camera"
 
 
+def has_video(src: Path) -> bool:
+    return bool(run("ffprobe", "-v", "error", "-select_streams", "v", "-show_entries", "stream=index", "-of", "csv=p=0", str(src)).strip())
+
+
+def speech_bounds(src: Path, pad: float = 0.12) -> tuple[float, float]:
+    """Where speech starts and ends in a take (silence below -45 dB trimmed, a little kept), so the audio and,
+    for picture-in-picture, the video are cut at exactly the same points."""
+    length = duration(src)
+    log = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(src), "-af", "silencedetect=noise=-45dB:d=0.25", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    starts = [float(x) for x in re.findall(r"silence_start: ([\d.]+)", log)]
+    ends = [float(x) for x in re.findall(r"silence_end: ([\d.]+)", log)]
+    a = ends[0] if starts and starts[0] < 0.05 and ends else 0.0
+    b = starts[-1] if starts and (len(ends) < len(starts) or ends[-1] >= length - 0.05) and starts[-1] > a else length
+    return max(0.0, a - pad), min(length, b + pad)
+
+
 def mine() -> None:
     """Use the presenter's own recordings: one file per line, named by its number (01.m4a, 02 hook.wav …).
     Each is cleaned the same way: rumble below 80 Hz cut, silence trimmed at both ends, loudness evened out
@@ -174,15 +193,21 @@ def mine() -> None:
     if missing:
         sys.exit(f"No recording in {folder} for: " + ", ".join(missing) + "\n(name each file by its line number, e.g. 01.m4a)")
     CLIPS.mkdir(exist_ok=True)
-    trim = "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.12"
     durations = {}
     for i, line in enumerate(want):
         if not narrated(line):
             continue
+        src = files[i + 1]
+        a, b = speech_bounds(src)
         out = CLIPS / f"{i:02}.wav"
-        run("ffmpeg", "-y", "-loglevel", "error", "-i", str(files[i + 1]), "-vn", "-af",
-            f"highpass=f=80,{trim},areverse,{trim},areverse,loudnorm=I=-18:TP=-2:LRA=11",
-            "-ar", "48000", "-ac", "1", str(out))
+        run("ffmpeg", "-y", "-loglevel", "error", "-ss", f"{a:.3f}", "-to", f"{b:.3f}", "-i", str(src), "-vn", "-af",
+            "highpass=f=80,loudnorm=I=-18:TP=-2:LRA=11", "-ar", "48000", "-ac", "1", str(out))
+        if line.get("mode") == "pip":   # the same stretch of your video, small, for the corner of the demo
+            if not has_video(src):
+                sys.exit(f"{src.name} has no video; picture-in-picture lines need a video take")
+            run("ffmpeg", "-y", "-loglevel", "error", "-ss", f"{a:.3f}", "-to", f"{b:.3f}", "-i", str(src), "-an",
+                "-vf", f"scale={PIP_W}:-2,fps=30,format=yuv420p", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+                str(CLIPS / f"{i:02}-cam.mp4"))
         durations[line["id"]] = round(duration(out), 2)
         words = len(line["text"].split())
         print(f"  {i + 1:02} {line['id']:10} {durations[line['id']]:5.1f}s  ({words / durations[line['id']] * 60:.0f} words/min)")
@@ -193,11 +218,20 @@ def mine() -> None:
 def recording_script() -> None:
     """A printable script: each line with the file name it goes in and a target length at a calm pace."""
     s = script()
-    out = [f"# Recording script: {s.get('output', 'demo')}", "",
-           "Record each line as its own file, named by its number: `01.m4a`, `02.m4a` … (any common audio format).",
-           "Quiet room, same distance from the mic, half a second of silence before and after. Redo a line rather",
-           "than editing it. Camera lines may be one take for several lines, named by the range: `01-05.mp4`.",
-           "Voice-only lines time the demo, so read them at the pace you want the screen to move.", ""]
+    if any(line.get("mode") == "pip" for line in s["scenes"]):
+        out = [f"# Recording script: {s.get('output', 'demo')}", "",
+               "Record every line as its own video, named by its number: `01.mp4`, `02.mp4` … (mp4 or mov, landscape).",
+               "\"Full screen\" lines are shown as you recorded them. \"Corner\" lines play your video small in the bottom-right",
+               "corner over the demo, so frame yourself centred, head and shoulders, against a plain background.",
+               "Same place, light and distance for every take. In corner lines, pause about a second before and after you speak:",
+               "the silence is trimmed automatically. Redo a line rather than editing it. Corner lines time the demo, so read",
+               "them at the pace you want the screen to move.", ""]
+    else:
+        out = [f"# Recording script: {s.get('output', 'demo')}", "",
+               "Record each line as its own file, named by its number: `01.m4a`, `02.m4a` … (any common audio format).",
+               "Quiet room, same distance from the mic, half a second of silence before and after. Redo a line rather",
+               "than editing it. Camera lines may be one take for several lines, named by the range: `01-05.mp4`.",
+               "Voice-only lines time the demo, so read them at the pace you want the screen to move.", ""]
     total = 0
     part = None
     for i, line in enumerate(s["scenes"]):
@@ -206,13 +240,15 @@ def recording_script() -> None:
             out += [f"## {part}", ""] if part else []
         secs = len(line["text"].split()) / 2.3
         total += secs
-        how = "on camera (video + audio)" if line.get("mode") == "camera" else "voice only (over the app demo)"
-        ext = "mp4" if line.get("mode") == "camera" else "m4a"
+        mode = line.get("mode", "screen")
+        how = {"camera": "on camera, full screen", "pip": "on camera, shown in a corner over the demo"}.get(mode, "voice only (over the app demo)")
+        ext = "mp4" if mode in ("camera", "pip") else "m4a"
         out += [f"**{i + 1:02} · {line.get('title', line['id'])}** — {how}, file `{i + 1:02}.{ext}`, about {secs:.0f} s", "",
                 line["text"], ""]
     out.append(f"About {total / 60:.0f} minutes of speech at 138 words a minute.")
-    (HERE / "RECORDING-SCRIPT.md").write_text("\n".join(out) + "\n")
-    print(f"script: {HERE / 'RECORDING-SCRIPT.md'}")
+    name = "RECORDING-SCRIPT.md" if s.get("output") == "MealSenseAI-presentation" else f"RECORDING-SCRIPT-{s.get('output', 'demo')}.md"
+    (HERE / name).write_text("\n".join(out) + "\n")
+    print(f"script: {HERE / name}")
 
 
 SAMPLE_VOICES = ["af_heart", "af_bella", "af_nicole", "af_sarah", "am_michael", "am_fenrir",
@@ -363,13 +399,37 @@ def normalise(src: Path, out: Path, start: float | None = None, end: float | Non
     cut = (["-ss", f"{start:.3f}"] if start is not None else []) + (["-to", f"{end:.3f}"] if end is not None else [])
     length = (end - (start or 0)) if end is not None else duration(src)
     af = "loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000,aformat=channel_layouts=stereo"
+    vf = FRAME
     if fade:
         af += f",afade=t=in:d={fade},afade=t=out:st={max(0.0, length - fade):.3f}:d={fade}"
+        vf += f",fade=t=in:d={fade},fade=t=out:st={max(0.0, length - fade):.3f}:d={fade}"
     # The audio is padded to the picture's length: pieces joined end to end must each be exactly as long in sound
     # as in picture, or every later camera take would drift out of lip sync.
     af += ",apad"
-    run("ffmpeg", "-y", "-loglevel", "error", *cut, "-i", str(src), "-vf", FRAME, "-af", af, "-shortest",
+    run("ffmpeg", "-y", "-loglevel", "error", *cut, "-i", str(src), "-vf", vf, "-af", af, "-shortest",
         "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", str(out))
+
+
+def overlay_presenter(piece: Path, pips: list, where: dict, start: float, end: float) -> None:
+    """Your take for each picture-in-picture line, in the bottom-right corner while you speak it; between lines the
+    last frame holds, so the corner window stays on screen for the whole stretch."""
+    inputs, chain, last = ["-i", str(piece)], [], "0:v"
+    for n, (k, line) in enumerate(pips, 1):
+        cam = CLIPS / f"{k - 1:02}-cam.mp4"
+        if not cam.exists():
+            sys.exit(f"No {cam.name}; run voice.py mine first (picture-in-picture needs the video takes)")
+        at = max(0.0, where[line["id"]]["voice"] - start)
+        nxt = [where[l["id"]]["voice"] - start for _, l in pips[n:]] + [end - start]
+        hold = max(0.0, nxt[0] - at - duration(cam))
+        inputs += ["-i", str(cam)]
+        chain.append(f"[{n}:v]tpad=stop_mode=clone:stop_duration={hold:.3f},pad=iw+6:ih+6:3:3:color=white,"
+                     f"setpts=PTS-STARTPTS+{at:.3f}/TB[p{n}]")
+        chain.append(f"[{last}][p{n}]overlay=W-w-{PIP_MARGIN}:H-h-{PIP_MARGIN}:eof_action=pass[v{n}]")
+        last = f"v{n}"
+    tmp = piece.with_name(piece.stem + "-pip.mp4")
+    run("ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(chain), "-map", f"[{last}]", "-map", "0:a",
+        "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "copy", str(tmp))
+    tmp.replace(piece)
 
 
 def splice() -> None:
@@ -405,7 +465,7 @@ def splice() -> None:
                 if not run("ffprobe", "-v", "error", "-select_streams", "v", "-show_entries", "stream=index", "-of", "csv=p=0", str(src)).strip():
                     sys.exit(f"{src.name} has no video; camera lines need a video take")
                 out = pieces_dir / f"{len(pieces):02}-camera-{line:02}.mp4"
-                normalise(src, out)
+                normalise(src, out, fade=0.25)
                 pieces.append(out)
                 print(f"  camera {line:02}{'-' + format(last, '02') if last != line else ''}  {src.name}  {duration(out):.1f}s")
                 line = last + 1
@@ -420,6 +480,9 @@ def splice() -> None:
             normalise(demo, out, start, end, fade=0.35)
             keep = HERE / f"{name}-demo-{n_screen}.mp4"
             shutil.copy(out, keep)
+            pips = [(k, want[k - 1]) for k in range(a, b + 1) if want[k - 1].get("mode") == "pip"]
+            if pips:
+                overlay_presenter(out, pips, where, start, end if end is not None else built["final"])
             pieces.append(out)
             print(f"  screen {a:02}-{b:02}  demo {start:.1f}–{end if end is not None else built['final']:.1f}s  → {keep.name}")
     (pieces_dir / "list.txt").write_text("".join(f"file '{p.name}'\n" for p in pieces))

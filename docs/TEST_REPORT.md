@@ -206,3 +206,11 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | `app.tools.tfidf_eval` on the local food table | **Ran**: results above (`docs/report/tfidf_eval.json`) |
 | `embedding_eval.py` analysis functions on synthetic clusters | **PASS**: perfect labels give NMI = ARI = 1; random labels ARI ≈ 0; silhouette matches a direct computation |
 | Not run here | `embedding_eval.py` on the real test images (needs Buddy, PyTorch and the datasets) |
+
+## v0.13.20: final presentation kit (29 Oct 2026)
+
+| Test | Result |
+|---|---|
+| `voice.py mine → build → splice` with stand-in takes (two full-screen, two corner) | **PASS**: corner window in the demo stretch, held between lines; final video 16.17 s, audio 16.17 s (no drift) |
+| `record.mjs` with every new figure scene against the local app | **PASS**: all scenes ran; figures fit 1080p and stay clear of the presenter's corner |
+| Not run here | The Buddy run with the real takes |

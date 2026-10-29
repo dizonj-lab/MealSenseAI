@@ -11,6 +11,11 @@
 #   NARRATION=narration-full.json ./demo/run.sh script         RECORDING-SCRIPT.md: what to record, file by file
 #   NARRATION=narration-full.json ./demo/run.sh                a full preview first, every line in the Kokoro voice
 #   NARRATION=narration-full.json RECORDINGS=~/mealsense-recordings ./demo/run.sh mine
+#
+# The final presentation (narration-final.json): every line is a video take of you; "camera" lines play full screen,
+# "pip" lines put you in a corner over the demo, the evaluation figures and the system design:
+#   NARRATION=narration-final.json ./demo/run.sh script         RECORDING-SCRIPT-MealSenseAI-final-presentation.md
+#   NARRATION=narration-final.json RECORDINGS=~/mealsense-final ./demo/run.sh mine
 #        your voice over the demo, then your camera takes spliced in → ~/mealsense-demo-<time>/…-final.mp4
 #
 #   VOICE=am_michael ./demo/run.sh voice     another Kokoro voice (af_sarah is the default)
@@ -124,7 +129,7 @@ fi
 # 2. The recording, in Playwright's own container (its browser, fonts and codecs).
 echo "==> Recording the tour (5 to 12 minutes)"
 rm -rf "$HERE/out"
-docker run --rm --network host --ipc=host -v "$HERE:/demo" -w /demo \
+docker run --rm --network host --ipc=host -v "$HERE:/demo" -v "$HERE/../docs/report/charts:/docs/report/charts:ro" -w /demo \
   -e BASE="$BASE" -e OUT=/demo/out -e THEME="$THEME" -e PHOTOS=/demo/photos -e NARRATION="$NARRATION" -e SCENES_MODE="$SCENES_MODE" \
   "mcr.microsoft.com/playwright:v$PLAYWRIGHT-noble" \
   bash -c "npm install --no-save --silent playwright@$PLAYWRIGHT >/dev/null && node record.mjs; chown -R $(id -u):$(id -g) /demo/out /demo/node_modules 2>/dev/null || true"

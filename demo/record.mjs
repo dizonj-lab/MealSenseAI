@@ -98,6 +98,9 @@ const overlay = () => {
     #demo-card .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
     #demo-card .metrics .tile { width: auto; padding: 18px 20px; } #demo-card .metrics .tile b { font-size: 44px; }
     #demo-card .eq { font: 600 40px "STIX Two Math", Georgia, serif; color: #fff; padding: 18px 34px; border-radius: 16px; background: rgba(240,253,250,.08); }
+    #demo-card .charts.big img { height: 640px; max-width: 1640px; }
+    #demo-card .charts.two img { height: 560px; max-width: 800px; }
+    #demo-card .charts.three img { height: 430px; max-width: 590px; }
     #demo-card .charts { display: flex; gap: 28px; justify-content: center; margin-top: 6px; }
     #demo-card .charts img { height: 400px; max-width: 820px; object-fit: contain; background: #fff; border-radius: 16px; padding: 12px; }
     #demo-card .row.small .tile { width: 300px; padding: 18px 20px; } #demo-card .row.small .tile b { font-size: 40px; }
@@ -151,6 +154,19 @@ const context = await browser.newContext({
   recordVideo: { dir: OUT, size: { width: W, height: H } },
 });
 await context.addInitScript(overlay);
+// Picture-in-picture scripts: keep cards and figures clear of the presenter's corner (bottom right, ~520 × 300 px).
+if (narration.some((s) => s.mode === "pip")) await context.addInitScript(() => {
+  const style = () => {
+    const el = document.createElement("style");
+    el.textContent = `#demo-card { padding: 0 560px 150px 90px !important; }
+      #demo-card .charts.big img { max-width: 1240px !important; height: 600px !important; }
+      #demo-card .charts.two img { max-width: 610px !important; height: 480px !important; }
+      #demo-card .charts.three img { max-width: 395px !important; height: 360px !important; }
+      #demo-card .charts img { max-width: 1240px !important; } #demo-card .row.small .tile { width: 270px !important; }`;
+    document.head.appendChild(el);
+  };
+  if (document.head) style(); else document.addEventListener("DOMContentLoaded", style);
+});
 // Wei Ming has used the app for a week: the first-run checklist is long dismissed.
 await context.addInitScript((theme) => {
   try { localStorage.setItem("mealsense.theme", theme); localStorage.setItem("mealsense.gs.dismissed", "1"); } catch {}
@@ -662,6 +678,45 @@ SCENES.quality = async (secs) => {
       <div class="tile" data-at="0.75"><b>1 command</b><span>docker compose up, on a CPU server</span></div>
     </div>`, secs);
 };
+
+
+// ---- The final presentation (narration-final.json): the presenter in a corner over the demo, the evaluation and the
+// system design. Figures come from docs/report/charts, made from the evidence files.
+const FIG = (f, at = 0.05, alt = "") => `<img data-at="${at}" src="${chart(f)}" alt="${alt}">`;
+const figCard = async (title, figs, secs, cls = "big", note = "") => { await chapter(""); return card(
+  `<h2 data-at="0">${title}</h2><div class="charts ${cls}">${figs}</div>${note ? `<small data-at="0.5">${note}</small>` : ""}`, secs); };
+
+SCENES.correct = async (secs) => { await SCENES.review(secs); await SCENES.mark(secs); };
+SCENES.tryit = async (secs) => { await SCENES.portion(secs); await SCENES.whatif(secs); };
+SCENES.evalmethod = async (secs) => { await chapter(""); await figCard("Eight experiments: input → method → output", FIG("20_experiments_flow.png"), secs); };
+SCENES.datatrain = async (secs) => figCard("Data and training", FIG("14_data_prep.png", 0.03) + FIG("11_training_curves.png", 0.55), secs, "two");
+SCENES.recognition = async (secs) => figCard("Recognition on 45,800 test images",
+  FIG("01_model_metrics.png", 0.03) + FIG("13_per_class_f1.png", 0.4) + FIG("12_calibration.png", 0.7), secs, "three");
+SCENES.platetest = async (secs) => figCard("Several foods on a plate", FIG("16_multifood_evidence.png"), secs);
+SCENES.textlang = async (secs) => figCard("Language model, rules and TF-IDF",
+  FIG("21_tfidf_matching.png", 0.03), secs, "big", "Meal explanations are now checked by the same validator as the advisor (v0.13.13).");
+SCENES.results = async (secs) => card(`
+    <h2 data-at="0">Advisor, glucose model, quality</h2>
+    <div class="row small">
+      <div class="tile" data-at="0.05"><b>38 / 38</b><span>advisor test questions, no unsupported claims</span>${SRC("advisor_eval.json")}</div>
+      <div class="tile" data-at="0.15"><b>12 ms</b><span>median advisor reply (rules)</span></div>
+      <div class="tile" data-at="0.65"><b>65</b><span>automated tests, real PostgreSQL</span></div>
+      <div class="tile" data-at="0.75"><b>9 / 9</b><span>acceptance checks, also offline</span></div>
+    </div>
+    <div class="charts"><img data-at="0.3" src="${chart("07_glucose_curves.png")}" alt=""></div>`, secs);
+SCENES.architecture = async (secs) => figCard("System design", FIG("19_system_detail.png"), secs);
+SCENES.stages = async (secs) => figCard("The ten-stage pipeline", FIG("10_pipeline.png"), secs);
+SCENES.grounded = async (secs) => figCard("Grounded by design", FIG("17_advisor_flow.png"), secs);
+SCENES.safelearn = async (secs) => figCard("Learning safely", FIG("18_learning_flow.png"), secs);
+SCENES.limits = async (secs) => card(`
+    <h2 data-at="0">Limits, and what comes next</h2>
+    <div class="pains">
+      <div class="tile" data-at="0.08"><b>Similar dishes</b><span>45 of 320 classes below 50% F1</span></div>
+      <div class="tile" data-at="0.3"><b>Portions</b><span>±35–50% from a photo; error not yet measured</span></div>
+      <div class="tile" data-at="0.55"><b>Nutrition data</b><span>to verify against an official source</span></div>
+    </div>
+    <p data-at="0.8">Next: a trial with real users.</p>`, secs);
+SCENES.close = async (secs) => SCENES.outro(secs);
 
 // The opening runs over title cards on the landing page, signed out.
 await page.goto(`${BASE}/`);
