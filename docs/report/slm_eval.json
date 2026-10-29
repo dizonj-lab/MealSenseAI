@@ -1,0 +1,7 @@
+{"model":"qwen2.5:1.5b","ollama_url":"http://ollama:11434","temperature":0.1,"host":"x86_64","started":"2026-10-29T03:56:03+0000",
+"parse":{"n":20,"slm":{"precision":0.812,"recall":0.667,"f1":0.732},"rules":{"precision":1.0,"recall":0.974,"f1":0.987},"slm_exact_sets":9,"rules_exact_sets":19,"latency_ms":{"n":20,"mean":921,"p50":884,"p95":1936},"failures":0},
+"match":{"n":15,"accuracy":0.267,"correct_when_in_table":"2/10","abstained_when_absent":"2/5","lookup_accuracy":0.467,"lookup_wrong_match":4,"slm_wrong_match":6,"latency_ms":{"n":15,"mean":5298,"p50":5232,"p95":5830}},
+"explain":{"n":6,"grounded":"1/6","latency_ms":{"n":6,"mean":2928,"p50":3259,"p95":3942}},
+"rewrite":{"n":8,"passed_validator":"7/8","latency_ms":{"n":8,"mean":953,"p50":1056,"p95":1559}},
+"tokens_per_s":{"mean":56.3,"min":50.4,"max":61.0},"finished":"2026-10-29T03:58:06+0000",
+"note":"SUMMARY block as printed on Buddy; per-item rows not included"}

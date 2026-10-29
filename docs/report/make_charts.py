@@ -140,9 +140,15 @@ lk = {"Correct": sum(r["lookup"] == r["want"] for r in rowsm), "Wrong food": sum
       "No match": sum(r["lookup"] is None and r["want"] is not None for r in rowsm)}
 groups = [("Fuzzy lookup (rules)", lk)]
 if slm.exists():
-    sr = s["match"]["rows"]
-    groups.append(("Language model", {"Correct": sum(r["correct"] for r in sr), "Wrong food": sum(r["slm"] is not None and r["slm"] != r["want"] for r in sr),
-                                      "No match": sum(r["slm"] is None and r["want"] is not None for r in sr)}))
+    m = s["match"]
+    if "rows" in m:
+        sr = m["rows"]
+        slm_counts = {"Correct": sum(r["correct"] for r in sr), "Wrong food": sum(r["slm"] is not None and r["slm"] != r["want"] for r in sr),
+                      "No match": sum(r["slm"] is None and r["want"] is not None for r in sr)}
+    else:   # summary only: correct includes correct abstentions, so the rest are misses
+        ok = round(m["accuracy"] * m["n"])
+        slm_counts = {"Correct": ok, "Wrong food": m["slm_wrong_match"], "No match": m["n"] - ok - m["slm_wrong_match"]}
+    groups.append(("Language model", slm_counts))
 fig, ax = plt.subplots(figsize=(6.4, 0.6 * len(groups) + 1.2))
 left = [0] * len(groups)
 for name, col in [("Correct", BLUE), ("Wrong food", ORANGE), ("No match", GREY)]:

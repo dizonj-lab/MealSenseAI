@@ -168,7 +168,7 @@ const tools = [
     ["Glycaemic load", "Published GI (Atkinson 2021) plus rule-based GI borrowing from the staple", "Covers local dishes without inventing values"],
     ["Glucose estimate", "One-compartment mass-balance ODE, OGTT anchor, per-user median-ratio calibration", "Explainable and conservative"],
     ["Language model", "Ollama with Qwen 2.5 1.5B, JSON-schema output, temperature control", "Local, small, structured; wording only"],
-    ["Grounding", "Rule engine draft → SLM rewrite → validator (numbers ±2%, food names, unsafe phrases)", "No unsupported number reaches the user"],
+    ["Grounding", "Rule engine draft → SLM rewrite → validator (numbers ±2%, food names, unsafe phrases)", "No unsupported number reaches the user in the Meal Advisor (meal explanations: see 6.4)"],
     ["Personal memory", "Class-probability fingerprints, cosine similarity ≥ 0.70 with a 0.05 margin", "Recognises a user's own foods without retraining"],
     ["Data governance", "Per-sample consent, 11 screening checks, perceptual hashes, frozen dataset versions, model gate with shadow mode", "Safe learning from user photos"],
     ["Backend", "FastAPI, SQLAlchemy 2, Alembic, PostgreSQL 16, Python 3.12", "Typed API, migrations on start"],
@@ -307,6 +307,8 @@ const perf = [
   P("Before any language model is asked, the rules do well on whole descriptions: the splitter recovered the exact food set for **19 of 20** descriptions (F1 0.987; it missed \"soft boiled eggs\"). On unknown names, however, the fuzzy lookup was right for only 7 of 15 and **confidently wrong for 4** (sugarcane juice → orange juice, curry chicken → chicken breast, mung bean soup → consommé, fishball soup → fried bee hoon). Because the language model is only consulted when the lookup returns nothing, these wrong matches currently bypass it; Section 7 proposes the fix."),
   ...(slmRows ? TABLE(`Local language model on the deployment server (E6): ${SLM.model}, ${SLM.tokens_per_s ? SLM.tokens_per_s.mean + " tokens/s" : ""}`, ["Task", "Language model", "Rule baseline", "p50 / p95 ms"], slmRows, [2200, 3626, 1900, 1300])
     : [P("**E6 results pending.** The benchmark (app/tools/slm_eval.py) runs the four language-model tasks above on fixed inputs with known answers, read-only, on the deployment server. This table will be completed from that run.", { shading: { fill: "FDF2E7", type: ShadingType.CLEAR, color: "auto" } })]),
+  ...(SLM ? [P("The result is clear and not flattering to the language model. On every task with a rule baseline, the **rules were better**: description parsing F1 0.987 against 0.732 (19 against 9 exact sets), and on unknown names the model was right 4 times in 15 and **wrong 6 times**, against the fuzzy lookup's 7 right and 4 wrong. Rewording advisor drafts is where it helps: **7 of 8** rewordings passed the validator and could be shown; the eighth fell back to the rule answer. Its meal explanations were the weakest: only **1 of 6** used only numbers from the facts."),
+    P("That last result exposed a gap. Advisor replies pass through the validator before they are shown, but meal explanations are displayed **without that check**, so an explanation can state a number the system never computed. The fix is to run the same validator on explanations and show nothing (the rule-based results remain) when it fails. The general lesson is the design's premise: a 1.5-billion-parameter model is useful for wording, not for facts, and every model output needs a deterministic check.")] : []),
   ...TABLE("Language model in real use on the deployment server (inference log, all calls since it was enabled)", ["Task", "Calls", "Completed", "Mean ms", "p50 / p95 ms"], [
     ["Meal explanation", "24", "100%", "1,515", "1,465 / 3,299"],
     ["Meal Advisor reply", "3", "100%", "4,735", "5,304 / 5,314"],
@@ -327,12 +329,13 @@ const findings = [
   H2("7.1 What worked"),
   ...BUL([
     "**Human in the loop beats a single answer.** With top-3 at 85.7% and one-tap correction, a wrong top-1 costs a tap, not a wrong log.",
-    "**Grounding by construction.** Letting rules produce facts and the language model only produce wording gave zero unsupported claims in testing, and a safe fallback when the model is slow or offline.",
+    "**Grounding by construction.** Letting rules produce facts and the language model only produce wording gave zero unsupported claims in the advisor, and a safe fallback when the model is slow or offline. Where the check was missing (meal explanations), the model added numbers of its own in 5 of 6 cases.",
     "**Honest uncertainty is a feature.** Leaving an item unidentified (48% of missed steaks) is preferable to a confident wrong dish for someone counting carbohydrate.",
     "**Cheap to run.** Every model runs on one CPU server; the classifier takes ~12 ms and a full multi-food analysis ~0.26 s.",
   ]),
   H2("7.2 Limitations"),
   ...BUL([
+    "**Meal explanations are not validated**: the language model's explanation is shown without the advisor's number check; in the benchmark 5 of 6 contained a number not in the facts. Fix before release (Section 6.4).",
     "**Visually similar dishes** (steak vs sirloin, noodle soups, rice plates) remain the main confusion; scores are uncalibrated.",
     "**Portions** come from priors or area, not volume (±35–50%); entering grams is the accurate path. The proposal's portion error measure (MAE against weighed portions) has not been run.",
     "**Nutrition values are unverified** transcriptions (USDA- and HPB-style values) or recipe approximations (199 records); a verified import (HPB SG FoodID, USDA FDC) is required before clinical use.",
