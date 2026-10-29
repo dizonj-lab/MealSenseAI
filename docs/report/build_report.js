@@ -307,6 +307,11 @@ const perf = [
   P("Before any language model is asked, the rules do well on whole descriptions: the splitter recovered the exact food set for **19 of 20** descriptions (F1 0.987; it missed \"soft boiled eggs\"). On unknown names, however, the fuzzy lookup was right for only 7 of 15 and **confidently wrong for 4** (sugarcane juice → orange juice, curry chicken → chicken breast, mung bean soup → consommé, fishball soup → fried bee hoon). Because the language model is only consulted when the lookup returns nothing, these wrong matches currently bypass it; Section 7 proposes the fix."),
   ...(slmRows ? TABLE(`Local language model on the deployment server (E6): ${SLM.model}, ${SLM.tokens_per_s ? SLM.tokens_per_s.mean + " tokens/s" : ""}`, ["Task", "Language model", "Rule baseline", "p50 / p95 ms"], slmRows, [2200, 3626, 1900, 1300])
     : [P("**E6 results pending.** The benchmark (app/tools/slm_eval.py) runs the four language-model tasks above on fixed inputs with known answers, read-only, on the deployment server. This table will be completed from that run.", { shading: { fill: "FDF2E7", type: ShadingType.CLEAR, color: "auto" } })]),
+  ...TABLE("Language model in real use on the deployment server (inference log, all calls since it was enabled)", ["Task", "Calls", "Completed", "Mean ms", "p50 / p95 ms"], [
+    ["Meal explanation", "24", "100%", "1,515", "1,465 / 3,299"],
+    ["Meal Advisor reply", "3", "100%", "4,735", "5,304 / 5,314"],
+  ], [2600, 1200, 1500, 1500, 2226]),
+  P("Every call returned a valid answer within its timeout. That is a small sample (27 calls) and measures availability and speed, not quality. The rules answer in about 12 ms, so the model adds 1.5–5 seconds; this is why explanations are deferred (the result appears first) and the rules stay the fallback."),
   H2("6.5 Grounded advisor"),
   P("All 38 labelled questions passed (E4), across meal retrieval, carbohydrate arithmetic, explainability, food lookup, week summaries, safety (6/6), prompt injection (3/3), conversation (4/4) and user isolation, with **no unsupported claims** and a 12 ms median reply (18 ms p95) from the rule engine."),
   H2("6.6 Glucose model scenarios"),
