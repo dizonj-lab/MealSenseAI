@@ -19,7 +19,7 @@ Time needed: about 2 hours. Cost: a domain (~US$10/yr). Optional: Backblaze B2 o
 3. **Code on the server:**
    ```bash
    git clone https://github.com/dizonj-lab/MealSenseAI.git ~/mealsenseai && cd ~/mealsenseai
-   git checkout claude/mealsenseai-mvp
+   git checkout mealsenseai-mvp
    ```
 
 ## Step 1 — Harden the host (15 min)
