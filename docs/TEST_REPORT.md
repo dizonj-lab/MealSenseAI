@@ -241,3 +241,12 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | A 40 s stand-in take with its number at 31.6 s | **PASS**: full screen, then fades to the slide; 39.97 s video, 39.99 s audio |
 | Both joined with `-c copy` | **PASS**: 65.0 s, no drift |
 | Not run here | The Buddy re-splice with the real takes |
+
+## v0.13.24: features and limitations slides (30 Oct 2026)
+
+| Test | Result |
+|---|---|
+| "value" with a 40.8 s stand-in take | **PASS**: slide from the start, take in the corner; eight tiles at 3.9–18.7 s in spoken order; 40.77 s video, 40.78 s audio |
+| "limits" with a 30 s stand-in take | **PASS**: three limitation cards then the next-steps panel at 1.9, 5.5, 16.6, 21.7 s; 29.97 s video, 29.99 s audio |
+| Frames from both | **PASS**: nothing covers the corner window; text fits its cards |
+| Not run here | The Buddy re-splice with the real takes |

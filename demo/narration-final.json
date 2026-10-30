@@ -74,14 +74,52 @@
      "image": "cards/stat-cost.png",
      "at": "a national study"
     }
-   ]
+   ],
+   "slide": "cards/stats-bg.png",
+   "slide_from_start": true
   },
   {
    "id": "value",
    "part": "Opening",
    "title": "What MealSenseAI is",
    "mode": "camera",
-   "text": "MealSenseAI turns one photo of a meal into the foods, their portions and their nutrients, and then into meaning: the likely effect on blood sugar, the glycaemic load and a practical next step. Every estimate shows its range and where it came from, and nothing is saved until you confirm it. It's for anyone who wants to understand their food, and I start with people with Type 1 and Type 2 diabetes, where the need is sharpest. Logging is free, and the subscription is three ninety-nine a month. Let me show you the current version."
+   "text": "MealSenseAI turns one photo of a meal into the foods, their portions and their nutrients, and then into meaning: the likely effect on blood sugar, the glycaemic load and a practical next step. Every estimate shows its range and where it came from, and nothing is saved until you confirm it. It's for anyone who wants to understand their food, and I start with people with Type 1 and Type 2 diabetes, where the need is sharpest. Logging is free, and the subscription is three ninety-nine a month. Let me show you the current version.",
+   "slide": "cards/features-bg.png",
+   "slide_from_start": true,
+   "overlays": [
+    {
+     "image": "cards/feat-1.png",
+     "at": "the foods"
+    },
+    {
+     "image": "cards/feat-2.png",
+     "at": "their portions"
+    },
+    {
+     "image": "cards/feat-3.png",
+     "at": "their nutrients"
+    },
+    {
+     "image": "cards/feat-4.png",
+     "at": "the likely effect on blood sugar"
+    },
+    {
+     "image": "cards/feat-5.png",
+     "at": "the glycaemic load"
+    },
+    {
+     "image": "cards/feat-6.png",
+     "at": "a practical next step"
+    },
+    {
+     "image": "cards/feat-7.png",
+     "at": "Every estimate shows its range"
+    },
+    {
+     "image": "cards/feat-8.png",
+     "at": "nothing is saved until you confirm"
+    }
+   ]
   },
   {
    "id": "dashboard",
@@ -214,7 +252,27 @@
    "part": "Close",
    "title": "Limits and next steps",
    "mode": "camera",
-   "text": "There are limits. Similar local dishes still confuse the model. Portions from a photo carry a margin of up to fifty percent, and I haven't yet measured portion error against weighed food. The nutrition values still need verifying against an official source. My next step is a trial with real users, which will measure all three."
+   "text": "There are limits. Similar local dishes still confuse the model. Portions from a photo carry a margin of up to fifty percent, and I haven't yet measured portion error against weighed food. The nutrition values still need verifying against an official source. My next step is a trial with real users, which will measure all three.",
+   "slide": "cards/limits-bg.png",
+   "slide_from_start": true,
+   "overlays": [
+    {
+     "image": "cards/limit-1.png",
+     "at": "Similar local dishes"
+    },
+    {
+     "image": "cards/limit-2.png",
+     "at": "Portions from a photo"
+    },
+    {
+     "image": "cards/limit-3.png",
+     "at": "The nutrition values"
+    },
+    {
+     "image": "cards/next-steps.png",
+     "at": "My next step"
+    }
+   ]
   },
   {
    "id": "close",

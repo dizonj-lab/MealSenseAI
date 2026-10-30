@@ -2,6 +2,16 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.24 — Features and limitations slides (no app change)
+
+- "value" (take 3) becomes a slide, "What MealSenseAI measures": eight tiles (foods, portions, nutrients,
+  blood-sugar effect, glycaemic load, next step, range and source, you confirm), each fading in as it is named.
+- "limits" (take 22) becomes a slide, "Limitations and next steps": confused dishes (from the report's confusion
+  table), the ±50% portion margin, unverified nutrition values, then the trial plan as four numbered steps (from
+  Section 7.3 and 8). No calendar dates: the report gives the order and the trial's length, not dates.
+- A line may set `slide_from_start` so the whole take is the slide; "burden", "value" and "limits" do, so the
+  only full-screen camera takes left are the opening (1) and the thank-you (23).
+
 ## v0.13.23 — Statistics as slides (no app change)
 
 - A camera line with `overlays` now becomes a slide (`cards/stats-bg.png`) with the take in the lower-right corner,

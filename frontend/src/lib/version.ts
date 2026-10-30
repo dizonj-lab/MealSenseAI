@@ -1,7 +1,10 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.23'
+export const APP_VERSION = '0.13.24'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.24', title: 'Features and limitations slides', changes: [
+    'Behind the scenes: in the presentation video, "what MealSenseAI is" and "limits" become slides with the presenter in the corner: what the app measures, and the limitations with the next steps; no change to the app',
+  ] },
   { version: '0.13.23', title: 'Statistics as slides', changes: [
     'Behind the scenes: in the presentation video the statistics are shown on a slide with the presenter in the lower-right corner, and the price card is dropped; no change to the app',
   ] },

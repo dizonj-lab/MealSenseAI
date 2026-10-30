@@ -464,13 +464,13 @@ def card_times(src: Path, text: str, overlays: list[dict]) -> list[tuple[float, 
     return out
 
 
-def stats_slide(piece: Path, cards: list[tuple[float, Path]], background: Path) -> None:
+def stats_slide(piece: Path, cards: list[tuple[float, Path]], background: Path, from_start: bool = False) -> None:
     """A camera take that gives numbers: from the first number on, the take moves to the lower-right corner of a
-    slide (as over the demo) and each statistic card fades in on the slide as its words are spoken. When the first
-    number comes within two seconds, the whole take is the slide."""
+    slide (as over the demo) and each card fades in on the slide as its words are spoken. When the first number comes
+    within two seconds, or the line says "slide_from_start", the whole take is the slide."""
     length = duration(piece)
     first = min(at for at, _ in cards)
-    switch = 0.0 if first < 2.0 else min(first, length - 1.0) - 0.2
+    switch = 0.0 if from_start or first < 2.0 else min(first, length - 1.0) - 0.2
     fit = f"fps=30,format=yuv420p,setsar=1,settb=AVTB"
     inputs = ["-i", str(piece), "-loop", "1", "-framerate", "30", "-t", f"{length:.3f}", "-i", str(background)]
     chain = ["[0:v]split[full][cam]",
@@ -542,7 +542,7 @@ def splice() -> None:
                 if overlays:
                     cards = card_times(src, " ".join(l["text"] for l in covered), overlays)
                     slide = next((l["slide"] for l in covered if l.get("slide")), "cards/stats-bg.png")
-                    stats_slide(out, cards, SRC / slide)
+                    stats_slide(out, cards, SRC / slide, any(l.get("slide_from_start") for l in covered))
                     note = "  slide, cards at " + ", ".join(f"{t:.1f}s" for t, _ in cards)
                 pieces.append(out)
                 print(f"  camera {line:02}{'-' + format(last, '02') if last != line else ''}  {src.name}  {duration(out):.1f}s{note}")

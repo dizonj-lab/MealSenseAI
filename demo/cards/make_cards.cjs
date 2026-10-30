@@ -18,6 +18,23 @@ html, body { width: 1920px; height: 1080px; background: transparent; font-family
 .card .big small { font-size: 52px; font-weight: 700; }
 .card .what { font-size: 36px; font-weight: 600; line-height: 1.3; margin-top: 14px; }
 .card .src { font-size: 21px; font-weight: 500; color: #9fd9c8; margin-top: 16px; line-height: 1.35; }
+.title { position: absolute; left: 150px; top: 178px; font-size: 46px; font-weight: 800; color: #0d2a2e; }
+.tile { position: absolute; width: 375px; height: 215px; background: #fff; border-radius: 18px; border-top: 7px solid #3cb895;
+  box-shadow: 0 8px 28px rgba(13,42,46,.12); padding: 24px 26px; color: #0d2a2e; }
+.tile b { display: block; font-size: 33px; font-weight: 800; margin-bottom: 10px; }
+.tile span { font-size: 21px; font-weight: 500; line-height: 1.35; color: #34545a; }
+.limit { position: absolute; left: 150px; width: 860px; background: #fff; border-radius: 18px; border-left: 8px solid #e8833a;
+  box-shadow: 0 8px 28px rgba(13,42,46,.12); padding: 22px 30px; color: #0d2a2e; }
+.limit b { display: block; font-size: 33px; font-weight: 800; margin-bottom: 8px; }
+.limit span { font-size: 22px; font-weight: 500; line-height: 1.4; color: #34545a; }
+.next { position: absolute; left: 1070px; top: 270px; width: 700px; background: rgba(13,42,46,.94); color: #fff; border-radius: 20px;
+  padding: 28px 34px 26px; border-left: 8px solid #3cb895; }
+.next h3 { font-size: 34px; font-weight: 800; margin-bottom: 18px; }
+.step { display: grid; grid-template-columns: 46px 1fr; gap: 14px; margin-top: 14px; }
+.step i { width: 40px; height: 40px; border-radius: 50%; background: #3cb895; color: #0d2a2e; font: 800 22px Montserrat, Arial;
+  display: grid; place-items: center; font-style: normal; }
+.step b { display: block; font-size: 25px; font-weight: 700; }
+.step span { font-size: 20px; font-weight: 500; color: #b8e6d8; line-height: 1.35; }
 `;
 
 const pages = {
@@ -40,6 +57,26 @@ const pages = {
     <img src="${data('logo.png')}" style="position:absolute;left:70px;top:58px;height:106px">
     <img src="${data('skyline.png')}" style="position:absolute;left:150px;bottom:40px;width:620px;opacity:.55">
   </body>`,
+  'features-bg': `<body style="background:#f0f5f5">
+    <img src="${data('logo.png')}" style="position:absolute;left:70px;top:58px;height:106px">
+    <div class="title">What MealSenseAI measures</div>
+  </body>`,
+  'feat-1': `<body><div class="tile" style="left:150px;top:270px"><b>Foods</b><span>320 dishes; several foods on one plate</span></div></body>`,
+  'feat-2': `<body><div class="tile" style="left:555px;top:270px"><b>Portions</b><span>grams, each with a range</span></div></body>`,
+  'feat-3': `<body><div class="tile" style="left:960px;top:270px"><b>Nutrients</b><span>kcal, carbs, protein, fat, sat. fat, sugar, fibre, sodium</span></div></body>`,
+  'feat-4': `<body><div class="tile" style="left:1365px;top:270px"><b>Blood-sugar effect</b><span>the likely glucose curve after the meal</span></div></body>`,
+  'feat-5': `<body><div class="tile" style="left:150px;top:515px"><b>Glycaemic load</b><span>per food and for the whole meal</span></div></body>`,
+  'feat-6': `<body><div class="tile" style="left:555px;top:515px"><b>Next step</b><span>a practical suggestion, such as a walk after eating</span></div></body>`,
+  'feat-7': `<body><div class="tile" style="left:960px;top:515px"><b>Range & source</b><span>every estimate labelled with its type and range</span></div></body>`,
+  'feat-8': `<body><div class="tile" style="left:1365px;top:515px"><b>You confirm</b><span>nothing is saved until you review it</span></div></body>`,
+  'limits-bg': `<body style="background:#f0f5f5">
+    <img src="${data('logo.png')}" style="position:absolute;left:70px;top:58px;height:106px">
+    <div class="title">Limitations and next steps</div>
+  </body>`,
+  'limit-1': `<body><div class="limit" style="top:270px"><b>Similar dishes get confused</b><span>dumpling &harr; xiao long bao, steak &harr; filet mignon; weakest: mee siam, soto bee hoon, bee hoon</span></div></body>`,
+  'limit-2': `<body><div class="limit" style="top:455px"><b>Portions: margin up to &plusmn;50%</b><span>estimated from one photo; not yet measured against weighed food</span></div></body>`,
+  'limit-3': `<body><div class="limit" style="top:610px"><b>Nutrition values not yet verified</b><span>204 approximated foods, to be checked against an official source</span></div></body>`,
+  'next-steps': `<body><div class="next"><h3>Next: a trial with real users</h3><div class="step"><i>1</i><div><b>Moderated sessions</b><span>5&ndash;8 users try the app with me</span></div></div><div class="step"><i>2</i><div><b>Two-week field trial</b><span>15&ndash;30 participants; weighed portions for portion error</span></div></div><div class="step"><i>3</i><div><b>Verified nutrition source</b><span>a Singapore food table replaces the approximations</span></div></div><div class="step"><i>4</i><div><b>Retrain the model</b><span>consented user photos, focused on the confused local dishes</span></div></div></div></body>`,
   outro: `<body style="background:#f0f5f5">
     <img src="${data('logo.png')}" style="position:absolute;left:70px;top:58px;height:106px">
     <div style="position:absolute;left:0;right:0;top:300px;text-align:center">
