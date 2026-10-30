@@ -2,6 +2,12 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.21 — Video build fix (no app change)
+
+- `demo/run.sh`: the voice container ran as root, so `demo/clips` from an earlier run could not be removed by the
+  next one (`rm: Permission denied`, and the build stopped). `in_voice` now hands what it writes back to the caller,
+  and a new `wipe` removes a folder through the container when a plain `rm` is refused.
+
 ## v0.13.20 — Final presentation kit (no app change)
 
 - `demo/narration-final.json`: 23 segments, about 11 minutes of speech (12–13 with the demo): opening on camera,

@@ -214,3 +214,12 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | `voice.py mine → build → splice` with stand-in takes (two full-screen, two corner) | **PASS**: corner window in the demo stretch, held between lines; final video 16.17 s, audio 16.17 s (no drift) |
 | `record.mjs` with every new figure scene against the local app | **PASS**: all scenes ran; figures fit 1080p and stay clear of the presenter's corner |
 | Not run here | The Buddy run with the real takes |
+
+## v0.13.21: video build fix (30 Oct 2026)
+
+| Test | Result |
+|---|---|
+| `wipe` as an ordinary user on a folder owned by root (Docker stubbed) | **PASS**: plain `rm` refused, falls back to removing it through the voice container; script carries on |
+| `wipe` on the user's own folder | **PASS**: removed directly, no container |
+| `bash -n demo/run.sh` | **PASS** |
+| Not run here | The Buddy run with the real takes (no Docker daemon in this environment) |

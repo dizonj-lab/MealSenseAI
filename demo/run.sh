@@ -66,10 +66,16 @@ voice_image() {
 }
 MODELS_VOLUME=mealsense-demo-models
 docker volume inspect cerebro-demo-models >/dev/null 2>&1 && MODELS_VOLUME=cerebro-demo-models  # Kokoro, already downloaded
-in_voice() {  # run voice.py in the voice container, in folder $1
+in_voice() {  # run voice.py in the voice container, in folder $1; what it writes is handed back to you, not left to root
   docker run --rm -v "$1:/work" -v "$HERE:/demo:ro" -v "$MODELS_VOLUME:/root/.cache" \
     -e VOICE="$VOICE" -e ENGINE=kokoro -e NARRATION="$NARRATION" -e SUBTITLES="${SUBTITLES:-1}" \
-    -e RECORDINGS=/work/recordings -w /work mealsense-demo-voice python /demo/voice.py "$2"
+    -e RECORDINGS=/work/recordings -w /work mealsense-demo-voice \
+    sh -c 'python /demo/voice.py "$1"; rc=$?; chown -R "$2" /work; exit $rc' _ "$2" "$(id -u):$(id -g)"
+}
+wipe() {  # remove a folder, even one an earlier container left owned by root
+  rm -rf "$1" 2>/dev/null && return
+  voice_image
+  docker run --rm -v "$(dirname "$1"):/parent" mealsense-demo-voice rm -rf "/parent/$(basename "$1")"
 }
 
 if [ "$STEP" = samples ]; then
@@ -85,10 +91,10 @@ SCENES_MODE=all
 if [ "$STEP" = mine ]; then
   # Your recordings: the voice-only lines time and narrate the demo; the camera takes are spliced in at the end.
   [ -n "${RECORDINGS:-}" ] && [ -d "$RECORDINGS" ] || { echo "Set RECORDINGS to the folder with your files (01-05.mp4, 06.m4a …)"; exit 1; }
-  rm -rf "$HERE/recordings" && mkdir -p "$HERE/recordings" && cp "$RECORDINGS"/* "$HERE/recordings/"
+  wipe "$HERE/recordings" && mkdir -p "$HERE/recordings" && cp "$RECORDINGS"/* "$HERE/recordings/"
   voice_image
   echo "==> Your recordings: cleaning and measuring the voice-only lines"
-  rm -rf "$HERE/clips"
+  wipe "$HERE/clips"
   in_voice "$HERE" mine
   SCENES_MODE=screen
 fi
@@ -122,13 +128,13 @@ fi
 if [ "$STEP" != record ] && [ "$STEP" != mine ] || [ ! -f "$HERE/clips/durations.json" ]; then
   voice_image
   echo "==> Speaking the narration ($VOICE)"
-  rm -rf "$HERE/clips"
+  wipe "$HERE/clips"
   in_voice "$HERE" speak
 fi
 
 # 2. The recording, in Playwright's own container (its browser, fonts and codecs).
 echo "==> Recording the tour (5 to 12 minutes)"
-rm -rf "$HERE/out"
+wipe "$HERE/out"
 docker run --rm --network host --ipc=host -v "$HERE:/demo" -v "$HERE/../docs/report/charts:/docs/report/charts:ro" -w /demo \
   -e BASE="$BASE" -e OUT=/demo/out -e THEME="$THEME" -e PHOTOS=/demo/photos -e NARRATION="$NARRATION" -e SCENES_MODE="$SCENES_MODE" \
   "mcr.microsoft.com/playwright:v$PLAYWRIGHT-noble" \
