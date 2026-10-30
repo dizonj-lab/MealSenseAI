@@ -1,4 +1,4 @@
-// Renders the video's title, statistic and closing cards at 1920x1080 from the proposal cover's own artwork.
+// Renders the video's title, statistic slide and closing cards at 1920x1080 from the proposal cover's own artwork.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -12,12 +12,12 @@ const css = `
 * { margin: 0; box-sizing: border-box; }
 html, body { width: 1920px; height: 1080px; background: transparent; font-family: Montserrat, Arial, sans-serif; }
 .ink { color: #0d2a2e; } .ai { color: #3cb895; }
-.card { position: absolute; right: 80px; width: 680px; background: rgba(13, 42, 46, .90); color: #fff;
+.card { position: absolute; left: 150px; width: 1060px; background: rgba(13, 42, 46, .90); color: #fff;
   border-radius: 20px; padding: 30px 36px 26px; border-left: 8px solid #3cb895; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
-.card .big { font-size: 76px; font-weight: 800; line-height: 1; letter-spacing: -.01em; }
-.card .big small { font-size: 40px; font-weight: 700; }
-.card .what { font-size: 28px; font-weight: 600; line-height: 1.3; margin-top: 14px; }
-.card .src { font-size: 17px; font-weight: 500; color: #9fd9c8; margin-top: 16px; line-height: 1.35; }
+.card .big { font-size: 96px; font-weight: 800; line-height: 1; letter-spacing: -.01em; }
+.card .big small { font-size: 52px; font-weight: 700; }
+.card .what { font-size: 36px; font-weight: 600; line-height: 1.3; margin-top: 14px; }
+.card .src { font-size: 21px; font-weight: 500; color: #9fd9c8; margin-top: 16px; line-height: 1.35; }
 `;
 
 const pages = {
@@ -27,17 +27,19 @@ const pages = {
     <div class="ink" style="position:absolute;left:146px;top:1045px;font-size:24px;font-weight:600;letter-spacing:.005em">
       Final Presentation <span class="ai" style="margin:0 22px">&bull;</span> Dizon Joselito Villanueva <span class="ai" style="margin:0 22px">&bull;</span> NUS-ISS</div>
   </body>`,
-  'stat-diabetes': `<body><div class="card" style="top:250px">
+  'stat-diabetes': `<body><div class="card" style="top:215px">
     <div class="big">1 in 12</div>
     <div class="what">adults in Singapore live with diabetes (8.5%)</div>
     <div class="src">Ministry of Health, Singapore, 2023</div></div></body>`,
-  'stat-cost': `<body><div class="card" style="top:560px">
-    <div class="big" style="font-size:66px">S$1.0B <small>&rarr;</small> S$2.5B</div>
+  'stat-cost': `<body><div class="card" style="top:575px">
+    <div class="big">S$1.0B <small>&rarr;</small> S$2.5B</div>
     <div class="what">yearly cost of diabetes to Singapore, 2010 &rarr; 2050</div>
     <div class="src">Png et al., BMC Public Health, 2016</div></div></body>`,
-  'stat-price': `<body><div class="card" style="top:560px">
-    <div class="big">S$3.99 <small>/ month</small></div>
-    <div class="what">subscription; meal logging is free<br>(S$2.99 elsewhere in ASEAN)</div></div></body>`,
+  // The slide the statistics sit on; the presenter's take goes in its lower-right corner.
+  'stats-bg': `<body style="background:#f0f5f5">
+    <img src="${data('logo.png')}" style="position:absolute;left:70px;top:58px;height:106px">
+    <img src="${data('skyline.png')}" style="position:absolute;left:150px;bottom:40px;width:620px;opacity:.55">
+  </body>`,
   outro: `<body style="background:#f0f5f5">
     <img src="${data('logo.png')}" style="position:absolute;left:70px;top:58px;height:106px">
     <div style="position:absolute;left:0;right:0;top:300px;text-align:center">

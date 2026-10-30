@@ -232,3 +232,12 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | Frames from that cut | **PASS**: title card; first card only at 4 s into the take; both cards at 10 s; closing card |
 | `run.sh splice` with Docker stubbed | **PASS**: picks the latest build, copies the current script into it, runs the splice; refuses a folder without recordings |
 | Not run here | The Buddy re-splice with the real takes |
+
+## v0.13.23: statistics as slides (30 Oct 2026)
+
+| Test | Result |
+|---|---|
+| "burden" stand-in take (first number at 1.4 s) | **PASS**: whole take is the slide, take in the lower-right corner, both cards fade in; 24.97 s video, 24.99 s audio |
+| A 40 s stand-in take with its number at 31.6 s | **PASS**: full screen, then fades to the slide; 39.97 s video, 39.99 s audio |
+| Both joined with `-c copy` | **PASS**: 65.0 s, no drift |
+| Not run here | The Buddy re-splice with the real takes |

@@ -450,7 +450,7 @@ def card(image: Path, seconds: float, out: Path) -> None:
 
 
 def card_times(src: Path, text: str, overlays: list[dict]) -> list[tuple[float, Path]]:
-    """When each statistic card appears in a camera take: at the share of the speech where its words fall
+    """When each statistic card appears on its slide: at the share of the speech where its words fall
     (speech is near enough even in pace), a moment early so the number is up as it is said."""
     s0, s1 = speech_bounds(src)
     words = text.split()
@@ -464,22 +464,35 @@ def card_times(src: Path, text: str, overlays: list[dict]) -> list[tuple[float, 
     return out
 
 
-def overlay_cards(piece: Path, cards: list[tuple[float, Path]]) -> None:
-    """Statistic cards over a camera take (full-frame transparent images): each fades in when its words are
-    spoken and stays until the take ends."""
+def stats_slide(piece: Path, cards: list[tuple[float, Path]], background: Path) -> None:
+    """A camera take that gives numbers: from the first number on, the take moves to the lower-right corner of a
+    slide (as over the demo) and each statistic card fades in on the slide as its words are spoken. When the first
+    number comes within two seconds, the whole take is the slide."""
     length = duration(piece)
-    inputs, chain, last = ["-i", str(piece)], [], "0:v"
-    for n, (at, image) in enumerate(cards, 1):
-        at = min(max(0.0, at), max(0.0, length - 1.5))
-        out = max(at + 0.5, length - 0.6)
+    first = min(at for at, _ in cards)
+    switch = 0.0 if first < 2.0 else min(first, length - 1.0) - 0.2
+    fit = f"fps=30,format=yuv420p,setsar=1,settb=AVTB"
+    inputs = ["-i", str(piece), "-loop", "1", "-framerate", "30", "-t", f"{length:.3f}", "-i", str(background)]
+    chain = ["[0:v]split[full][cam]",
+             f"[cam]scale={PIP_W}:-2,pad=iw+6:ih+6:3:3:color=white[pip]", "[1:v]format=rgba[s1]"]
+    last = "s1"
+    for n, (at, image) in enumerate(cards, 2):
+        at = min(max(switch, at), max(0.0, length - 1.5))
         inputs += ["-loop", "1", "-framerate", "30", "-t", f"{length:.3f}", "-i", str(image)]
-        chain.append(f"[{n}:v]format=rgba,fade=t=in:st={at:.3f}:d=0.5:alpha=1,fade=t=out:st={out:.3f}:d=0.4:alpha=1[c{n}]")
-        chain.append(f"[{last}][c{n}]overlay=0:0:eof_action=pass[v{n}]")
-        last = f"v{n}"
-    tmp = piece.with_name(piece.stem + "-cards.mp4")
-    run("ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(chain) + f";[{last}]format=yuv420p[out]",
+        chain.append(f"[{n}:v]format=rgba,fade=t=in:st={at:.3f}:d=0.5:alpha=1[c{n}]")
+        chain.append(f"[{last}][c{n}]overlay=0:0[s{n}]")
+        last = f"s{n}"
+    chain.append(f"[{last}][pip]overlay=W-w-{PIP_MARGIN}:H-h-{PIP_MARGIN},"
+                 f"fade=t=out:st={max(0.0, length - 0.25):.3f}:d=0.25,{fit}[slide]")
+    if switch <= 0:
+        chain.append("[full]nullsink;[slide]copy[out]")
+    else:
+        chain.append(f"[full]{fit}[a];[slide]trim=start={switch:.3f},setpts=PTS-STARTPTS[b];"
+                     f"[a][b]xfade=transition=fade:duration=0.4:offset={switch:.3f}[out]")
+    tmp = piece.with_name(piece.stem + "-slide.mp4")
+    run("ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(chain),
         "-map", "[out]", "-map", "0:a", "-t", f"{length:.3f}", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-        "-c:a", "copy", str(tmp))
+        "-pix_fmt", "yuv420p", "-c:a", "copy", str(tmp))
     tmp.replace(piece)
 
 
@@ -528,8 +541,9 @@ def splice() -> None:
                 note = ""
                 if overlays:
                     cards = card_times(src, " ".join(l["text"] for l in covered), overlays)
-                    overlay_cards(out, cards)
-                    note = "  cards at " + ", ".join(f"{t:.1f}s" for t, _ in cards)
+                    slide = next((l["slide"] for l in covered if l.get("slide")), "cards/stats-bg.png")
+                    stats_slide(out, cards, SRC / slide)
+                    note = "  slide, cards at " + ", ".join(f"{t:.1f}s" for t, _ in cards)
                 pieces.append(out)
                 print(f"  camera {line:02}{'-' + format(last, '02') if last != line else ''}  {src.name}  {duration(out):.1f}s{note}")
                 line = last + 1

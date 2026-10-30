@@ -2,6 +2,13 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.23 — Statistics as slides (no app change)
+
+- A camera line with `overlays` now becomes a slide (`cards/stats-bg.png`) with the take in the lower-right corner,
+  as over the demo, and the cards fade in on the slide. If the first number comes within two seconds the whole take
+  is the slide; otherwise the take plays full screen and fades to the slide at the first number.
+- The price card is dropped: "value" stays full screen. Only "burden" carries statistics (1 in 12; S$1.0B → S$2.5B).
+
 ## v0.13.22 — Title, statistics and closing cards (no app change)
 
 - `demo/cards/`: the title card (the proposal cover, its footer line reset to "Final Presentation"), statistic cards

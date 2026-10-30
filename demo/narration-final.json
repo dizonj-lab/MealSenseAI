@@ -81,13 +81,7 @@
    "part": "Opening",
    "title": "What MealSenseAI is",
    "mode": "camera",
-   "text": "MealSenseAI turns one photo of a meal into the foods, their portions and their nutrients, and then into meaning: the likely effect on blood sugar, the glycaemic load and a practical next step. Every estimate shows its range and where it came from, and nothing is saved until you confirm it. It's for anyone who wants to understand their food, and I start with people with Type 1 and Type 2 diabetes, where the need is sharpest. Logging is free, and the subscription is three ninety-nine a month. Let me show you the current version.",
-   "overlays": [
-    {
-     "image": "cards/stat-price.png",
-     "at": "Logging is free"
-    }
-   ]
+   "text": "MealSenseAI turns one photo of a meal into the foods, their portions and their nutrients, and then into meaning: the likely effect on blood sugar, the glycaemic load and a practical next step. Every estimate shows its range and where it came from, and nothing is saved until you confirm it. It's for anyone who wants to understand their food, and I start with people with Type 1 and Type 2 diabetes, where the need is sharpest. Logging is free, and the subscription is three ninety-nine a month. Let me show you the current version."
   },
   {
    "id": "dashboard",
