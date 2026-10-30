@@ -391,7 +391,8 @@ def build() -> None:
 # --- Splicing your camera takes with the demo --------------------------------------------------
 
 FRAME = ("scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,"
-         "fps=30,format=yuv420p")
+         "fps=30,format=yuv420p,setsar=1")
+CARD_FADE = 0.8      # a title or closing card fades in and out this long
 
 
 def normalise(src: Path, out: Path, start: float | None = None, end: float | None = None, fade: float = 0.0) -> None:
@@ -432,6 +433,56 @@ def overlay_presenter(piece: Path, pips: list, where: dict, start: float, end: f
     tmp.replace(piece)
 
 
+def card(image: Path, seconds: float, out: Path) -> None:
+    """A still card (the title or the closing), faded in and out, over the opening of the music bed."""
+    import music
+    bed = out.with_suffix(".wav")
+    music.write(str(bed), music.bed(seconds + 1))
+    f, end = CARD_FADE, seconds - CARD_FADE
+    run("ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30", "-t", f"{seconds:.3f}", "-i", str(image),
+        "-i", str(bed), "-vf", FRAME + f",fade=t=in:d={f},fade=t=out:st={end:.3f}:d={f}",
+        # Quieter than the voice (-16 LUFS): music alone should not jump out between talking pieces.
+        "-af", f"loudnorm=I=-24:TP=-2:LRA=11,aresample=48000,aformat=channel_layouts=stereo,"
+               f"afade=t=in:d={f},afade=t=out:st={end:.3f}:d={f},apad",
+        "-t", f"{seconds:.3f}", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+        "-c:a", "aac", "-b:a", "192k", "-ar", "48000", str(out))
+    bed.unlink(missing_ok=True)
+
+
+def card_times(src: Path, text: str, overlays: list[dict]) -> list[tuple[float, Path]]:
+    """When each statistic card appears in a camera take: at the share of the speech where its words fall
+    (speech is near enough even in pace), a moment early so the number is up as it is said."""
+    s0, s1 = speech_bounds(src)
+    words = text.split()
+    out = []
+    for o in overlays:
+        at = text.lower().find(o["at"].lower())
+        if at < 0:
+            sys.exit(f"Overlay {o['image']}: '{o['at']}' is not in the line's text")
+        k = len(text[:at].split())
+        out.append((s0 + (s1 - s0) * k / max(1, len(words)) - 0.3, SRC / o["image"]))
+    return out
+
+
+def overlay_cards(piece: Path, cards: list[tuple[float, Path]]) -> None:
+    """Statistic cards over a camera take (full-frame transparent images): each fades in when its words are
+    spoken and stays until the take ends."""
+    length = duration(piece)
+    inputs, chain, last = ["-i", str(piece)], [], "0:v"
+    for n, (at, image) in enumerate(cards, 1):
+        at = min(max(0.0, at), max(0.0, length - 1.5))
+        out = max(at + 0.5, length - 0.6)
+        inputs += ["-loop", "1", "-framerate", "30", "-t", f"{length:.3f}", "-i", str(image)]
+        chain.append(f"[{n}:v]format=rgba,fade=t=in:st={at:.3f}:d=0.5:alpha=1,fade=t=out:st={out:.3f}:d=0.4:alpha=1[c{n}]")
+        chain.append(f"[{last}][c{n}]overlay=0:0:eof_action=pass[v{n}]")
+        last = f"v{n}"
+    tmp = piece.with_name(piece.stem + "-cards.mp4")
+    run("ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(chain) + f";[{last}]format=yuv420p[out]",
+        "-map", "[out]", "-map", "0:a", "-t", f"{length:.3f}", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+        "-c:a", "copy", str(tmp))
+    tmp.replace(piece)
+
+
 def splice() -> None:
     """The final cut: in script order, each run of camera lines is your own take, and each run of screen lines is
     its stretch of the recorded demo (built.json says where each scene landed). The demo stretches are also kept
@@ -454,6 +505,12 @@ def splice() -> None:
     pieces_dir = HERE / "pieces"
     pieces_dir.mkdir(exist_ok=True)
     pieces, n_screen = [], 0
+    meta = script()
+    if meta.get("intro_card"):
+        out = pieces_dir / "00-intro.mp4"
+        card(SRC / meta["intro_card"]["image"], float(meta["intro_card"].get("seconds", 5)), out)
+        pieces.append(out)
+        print(f"  intro card  {meta['intro_card']['image']}  {duration(out):.1f}s")
     for mode, a, b in runs:
         if mode == "camera":
             line = a
@@ -466,8 +523,15 @@ def splice() -> None:
                     sys.exit(f"{src.name} has no video; camera lines need a video take")
                 out = pieces_dir / f"{len(pieces):02}-camera-{line:02}.mp4"
                 normalise(src, out, fade=0.25)
+                covered = want[line - 1:last]
+                overlays = [o for l in covered for o in l.get("overlays", [])]
+                note = ""
+                if overlays:
+                    cards = card_times(src, " ".join(l["text"] for l in covered), overlays)
+                    overlay_cards(out, cards)
+                    note = "  cards at " + ", ".join(f"{t:.1f}s" for t, _ in cards)
                 pieces.append(out)
-                print(f"  camera {line:02}{'-' + format(last, '02') if last != line else ''}  {src.name}  {duration(out):.1f}s")
+                print(f"  camera {line:02}{'-' + format(last, '02') if last != line else ''}  {src.name}  {duration(out):.1f}s{note}")
                 line = last + 1
         else:
             ids = [want[k - 1]["id"] for k in range(a, b + 1)]
@@ -485,6 +549,11 @@ def splice() -> None:
                 overlay_presenter(out, pips, where, start, end if end is not None else built["final"])
             pieces.append(out)
             print(f"  screen {a:02}-{b:02}  demo {start:.1f}–{end if end is not None else built['final']:.1f}s  → {keep.name}")
+    if meta.get("outro_card"):
+        out = pieces_dir / f"{len(pieces):02}-outro.mp4"
+        card(SRC / meta["outro_card"]["image"], float(meta["outro_card"].get("seconds", 7)), out)
+        pieces.append(out)
+        print(f"  outro card  {meta['outro_card']['image']}  {duration(out):.1f}s")
     (pieces_dir / "list.txt").write_text("".join(f"file '{p.name}'\n" for p in pieces))
     final = HERE / f"{name}-final.mp4"
     run("ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(pieces_dir / "list.txt"),

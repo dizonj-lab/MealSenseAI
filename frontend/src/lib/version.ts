@@ -1,7 +1,10 @@
 /** App version (kept in step with backend/app/version.py) and high-level release notes, newest first. */
-export const APP_VERSION = '0.13.21'
+export const APP_VERSION = '0.13.22'
 
 export const CHANGELOG: { version: string; title: string; changes: string[] }[] = [
+  { version: '0.13.22', title: 'Title, statistics and closing cards', changes: [
+    'Behind the scenes: the presentation video opens on a title card, shows the statistics as they are spoken, and closes on a MealSenseAI card; no change to the app',
+  ] },
   { version: '0.13.21', title: 'Video build fix', changes: [
     'Behind the scenes: the presentation video build no longer stops on files an earlier run left owned by the system; no change to the app',
   ] },

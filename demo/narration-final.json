@@ -1,6 +1,14 @@
 {
  "voice_note": "Final presentation: the presenter on camera for the opening and close, and in a corner (picture-in-picture) over the app demo, the evaluation figures and the system design.",
  "output": "MealSenseAI-final-presentation",
+ "intro_card": {
+  "image": "cards/intro.png",
+  "seconds": 5
+ },
+ "outro_card": {
+  "image": "cards/outro.png",
+  "seconds": 7
+ },
  "pronounce": {
   "MealSenseAI": [
    "[MealSenseAI](/mˈil sˈɛns ˌAˈI/)",
@@ -56,14 +64,30 @@
    "part": "Opening",
    "title": "Why it matters",
    "mode": "camera",
-   "text": "This matters. About one adult in twelve in Singapore lives with diabetes, and a national study put the yearly cost of diabetes to Singapore at about one billion dollars in 2010, rising to two and a half billion by 2050. Diabetes is managed one meal at a time, and most of those meals have no label."
+   "text": "This matters. About one adult in twelve in Singapore lives with diabetes, and a national study put the yearly cost of diabetes to Singapore at about one billion dollars in 2010, rising to two and a half billion by 2050. Diabetes is managed one meal at a time, and most of those meals have no label.",
+   "overlays": [
+    {
+     "image": "cards/stat-diabetes.png",
+     "at": "About one adult in twelve"
+    },
+    {
+     "image": "cards/stat-cost.png",
+     "at": "a national study"
+    }
+   ]
   },
   {
    "id": "value",
    "part": "Opening",
    "title": "What MealSenseAI is",
    "mode": "camera",
-   "text": "MealSenseAI turns one photo of a meal into the foods, their portions and their nutrients, and then into meaning: the likely effect on blood sugar, the glycaemic load and a practical next step. Every estimate shows its range and where it came from, and nothing is saved until you confirm it. It's for anyone who wants to understand their food, and I start with people with Type 1 and Type 2 diabetes, where the need is sharpest. Logging is free, and the subscription is three ninety-nine a month. Let me show you the current version."
+   "text": "MealSenseAI turns one photo of a meal into the foods, their portions and their nutrients, and then into meaning: the likely effect on blood sugar, the glycaemic load and a practical next step. Every estimate shows its range and where it came from, and nothing is saved until you confirm it. It's for anyone who wants to understand their food, and I start with people with Type 1 and Type 2 diabetes, where the need is sharpest. Logging is free, and the subscription is three ninety-nine a month. Let me show you the current version.",
+   "overlays": [
+    {
+     "image": "cards/stat-price.png",
+     "at": "Logging is free"
+    }
+   ]
   },
   {
    "id": "dashboard",

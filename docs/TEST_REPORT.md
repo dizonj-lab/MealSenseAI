@@ -223,3 +223,12 @@ Executed locally (CPU, Python venv + PostgreSQL 16, built frontend served by the
 | `wipe` on the user's own folder | **PASS**: removed directly, no container |
 | `bash -n demo/run.sh` | **PASS** |
 | Not run here | The Buddy run with the real takes (no Docker daemon in this environment) |
+
+## v0.13.22: title, statistics and closing cards (30 Oct 2026)
+
+| Test | Result |
+|---|---|
+| Title card + a 25 s stand-in camera take with both statistic cards + closing card, joined with `-c copy` | **PASS**: 5 s + 25 s + 7 s = 37.0 s video, 37.02 s audio; every piece 1920×1080, 30 fps, square pixels, 48 kHz stereo |
+| Frames from that cut | **PASS**: title card; first card only at 4 s into the take; both cards at 10 s; closing card |
+| `run.sh splice` with Docker stubbed | **PASS**: picks the latest build, copies the current script into it, runs the splice; refuses a folder without recordings |
+| Not run here | The Buddy re-splice with the real takes |

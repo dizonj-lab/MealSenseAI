@@ -17,6 +17,9 @@
 #   NARRATION=narration-final.json ./demo/run.sh script         RECORDING-SCRIPT-MealSenseAI-final-presentation.md
 #   NARRATION=narration-final.json RECORDINGS=~/mealsense-final ./demo/run.sh mine
 #        your voice over the demo, then your camera takes spliced in → ~/mealsense-demo-<time>/…-final.mp4
+#   NARRATION=narration-final.json ./demo/run.sh splice [~/mealsense-demo-<time>]
+#        join that build again (the latest if none is named) with the current title, statistic and closing
+#        cards: no recording, a few minutes
 #
 #   VOICE=am_michael ./demo/run.sh voice     another Kokoro voice (af_sarah is the default)
 #
@@ -50,8 +53,8 @@ case "$STEP" in
   script)
     NARRATION="$NARRATION" python3 voice.py script
     exit 0 ;;
-  all|record|voice|samples|mine) ;;
-  *) echo "usage: $0 [all|record|voice|samples|script|mine|down]"; exit 1 ;;
+  all|record|voice|samples|mine|splice) ;;
+  *) echo "usage: $0 [all|record|voice|samples|script|mine|splice|down]"; exit 1 ;;
 esac
 
 # The voice image is the same as CEREBRO's demo; reuse it if CEREBRO's was built here.
@@ -84,6 +87,21 @@ if [ "$STEP" = samples ]; then
   docker run --rm -v "$HOME/mealsense-voice-samples:/work" -v "$HERE:/demo:ro" -v "$MODELS_VOLUME:/root/.cache" \
     -w /work mealsense-demo-voice python /demo/voice.py samples
   echo "==> Samples in ~/mealsense-voice-samples/voice-samples/. Listen, then: VOICE=<name> ./demo/run.sh"
+  exit 0
+fi
+
+if [ "$STEP" = splice ]; then
+  # Join an earlier build again with the current cards: your takes and the recorded demo are reused as they are.
+  DEST="${2:-$(ls -d "$HOME"/mealsense-demo-*/ 2>/dev/null | sort | tail -1)}"
+  DEST="${DEST%/}"
+  [ -f "$DEST/built.json" ] && [ -d "$DEST/recordings" ] || { echo "No earlier build with your recordings in '$DEST'"; exit 1; }
+  cp "$HERE/$NARRATION" "$DEST/"
+  voice_image
+  echo "==> Splicing again in $DEST"
+  in_voice "$DEST" splice
+  echo
+  echo "==> Done: $DEST/$OUTPUT-final.mp4"
+  echo "    On your Mac:  scp 'admin@<buddy>:$DEST/$OUTPUT-final.mp4' ~/Downloads/"
   exit 0
 fi
 
@@ -163,4 +181,8 @@ else
   echo "==> Done: $DEST/$OUTPUT.mp4"
 fi
 echo "    Photo credits (for the description): $DEST/PHOTO-CREDITS.md"
-echo "    On your Mac:  scp 'admin@<buddy>:$DEST/MealSenseAI-demo.mp4' ~/Downloads/"
+if [ "$STEP" = mine ]; then
+  echo "    On your Mac:  scp 'admin@<buddy>:$DEST/$OUTPUT-final.mp4' ~/Downloads/"
+else
+  echo "    On your Mac:  scp 'admin@<buddy>:$DEST/$OUTPUT.mp4' ~/Downloads/"
+fi

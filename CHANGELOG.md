@@ -2,6 +2,16 @@
 
 High-level changes per release. The running version is shown next to the logo and on the About page.
 
+## v0.13.22 — Title, statistics and closing cards (no app change)
+
+- `demo/cards/`: the title card (the proposal cover, its footer line reset to "Final Presentation"), statistic cards
+  and a closing card ("Understand your food. Make healthier choices."), rendered at 1080p by `make_cards.cjs`.
+- `narration-final.json`: `intro_card` and `outro_card` (5 s and 7 s, fading in and out over the music), and
+  `overlays` on the camera lines: 1 in 12 adults (MOH 2023) and S$1.0B → S$2.5B (Png et al. 2016) on "burden",
+  the price on "value". Each card fades in where its words fall in the take's speech and stays to the end.
+- `run.sh splice [folder]`: joins an earlier build again with the current cards, reusing your takes and the
+  recorded demo; a few minutes instead of a full run. The closing hint now names the file that was made.
+
 ## v0.13.21 — Video build fix (no app change)
 
 - `demo/run.sh`: the voice container ran as root, so `demo/clips` from an earlier run could not be removed by the
